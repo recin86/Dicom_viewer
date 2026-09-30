@@ -1,0 +1,4 @@
+# Unredacted build diagnostics are local only.
+*.log
+results/*-time.txt
+results/*-build.txt

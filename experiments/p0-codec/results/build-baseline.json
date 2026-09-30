@@ -1,0 +1,465 @@
+{
+  "profile": "baseline",
+  "features_requested": [
+    "baseline"
+  ],
+  "binary_sha256": "227440887a25615ea1c0700ed4f011579a86c9a59ec424d9c7cfd3b174fbb29a",
+  "source_sha256": "fd7c59ffae75abeeba97bc723a8adcd55e9897938c9c34f2e7990123fe030683",
+  "source_files_sha256": {
+    "bench_memory.py": "9208adbcb76564533a7115241706a0969ce4bf5783ec3c79cf0da88828ad3f38",
+    "record_build.py": "e05160490d312e056481ab6da3c13a4c081c030b6a44309ecc8e1c90e22da856",
+    "reference/common.py": "77c7dcef3d80be2717305591a5455b6cfd78c874c256687f1d0c5a6dc49c538c",
+    "reference/fixtures.py": "9ee7f790273847cf127cc19a114d6d6160805f95ab80b77420c3b3fca0a67e09",
+    "reference/run.py": "0d1d3e9038847390d41c951a2e6324131f41f968bf5413a1a3e2a841fc56d344",
+    "reference/test_runner.py": "68503b6407101d1e0ac6addcd2700190608e3c0f2ec6c4b3fc5eedc6b77a196d",
+    "requirements.txt": "2217996c42dd11aece513cf0f38a0407980675ff28649d234c62af92b16dc55a",
+    "run.sh": "cfac7350288f1280b1737f995c3884db0b1f05b323ec345b2f0dfe8ae9fb1245",
+    "rust/Cargo.lock": "fd1e5ee87ab7c28d7b459d5843fe56dfd85d064418de311db0cc6716f8c67a6e",
+    "rust/Cargo.toml": "98c196eea95cb21bf39425a65f96a1cbdee98b428a015caeb649a5517ccb52b9",
+    "rust/rust-toolchain.toml": "887f9be066a15585a2c583578e84b0fcb541126d81546276bad3d2ff00d61167",
+    "rust/src/main.rs": "c6db6769389f3f587815d675cde0349a6297b438395e03efa1c03f3c4bb8da1d"
+  },
+  "packages": [
+    {
+      "name": "adler2",
+      "version": "2.0.1",
+      "license": "0BSD OR MIT OR Apache-2.0",
+      "features": []
+    },
+    {
+      "name": "autocfg",
+      "version": "1.5.1",
+      "license": "Apache-2.0 OR MIT",
+      "features": []
+    },
+    {
+      "name": "byteorder",
+      "version": "1.5.0",
+      "license": "Unlicense OR MIT",
+      "features": [
+        "default",
+        "i128",
+        "std"
+      ]
+    },
+    {
+      "name": "byteordered",
+      "version": "0.6.0",
+      "license": "MIT OR Apache-2.0",
+      "features": []
+    },
+    {
+      "name": "cfg-if",
+      "version": "1.0.5",
+      "license": "MIT OR Apache-2.0",
+      "features": []
+    },
+    {
+      "name": "chrono",
+      "version": "0.4.45",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "alloc",
+        "clock",
+        "iana-time-zone",
+        "now",
+        "std",
+        "winapi",
+        "windows-link"
+      ]
+    },
+    {
+      "name": "core-foundation-sys",
+      "version": "0.8.7",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "default",
+        "link"
+      ]
+    },
+    {
+      "name": "crc32fast",
+      "version": "1.5.2",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "dicom-core",
+      "version": "0.10.0",
+      "license": "MIT OR Apache-2.0",
+      "features": []
+    },
+    {
+      "name": "dicom-dictionary-std",
+      "version": "0.10.0",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "dicom-encoding",
+      "version": "0.10.0",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "dicom-object",
+      "version": "0.10.0",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "default",
+        "deflate"
+      ]
+    },
+    {
+      "name": "dicom-parser",
+      "version": "0.10.0",
+      "license": "MIT OR Apache-2.0",
+      "features": []
+    },
+    {
+      "name": "dicom-pixeldata",
+      "version": "0.10.0",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "deflate",
+        "jpeg",
+        "native",
+        "rle"
+      ]
+    },
+    {
+      "name": "dicom-transfer-syntax-registry",
+      "version": "0.10.0",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "deflate",
+        "jpeg",
+        "jpeg-decoder",
+        "jpeg-encoder",
+        "native",
+        "rle"
+      ]
+    },
+    {
+      "name": "either",
+      "version": "1.18.0",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "default",
+        "std",
+        "use_std"
+      ]
+    },
+    {
+      "name": "encoding",
+      "version": "0.2.33",
+      "license": "MIT",
+      "features": []
+    },
+    {
+      "name": "encoding-index-japanese",
+      "version": "1.20141219.5",
+      "license": "CC0-1.0",
+      "features": []
+    },
+    {
+      "name": "encoding-index-korean",
+      "version": "1.20141219.5",
+      "license": "CC0-1.0",
+      "features": []
+    },
+    {
+      "name": "encoding-index-simpchinese",
+      "version": "1.20141219.5",
+      "license": "CC0-1.0",
+      "features": []
+    },
+    {
+      "name": "encoding-index-singlebyte",
+      "version": "1.20141219.5",
+      "license": "CC0-1.0",
+      "features": []
+    },
+    {
+      "name": "encoding-index-tradchinese",
+      "version": "1.20141219.5",
+      "license": "CC0-1.0",
+      "features": []
+    },
+    {
+      "name": "encoding_index_tests",
+      "version": "0.1.4",
+      "license": "CC0-1.0",
+      "features": []
+    },
+    {
+      "name": "flate2",
+      "version": "1.1.10",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "any_impl",
+        "default",
+        "miniz_oxide",
+        "runtime_detection",
+        "rust_backend"
+      ]
+    },
+    {
+      "name": "heck",
+      "version": "0.5.0",
+      "license": "MIT OR Apache-2.0",
+      "features": []
+    },
+    {
+      "name": "iana-time-zone",
+      "version": "0.1.65",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "fallback"
+      ]
+    },
+    {
+      "name": "itertools",
+      "version": "0.14.0",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "default",
+        "use_alloc",
+        "use_std"
+      ]
+    },
+    {
+      "name": "itoa",
+      "version": "1.0.18",
+      "license": "MIT OR Apache-2.0",
+      "features": []
+    },
+    {
+      "name": "jpeg-decoder",
+      "version": "0.3.2",
+      "license": "MIT OR Apache-2.0",
+      "features": []
+    },
+    {
+      "name": "jpeg-encoder",
+      "version": "0.7.1",
+      "license": "(MIT OR Apache-2.0) AND IJG",
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "lazy_static",
+      "version": "1.5.0",
+      "license": "MIT OR Apache-2.0",
+      "features": []
+    },
+    {
+      "name": "memchr",
+      "version": "2.8.3",
+      "license": "Unlicense OR MIT",
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "miniz_oxide",
+      "version": "0.9.1",
+      "license": "MIT OR Zlib OR Apache-2.0",
+      "features": [
+        "default",
+        "simd",
+        "simd-adler32",
+        "with-alloc"
+      ]
+    },
+    {
+      "name": "num-traits",
+      "version": "0.2.19",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "once_cell",
+      "version": "1.21.4",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "alloc",
+        "default",
+        "race",
+        "std"
+      ]
+    },
+    {
+      "name": "p0-codec",
+      "version": "0.1.0",
+      "license": null,
+      "features": [
+        "baseline"
+      ]
+    },
+    {
+      "name": "pin-project-lite",
+      "version": "0.2.17",
+      "license": "Apache-2.0 OR MIT",
+      "features": []
+    },
+    {
+      "name": "proc-macro2",
+      "version": "1.0.107",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "default",
+        "proc-macro"
+      ]
+    },
+    {
+      "name": "quote",
+      "version": "1.0.47",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "default",
+        "proc-macro"
+      ]
+    },
+    {
+      "name": "safe-transmute",
+      "version": "0.11.3",
+      "license": "MIT",
+      "features": [
+        "alloc",
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "serde_core",
+      "version": "1.0.229",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "result",
+        "std"
+      ]
+    },
+    {
+      "name": "serde_json",
+      "version": "1.0.149",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "simd-adler32",
+      "version": "0.3.10",
+      "license": "MIT",
+      "features": []
+    },
+    {
+      "name": "smallvec",
+      "version": "1.16.2",
+      "license": "MIT OR Apache-2.0",
+      "features": []
+    },
+    {
+      "name": "snafu",
+      "version": "0.9.2",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "alloc",
+        "default",
+        "rust_1_81",
+        "std"
+      ]
+    },
+    {
+      "name": "snafu-derive",
+      "version": "0.9.2",
+      "license": "MIT OR Apache-2.0",
+      "features": []
+    },
+    {
+      "name": "syn",
+      "version": "2.0.119",
+      "license": "MIT OR Apache-2.0",
+      "features": [
+        "clone-impls",
+        "derive",
+        "extra-traits",
+        "full",
+        "parsing",
+        "printing",
+        "proc-macro",
+        "visit-mut"
+      ]
+    },
+    {
+      "name": "tracing",
+      "version": "0.1.44",
+      "license": "MIT",
+      "features": [
+        "attributes",
+        "default",
+        "std",
+        "tracing-attributes"
+      ]
+    },
+    {
+      "name": "tracing-attributes",
+      "version": "0.1.31",
+      "license": "MIT",
+      "features": []
+    },
+    {
+      "name": "tracing-core",
+      "version": "0.1.36",
+      "license": "MIT",
+      "features": [
+        "once_cell",
+        "std"
+      ]
+    },
+    {
+      "name": "unicode-ident",
+      "version": "1.0.26",
+      "license": "(MIT OR Apache-2.0) AND Unicode-3.0",
+      "features": []
+    },
+    {
+      "name": "zlib-rs",
+      "version": "0.6.8",
+      "license": "Zlib",
+      "features": [
+        "rust-allocator",
+        "std"
+      ]
+    },
+    {
+      "name": "zmij",
+      "version": "1.0.23",
+      "license": "MIT",
+      "features": []
+    }
+  ],
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "deployment_target": "27.0",
+  "minimum_os_from_binary": "27.0",
+  "linked_libraries": [
+    "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+    "/usr/lib/libSystem.B.dylib"
+  ],
+  "mode": "release",
+  "architecture": "aarch64-apple-darwin"
+}

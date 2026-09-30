@@ -1,0 +1,32 @@
+[package]
+name = "p0-codec"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.98.1"
+publish = false
+
+[features]
+default = []
+baseline = [
+    "dicom-object/deflate",
+    "dicom-pixeldata/native",
+    "dicom-transfer-syntax-registry/native",
+    "dicom-transfer-syntax-registry/deflate",
+]
+charls = ["dicom-pixeldata/charls", "dicom-transfer-syntax-registry/charls"]
+openjp2 = ["dicom-pixeldata/openjp2", "dicom-transfer-syntax-registry/openjp2"]
+openjpeg-sys = ["dicom-pixeldata/openjpeg-sys", "dicom-transfer-syntax-registry/openjpeg-sys"]
+combined = ["baseline", "charls", "openjp2"]
+combined-c = ["baseline", "charls", "openjpeg-sys"]
+
+[dependencies]
+dicom-object = { version = "=0.10.0", default-features = false }
+dicom-pixeldata = { version = "=0.10.0", default-features = false }
+dicom-transfer-syntax-registry = { version = "=0.10.0", default-features = false }
+serde_json = "=1.0.149"
+
+[profile.release]
+panic = "unwind"
+
+# An isolated P0 experiment; it is deliberately not a product workspace member.
+[workspace]

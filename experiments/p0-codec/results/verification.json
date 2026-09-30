@@ -1,0 +1,190 @@
+{
+  "task_id": "P0-CODEC-20260930",
+  "base_commit": "ea7e2b351fad35a1e8871e6e21bf226739913d67",
+  "fixture_count": 381,
+  "public_fixture_count": 331,
+  "synthetic_fixture_count": 50,
+  "normal_synthetic_count": 42,
+  "malformed_synthetic_count": 8,
+  "profile_count": 6,
+  "runs": [
+    {
+      "profile": "baseline",
+      "counts": {
+        "pass": 253,
+        "fail": 59,
+        "not-run": 10,
+        "not-applicable": 59
+      },
+      "binary_sha256": "227440887a25615ea1c0700ed4f011579a86c9a59ec424d9c7cfd3b174fbb29a",
+      "source_sha256": "fd7c59ffae75abeeba97bc723a8adcd55e9897938c9c34f2e7990123fe030683",
+      "source_hashes_unchanged": true,
+      "inventory_hashes_match": true,
+      "exact_artifact_provenance": "pass",
+      "minimum_os": "27.0",
+      "linked_libraries": [
+        "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+        "/usr/lib/libSystem.B.dylib"
+      ]
+    },
+    {
+      "profile": "charls",
+      "counts": {
+        "pass": 264,
+        "fail": 53,
+        "not-applicable": 59,
+        "not-run": 5
+      },
+      "binary_sha256": "9d4f6c7ccfddc30d5f3fef248bb625bd020cfc7c77b523e9c8e6367ab6e8be23",
+      "source_sha256": "fd7c59ffae75abeeba97bc723a8adcd55e9897938c9c34f2e7990123fe030683",
+      "source_hashes_unchanged": true,
+      "inventory_hashes_match": true,
+      "exact_artifact_provenance": "pass",
+      "minimum_os": "27.0",
+      "linked_libraries": [
+        "/usr/lib/libc++.1.dylib",
+        "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+        "/usr/lib/libSystem.B.dylib"
+      ]
+    },
+    {
+      "profile": "openjp2",
+      "counts": {
+        "pass": 273,
+        "fail": 39,
+        "not-run": 10,
+        "not-applicable": 59
+      },
+      "binary_sha256": "e066568948ea608c07c868fa0ed6894db919094f48043ae35bbe8da83a323f9c",
+      "source_sha256": "fd7c59ffae75abeeba97bc723a8adcd55e9897938c9c34f2e7990123fe030683",
+      "source_hashes_unchanged": true,
+      "inventory_hashes_match": true,
+      "exact_artifact_provenance": "pass",
+      "minimum_os": "27.0",
+      "linked_libraries": [
+        "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+        "/usr/lib/libSystem.B.dylib"
+      ]
+    },
+    {
+      "profile": "openjpeg",
+      "counts": {
+        "pass": 273,
+        "fail": 39,
+        "not-run": 10,
+        "not-applicable": 59
+      },
+      "binary_sha256": "5b823a3b42ce4eb605838c64d0fe210c3fa49f0a1224753d275cf3d24de3d648",
+      "source_sha256": "fd7c59ffae75abeeba97bc723a8adcd55e9897938c9c34f2e7990123fe030683",
+      "source_hashes_unchanged": true,
+      "inventory_hashes_match": true,
+      "exact_artifact_provenance": "pass",
+      "minimum_os": "27.0",
+      "linked_libraries": [
+        "/usr/lib/libiconv.2.dylib",
+        "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+        "/usr/lib/libSystem.B.dylib"
+      ]
+    },
+    {
+      "profile": "combined",
+      "counts": {
+        "pass": 284,
+        "fail": 33,
+        "not-applicable": 59,
+        "not-run": 5
+      },
+      "binary_sha256": "c443e3666b6d44dd108aa5e332ca199d7fd69a90dfa1680b844b46f4790aa45a",
+      "source_sha256": "fd7c59ffae75abeeba97bc723a8adcd55e9897938c9c34f2e7990123fe030683",
+      "source_hashes_unchanged": true,
+      "inventory_hashes_match": true,
+      "exact_artifact_provenance": "pass",
+      "minimum_os": "27.0",
+      "linked_libraries": [
+        "/usr/lib/libc++.1.dylib",
+        "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+        "/usr/lib/libSystem.B.dylib"
+      ]
+    },
+    {
+      "profile": "combined-c",
+      "counts": {
+        "pass": 284,
+        "fail": 33,
+        "not-applicable": 59,
+        "not-run": 5
+      },
+      "binary_sha256": "e1290966d458fc86586448bf39c27317ce5d90aee14dbfef271154aa36bad97e",
+      "source_sha256": "fd7c59ffae75abeeba97bc723a8adcd55e9897938c9c34f2e7990123fe030683",
+      "source_hashes_unchanged": true,
+      "inventory_hashes_match": true,
+      "exact_artifact_provenance": "pass",
+      "minimum_os": "27.0",
+      "linked_libraries": [
+        "/usr/lib/libc++.1.dylib",
+        "/usr/lib/libiconv.2.dylib",
+        "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+        "/usr/lib/libSystem.B.dylib"
+      ]
+    }
+  ],
+  "synthetic_hashes_equal_across_profiles": true,
+  "checks": [
+    {
+      "command": "cargo +1.98.1 fmt --manifest-path experiments/p0-codec/rust/Cargo.toml --check",
+      "status": "pass"
+    },
+    {
+      "command": "cargo +1.98.1 test --manifest-path experiments/p0-codec/rust/Cargo.toml --locked --no-default-features --features baseline",
+      "status": "pass",
+      "tests": 3
+    },
+    {
+      "command": "cargo +1.98.1 clippy --manifest-path experiments/p0-codec/rust/Cargo.toml --locked --no-default-features --features baseline -- -D warnings",
+      "status": "pass"
+    },
+    {
+      "command": "venv/bin/python experiments/p0-codec/reference/test_runner.py",
+      "status": "pass",
+      "tests": 8
+    },
+    {
+      "command": "Python py_compile (6 scripts); bash -n experiments/p0-codec/run.sh",
+      "status": "pass"
+    },
+    {
+      "command": "bash experiments/p0-codec/run.sh all",
+      "status": "fail",
+      "exit_code": 1,
+      "reason": "recorded decoder pixel/frame/transform findings and independent-reference not-run; no product support acceptance"
+    },
+    {
+      "command": "git diff --check",
+      "status": "pass"
+    },
+    {
+      "command": "JSON parsing, report path/identifier scan, changed documentation local-link verification",
+      "status": "pass"
+    }
+  ],
+  "product_tests": {
+    "T-03/T-04/T-05": "not-run: no app; P0 decoder experiments only",
+    "T-13": "not-run: parser/codec allocation limits not product-implemented",
+    "GPU/display/FFI integration": "not-run: outside codec experiment"
+  },
+  "functional_group_reference_correction": {
+    "fixture_id": "public-309-0a4c3aa02d1b",
+    "stored": "pass",
+    "frame_checks": "4 pass",
+    "modality": "not-run",
+    "reason": "independent oracle does not interpret Shared/PerFrame PixelValueTransformationSequence"
+  },
+  "memory_provenance": "pass: unchanged binary and generator; six exact pixel runs",
+  "independent_review": {
+    "task_id": "P0-CODEC-REVIEW",
+    "status": "complete: no additional experiment blocker after corrections",
+    "scope": "read-only source, current hashes and counts, report privacy and final documentation; not full P0 or product acceptance",
+    "known_failures": "retained as P1 prerequisites",
+    "reviewer_mutations": "none"
+  }
+}

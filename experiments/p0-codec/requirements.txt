@@ -1,0 +1,7 @@
+pydicom==3.0.2
+numpy==2.5.3
+pylibjpeg==2.1.0
+pylibjpeg-libjpeg==2.4.0
+pylibjpeg-openjpeg==2.6.0
+pyjpegls==1.5.1
+cmake==4.4.3
