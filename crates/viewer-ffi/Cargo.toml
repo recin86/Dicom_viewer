@@ -1,0 +1,24 @@
+[package]
+name = "viewer-ffi"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+description = "Rust–Swift boundary for the local DICOM viewer"
+
+[lib]
+name = "viewer_ffi"
+crate-type = ["lib", "staticlib", "cdylib"]
+
+[[bin]]
+name = "viewer-bindgen"
+path = "src/bin/viewer-bindgen.rs"
+required-features = ["bindgen"]
+
+[features]
+default = []
+bindgen = ["uniffi/cli"]
+
+[dependencies]
+viewer-core.workspace = true
+uniffi.workspace = true

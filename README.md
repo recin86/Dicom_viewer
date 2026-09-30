@@ -2,7 +2,7 @@
 
 개인 연구용 macOS 로컬 DICOM 뷰어를 개발하기 위한 문서 모음이다. CT, MR, X-ray, US를 대상으로 Rust와 dicom-rs로 영상 코어를 만들고 Swift로 macOS 앱을 구성한다. 특정 장비나 한 대의 Mac에만 맞춘 설계를 피하고, 지원 범위를 검증하면서 확장하는 것을 목표로 한다.
 
-작성일과 검토일은 2026-09-30이며 문서 버전은 0.2이다. 현재 상태는 **검토·보완한 설계 초안**이다. 구현, 빌드, 실제 DICOM 호환성 시험과 성능 측정은 아직 수행하지 않았다. 문서의 목표치와 API는 구현 결과가 아니다.
+제품 설계 문서 버전은 0.2이며 구현 상태는 2026-10-01에 갱신했다. **P0 기술 검증, P1 제품 골격과 픽셀 계약의 구현·통합 검증을 마쳤으며 P1 전체는 진행 중**이다. `experiments/`는 기술 실험, `crates/`와 `macos/`는 제품 코드다. 제한된 native DICOM 단일 프레임을 Rust에서 읽어 Swift 버퍼로 전달한다. 앱 파일 열기·영상 표시와 앱 성능은 후속이며 문서의 목표치와 개념 API를 구현 결과로 취급하지 않는다.
 
 **작업을 이어받는 AI는 [AGENTS.md](AGENTS.md)와 [현재 진행 상황](PROGRESS.md)을 먼저 읽는다.** 단계별 배정·검증·인수인계는 [진행 기록 안내](docs/implementation/README.md)와 [작업 이력](docs/implementation/work-log.md)에 남긴다.
 
@@ -25,7 +25,7 @@
 
 **사용자와의 대화에서 확정된 사항**은 macOS 앱, 개인 연구용 로컬 사용, CT/MR/X-ray/US, Rust와 dicom-rs 코어, Swift 앱, 범용성을 고려한 설계, 구현에 앞선 문서 작성이다.
 
-**문서 작성 과정에서 제안한 사항**은 SwiftUI/AppKit/Metal, UniFFI, SQLite, 버전별 기능 범위, 성능 목표, 구체적인 API와 저장 형식이다. 이들은 일관된 설계를 검토하기 위한 작업안이다. 사용자 승인이나 기술 검증이 이미 끝났다고 해석하지 않는다.
+**P0에서 채택한 사항**은 UniFFI 0.32.2·Rust 정적 라이브러리·SwiftPM 연결과 타입 있는 픽셀 복사 방향이다. **설계 제안과 후속 검증 대상**은 SwiftUI/AppKit/Metal의 전체 화면·표시 구조, SQLite, 버전별 기능 범위, 성능 목표와 구체적인 영상·저장 API다. 초기 AppKit 창을 구현했다고 영상 표시 구조와 지원까지 검증됐다고 해석하지 않는다.
 
 문서 안의 규범형 문장은 해당 작업안을 채택할 경우 지켜야 할 구현 계약을 뜻한다. 목표 버전은 일정 약속이 아니다.
 
@@ -61,7 +61,26 @@
 
 기술 참고 자료는 각 문서의 관련 설명과 참고 자료 항목에 연결했다. 라이브러리 문서의 지원 표는 앱의 검증 결과가 아니다. 개발을 시작할 때 실제 의존성 버전과 기능 옵션을 고정하고 시험 자료 및 결과를 연결한다.
 
-후속 구현에서 만들 코드 폴더와 명령은 계획으로만 기술했다. 이 문서 묶음에는 실행 가능한 앱이나 코어 라이브러리가 포함되어 있지 않다.
+P1 계획·제품 골격·실행 결과와 다음 배정은 [P1 한 프레임 표시](docs/implementation/P1-single-frame.md)에 기록한다. [P1 픽셀 계약](docs/implementation/P1-pixel-contract.md)은 불변 Rust handle·C 복사·Swift 소유 버퍼의 수명과 예산을 구현하고 실제 합성 DICOM으로 검증한다. 전체 FramePayload/표시·요청 API는 후속이다.
+
+## 제품 골격 빌드와 실행
+
+Apple Silicon·macOS 27.0 이상, Rust 1.98.1, Swift 6.4 Command Line Tools, CMake와 Python 3가 필요하다. Xcode는 필요하지 않다. CMake가 PATH에 없으면 기존 P0 codec의 격리 환경(`~/Library/Caches/dicom-viewer/p0-codec/venv/bin`)을 사용한다. 다른 Mac에서는 CMake를 별도로 준비해야 한다.
+
+프로젝트 루트에서 실행한다.
+
+```sh
+bash scripts/build.sh             # debug Rust·UniFFI 생성·Swift 빌드
+bash scripts/build.sh release     # release 빌드
+bash scripts/check.sh             # Rust 시험·lint·build·DICOM 픽셀/수명/예산·bootstrap
+bash scripts/check.sh --release   # 같은 계약을 최적화 빌드에서 검증
+bash scripts/check.sh --ui        # 로그인한 GUI 세션: 창·메뉴·창 닫기 종료 추가 확인
+bash scripts/run.sh               # 최신 소스를 빌드하고 기본 창 실행
+```
+
+현재 창에는 빈 검사 목록과 영상 영역이 나타나며 열기는 비활성화된다. 픽셀 계약은 별도 검증 실행 파일에서 실제 DICOM 입력으로 확인한다. 다음은 VOI·표시 설명과 Metal을 연결해 앱에서 한 프레임을 여는 단계다.
+
+산출물과 합성 DICOM은 기본적으로 `~/Library/Caches/dicom-viewer/p1/`에 두며 `DICOM_VIEWER_CACHE`로 별도 캐시를 지정할 수 있다. 생성된 Swift/header/module map과 링크용 정적 라이브러리만 ignored `macos/` 경로에 복사한다. 생성 바인딩은 손으로 수정하지 않는다. 개발용 앱은 캐시의 `app-debug/DICOM Viewer.app` 또는 `app-release/DICOM Viewer.app`이며 직접 열어 기본 창을 볼 수 있다. 빌드 중 로컬 실행용 ad-hoc 서명과 검증을 수행한다. 임시 식별자는 `local.dicomviewer.development`다(OQ-09 최종 이름·식별자 미결정). 설치·배포 서명·Gatekeeper·다른 Mac 배포는 P5 과제다.
 
 ## 문서 검토 결과 · 0.2
 

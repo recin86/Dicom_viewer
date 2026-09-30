@@ -42,7 +42,7 @@ SwiftUI에 AppKit 뷰를 넣는 경계에는 NSViewRepresentable을 사용하고
 
 초기에는 Rust 모듈로 책임을 나누고, 실제 재사용이나 빌드 시간의 이점이 있을 때 crate를 분리한다. 범용성을 이유로 첫 단계부터 과도한 인터페이스 계층이나 플러그인 시스템을 만들지 않는다.
 
-예상 코드 배치는 다음과 같다. 아래 폴더는 아직 생성하지 않았다.
+P1 골격에서 `viewer-core`, `viewer-ffi`, `macos`, `scripts`를 생성했다. 후속 PIXEL-1은 코어의 불변 frame/budget·좁은 native adapter, FFI session/handle·C copy, Swift 소유 버퍼를 연결한다([픽셀 계약](implementation/P1-pixel-contract.md)). 앱은 아직 AppKit 기본 창만 제공한다. 아래 domain/engine/persistence 등의 전체 모듈은 후속 계획이다.
 
 ```text
 crates/viewer-core/    domain, dicom, engine, measurement, persistence
@@ -103,6 +103,8 @@ source revision, display set의 grouping revision 또는 세션이 바뀔 때도
 | 썸네일 | Rust 및 디스크 캐시 | 원본 revision과 thumbnail recipe version |
 
 FFI는 Rust 보유 프레임을 Swift 소유 버퍼로 한 번 복사해 전달한다([ADR 0002](adr/0002-uniffi-and-pixel-buffers.md), P0 종료 채택). Rust 포인터를 Swift에 빌려주지 않는다. FFI 복사와 GPU 업로드의 비용, Rust 보유본과 Swift 버퍼가 함께 존재하는 메모리(복사 중과 Swift가 handle을 보유하는 동안)를 자원 예산에 포함하며 zero-copy라고 표현하지 않는다. 포인터 공유는 성능 병목이 확인된 뒤 별도 ADR로 도입한다.
+
+PIXEL-1의 실제 예산은 [API 계약](04-core-api-and-data-model.md#구현한-버퍼-계약--pixel-1)을 따른다. Rust는 cache eviction 뒤 보유 handle·C copy까지 마지막 참조가 사라질 때까지 예약하고, Swift 소유 복사본은 별도 예산으로 계수한다. 세션별 제한이지 앱 전체 engine/RSS 상한은 아니다. 현재 캐시는 한도 안에서 명시적으로 비우는 단순 참조 저장소이며 source revision 기반 재사용·무효화는 아직 구현하지 않았다.
 
 캐시는 프레임 개수보다 바이트 기준으로 제한한다. 현재 화면 리소스, 재생 준비 프레임, 일반 미리 읽기의 순서로 우선순위를 둔다. CPU/GPU 리소스와 전송 중 버퍼를 함께 계측한다. Metal 리소스 해제는 해당 command buffer의 사용 완료 이후에만 한다.
 

@@ -2,7 +2,41 @@
 
 이 문서는 Rust와 Swift 사이에서 주고받을 데이터, 작업 수명, 오류와 저장 형식을 정의한다. 프레임을 파일과 분리하고, 픽셀의 변환 단계와 좌표 단위를 명시해 화면과 계산의 일관성을 유지한다.
 
-문서 버전 0.2 · 작성·검토일 2026-09-30 · 상태 검토·보완한 설계 초안. 아래 타입과 함수는 구현을 위한 개념 계약이며 컴파일 가능한 Rust/Swift 선언이나 확정 ABI가 아니다. UniFFI로 표현 가능한 구체 타입은 P0에서 검증한다.
+문서 버전 0.2 · 작성·검토일 2026-09-30 · 상태 검토·보완한 설계 초안. 아래 영상·저장 타입과 함수는 개념 계약이며 컴파일 가능한 Rust/Swift 선언이나 확정 ABI가 아니다. 구현한 초기 연결 정보는 다음 절에 따로 기록한다. P0 실험을 전체 제품 API 구현으로 취급하지 않는다.
+
+## 구현한 초기 연결 API · BOOTSTRAP-1
+
+P1 골격의 [Rust facade](../crates/viewer-ffi/src/lib.rs)는 초기 연결 확인용 `bootstrap_info() -> BootstrapInfo`를 노출한다. Swift 이름은 `bootstrapInfo()`이며 앱은 [ViewerBridge](../macos/Sources/ViewerBridge/ViewerBridge.swift)를 통해 접근한다.
+
+| 필드 | 타입 | 의미 |
+| --- | --- | --- |
+| api_revision | u32 | 초기 연결 계약 revision 1; 프로젝트 schema나 DICOM revision 아님 |
+| core_version | String | 빌드한 제품 코어 crate 버전 |
+| dicom_rs_version | String | 고정한 dicom-rs 버전이며 지원 판정 아님 |
+| frame_decode_implemented | bool | 현재 false. 앱 표시 경로가 없어 열기 버튼과 메뉴를 비활성화; 아래 제한된 PIXEL-1 adapter의 존재와 구분 |
+
+짧은 동기 호출이며 파일 I/O·환자 태그·픽셀·세션·캐시를 다루지 않는다. Swift `ViewerReadiness`는 이를 `apiRevision/coreVersion/dicomRSVersion/canOpenDicom`으로 전달한다. 영상 디코딩 capability는 이 전역 bool로 대신하지 않고 후속 프레임 계약에서 정의한다.
+
+## 구현한 버퍼 계약 · PIXEL-1
+
+[Rust API](../crates/viewer-ffi/src/pixels.rs)와 [Swift 래퍼](../macos/Sources/ViewerBridge/PixelFrames.swift)는 실제 native 단일 프레임을 불변 버퍼로 전달한다. 아직 아래 전체 `FramePayload`/`decode_frame`은 아니다. source/frame reference, 요청 generation, 단위·VOI·표시 극성·종횡비·진단 모델은 후속 표시 통합에서 추가한다. 따라서 이 API로 받은 픽셀만으로 앱 표시나 측정을 활성화하지 않는다.
+
+| Rust 선언 (생성 Swift 이름은 camelCase) | 의미 |
+| --- | --- |
+| `PixelSession::new(max_live_bytes, max_frame_bytes)` | 두 한도는 u64 바이트, 픽셀+mask 대상. 세션별 한 번에 준비 1개 |
+| `prepare_native_frame(path, frame_index) -> PixelHandle` | 동기 Rust I/O·변환. Swift `ViewerPixelSession.prepareNativeFrame`은 detached task에서 실행. 0기반 index 0만 지원 |
+| `PixelHandle.info() -> PixelBufferInfo` | width/height u32; row_stride_bytes/byte_len/mask_len u64; pixel_format GrayF32Le/Rgba8; value_domain ModalityApplied/DisplayColor; contract_revision u32=1, payload_revision u64=1 |
+| `PixelHandle.copy_ticket() -> u64` | ViewerBridge 내부 전용 불투명 ID, 주소 아님. 프로세스 안에서 재사용하지 않음 |
+| `evict_all() -> u32`, `close()` | 캐시 참조 해제, close는 이후 준비·진행 중 결과의 공개를 거부. 이미 받은 handle과 복사본은 유효 |
+| `memory_snapshot() -> MemorySnapshot` | live/peak/max_live/max_frame bytes, cached_frames/active_preparations. 동시 변경 중 계측값은 전체 필드의 원자적 snapshot이 아님 |
+
+`PixelError`는 InvalidArgument/ResourceLimit/Unsupported/DecodeFailed의 안전한 reason, SessionClosed, Busy다. 원문 경로·환자 태그를 reason에 넣지 않는다. C 상태는 0=OK, 1=InvalidTicket, 2=NullDestination, 3=WrongLength, 4=Panic, 5=NoMask이며 오류 시 목적지를 쓰지 않는다. 잘못된 비null 주소는 C에서 검사할 수 없으므로 C 함수와 생성 타입은 ViewerBridge 내부에만 둔다.
+
+Swift는 `PreparedPixelFrame`으로 Rust handle을 유지하며, `copy(using: PixelCopyBudget)`가 별도로 예산을 예약한 `OwnedPixelFrame`을 반환한다. copy도 detached task에서 실행한다. 목적지 할당과 복사가 성공하기 전에는 소유 객체를 공개하지 않는다. 소유 버퍼는 불변이며 bytes는 읽기용 closure로만 빌린다(포인터를 closure 밖에 보관하면 안 됨). 임의 writable 버퍼나 GPU 사용 중 버퍼를 받는 제품 API는 아직 없다.
+
+기본값은 Rust live 512 MiB/한 프레임 128 MiB, Swift 복사본 live 512 MiB다. Rust cache·반환 handle·진행 중 C copy가 같은 payload 예약을 공유하고 마지막 참조가 해제될 때 반환한다. Swift도 같은 소유 객체의 여러 참조는 한 번, 별도 복사본은 각각 계수하며 마지막 객체 해제 시 반환한다. 두 예산은 독립적이므로 RSS 총합 512 MiB를 보장하지 않는다. parser·입력·allocator overhead·GPU는 payload 예산 밖이다. 좁은 native adapter는 입력 32 MiB와 세션당 준비 1개를 제한하며 parser 전체 할당/중첩 한도는 미검증이다.
+
+입력 범위와 실제 검증/남은 항목은 [PIXEL-1 작업 기록](implementation/P1-pixel-contract.md)에 둔다. 앱 파일 열기, 전체 codec 및 T-11/T-13 정식 합격과 구분한다.
 
 ## 공통 규칙
 
@@ -102,9 +136,9 @@ RGBA8은 R,G,B,A 순서이며 기본 alpha는 255이다. 색상 변환과 palett
 [ADR 0002](adr/0002-uniffi-and-pixel-buffers.md) 채택안(P0 종료 2026-09-30)을 따른다. `decode_frame`의 결과는 Rust가 보유하는 불변 프레임의 UniFFI handle이며, 위 표의 bytes 외 필드와 불투명 copy ticket을 제공한다. bytes와 valid_mask는 타입 있는 C 복사 함수로 Swift 소유 버퍼에 정확히 한 번 복사한다. Rust 포인터는 Swift로 나가지 않고, Rust는 Swift 목적지 포인터를 보관하지 않는다.
 
 - 목적지 길이는 bytes는 row_stride_bytes × height, mask는 width × height와 정확히 같아야 한다. 오류(만료된 ticket, null, mask 없음, 길이 불일치)는 목적지에 쓰지 않는다. 경계 안의 panic은 상태 코드로 격리한다.
-- Swift 코드는 C 함수를 직접 부르지 않고 안전 래퍼만 사용한다. 래퍼는 호출 동안 handle 수명을 연장하고, 정확한 크기의 버퍼를 할당하거나 배타적 버퍼·shared `MTLBuffer`를 길이 검사 후 채운다.
+- Swift 앱 코드는 C 함수를 직접 부르지 않고 안전 래퍼만 사용한다. PIXEL-1 래퍼는 호출 동안 handle 수명을 연장하고, 정확한 크기의 새 소유 버퍼만 할당·복사한다. 배타적 버퍼·shared `MTLBuffer` 목적지는 후속 계약·검증 대상이다.
 - 이미 받은 handle과 복사된 Swift 버퍼는 Rust cache eviction·세션 close와 무관하게 유효하다. handle과 캐시가 모두 해제되면 ticket은 만료되고 재사용되지 않는다.
-- handle을 보유하는 동안 Rust 프레임은 eviction·close 뒤에도 해제되지 않는다. 이 bytes가 캐시 바이트 한도 밖에서 살아남지 않도록, P1 계약에서 "복사 직후 handle 해제" 또는 "살아 있는 handle의 bytes를 진행 중 버퍼 예산으로 계수" 중 하나를 정하고 T-13에서 계측한다(P0 종료 검토 F3).
+- handle을 보유하는 동안 Rust 프레임은 eviction·close 뒤에도 해제되지 않는다. PIXEL-1은 **모든 살아 있는 payload를 마지막 소유권 해제까지 같은 예산에 계수**한다. eviction만으로 새 할당 여유가 생기지 않으며, cache·handle·C 복사는 같은 payload를 중복 계수하지 않는다(P0 종료 검토 F3 대응).
 - P0 계약 실험의 증거와 한계는 [P0-FFI-CONTRACT](../experiments/p0-ffi-contract/README.md)에 있다. 실제 decode·요청 generation·GPU 사용과의 결합은 P1 계약 시험에서 확인한다.
 
 Swift는 Metal 업로드를 위해 byte storage를 사용하는 동안 해당 storage를 유지한다. 비동기 command buffer가 사용하는 리소스를 먼저 해제하지 않는다. Rust 메모리를 Swift allocator로 해제하거나 반대로 해제하지 않는다.

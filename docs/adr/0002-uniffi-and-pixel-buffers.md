@@ -18,6 +18,8 @@ UniFFI로 Swift 바인딩을 생성하고 Rust 정적 라이브러리를 앱에 
 - 이미 받은 프레임 handle과 복사된 Swift 버퍼는 캐시 eviction·세션 close와 독립적으로 유효하다. 마지막 owner가 사라지면 ticket은 만료된다.
 - 기존 실험의 `copy_into(dst_addr: u64)`처럼 임의 정수 주소를 받는 공개 메서드는 쓰지 않는다. UniFFI가 안전한 `&mut [u8]` 인자를 정식 제공하면 같은 의미로 교체를 검토한다.
 
+P1 PIXEL-1 보완(2026-09-30): Rust payload는 cache·handle·진행 중 copy의 마지막 참조까지 같은 live 예산에 계수한다. Swift의 불변 소유 복사본은 별도 예산을 가진다. 현재 제품 래퍼는 새 버퍼만 할당·복사하며, 임의 배타적 목적지/shared `MTLBuffer` 경로는 GPU 수명 시험과 함께 후속 도입한다. C 모듈과 생성 바인딩은 ViewerBridge 내부 의존성이다. 상세 구현 계약과 한도 범위는 [API 문서](../04-core-api-and-data-model.md#구현한-버퍼-계약--pixel-1), 실행 증거는 [P1 픽셀 계약](../implementation/P1-pixel-contract.md)을 따른다.
+
 공개 API는 DICOM 라이브러리 객체 전체를 그대로 노출하지 않는다. request ID, frame reference, 변환 단계와 오류를 명시한다. 디코딩 결과를 JSON이나 PNG로 바꿔 전달하는 중간 경로를 기본으로 사용하지 않는다.
 
 UniFFI의 Xcode 문서는 정적 라이브러리와 생성된 Swift 연결을 설명한다. 실제 macOS 프로젝트 빌드와 비동기 타입 표현은 별도 실험으로 확인한다. [UniFFI Xcode 연동](https://mozilla.github.io/uniffi-rs/latest/swift/xcode.html)

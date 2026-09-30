@@ -10,6 +10,9 @@ target/
 DerivedData/
 build/
 dist/
+/macos/lib/
+/macos/Sources/ViewerBindings/*.swift
+/macos/Sources/viewer_ffiFFI/include/
 __pycache__/
 *.py[cod]
 .pytest_cache/

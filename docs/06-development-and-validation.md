@@ -21,7 +21,7 @@ MPR과 Enhanced CT/MR 확장은 v0.2 후보이다. 대표 자료에서 필수로
 
 ## 시험 자료 관리
 
-작은 합성 자료는 계산값과 경계 조건을 검증하는 데 사용하고, 사용 권한을 확인한 비식별 실제 자료는 제조사와 코덱 호환성 시험에 사용한다. 현재 이 프로젝트에 수집된 시험 자료는 없다. 공개 데이터라는 이유만으로 재배포 가능하다고 가정하지 않는다.
+작은 합성 자료는 계산값과 경계 조건을 검증하는 데 사용하고, 사용 권한을 확인한 비식별 실제 자료는 제조사와 코덱 호환성 시험에 사용한다. P0에서 공개 331개와 CODEC 합성 50개·DATA 합성 38개를 준비했다([P0 종료 기록](implementation/P0-closeout.md)). 자료 준비와 제품 시험 통과는 구분한다. 공개 데이터라는 이유만으로 재배포 가능하다고 가정하지 않는다.
 
 각 fixture manifest에는 다음을 기록한다.
 
@@ -141,6 +141,8 @@ P0에서 Rust toolchain, Cargo.lock, UniFFI runtime/generator, Xcode와 Swift �
 P0 종료(2026-09-30)에서 고정한 값: Rust 1.98.1(aarch64-apple-darwin), UniFFI 0.32.2 runtime/generator, Swift 6.4 Command Line Tools와 SwiftPM(Xcode 없음), dicom-rs 0.10.0 baseline + charls + openjpeg-sys(각 Cargo.lock은 [P0-CODEC](../experiments/p0-codec/README.md)·[P0-FFI-CONTRACT](../experiments/p0-ffi-contract/README.md)). 지원 대상은 Apple Silicon과 macOS 27.0 이상(OQ-01)이며 제품의 Rust·Swift·네이티브 codec deployment target은 27.0으로 맞춘다. P0 FFI 실험 두 개는 deployment target 14.0으로 빌드했으므로 그 값은 제품 기준이 아니다. Intel은 지원하지 않으므로 아래 범용 패키징 문단은 현재 적용되지 않는다.
 
 검증 자동화는 Rust format/lint/test → 코어 기준 영상 시험 → FFI 계약 시험 → Swift/Metal 빌드와 시험 → release 패키지 smoke test 순서로 설계한다. macOS 앱과 GPU 시험은 실제 macOS 환경에서 수행한다. Windows/Linux에서 통과한 코어 시험으로 macOS 통합을 대체하지 않는다.
+
+P1 PIXEL-1(2026-10-01): `bash scripts/check.sh`와 `--release`는 fmt/clippy, Rust core 16+FFI 6, 실제 native 합성 DICOM→Swift 계약 18, bootstrap과 원본 hash 보존을 검증한다. 별도 debug/release 앱 UI smoke도 실행했다. [결과](implementation/results/P1-pixel-contract.json)는 소스·바이너리·fixture hash와 macOS 27.0.1 환경을 기록한다. T-03~05의 좁은 native 변환, T-11의 payload 수명과 T-13의 payload 예산 일부에 해당한다. 요청 generation·GPU 완료·전체 parser/codec/engine 한도·RSS와 정식 설치는 미검증으로 유지한다.
 
 개인용 설치는 일반 `.app` 패키지를 목표로 한다. Apple Silicon/Intel 모두 지원할 경우 각 아키텍처 라이브러리와 모든 codec 의존성을 검사하고 적절한 범용 패키징을 수행한다. Intel 지원을 실제 Intel에서 검증했는지 Rosetta에서만 검증했는지 구분한다.
 

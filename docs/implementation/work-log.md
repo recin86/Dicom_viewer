@@ -2,6 +2,42 @@
 
 이 문서는 작업별 변경과 검증·인수인계의 이력을 보존한다. 현재 상태는 [PROGRESS.md](../../PROGRESS.md), 작성 규칙은 [진행 기록 안내](README.md)를 따른다. 오래된 기록은 당시 관찰이며 현재 상태를 자동 보장하지 않는다.
 
+## 2026-10-01 · P1-PIXEL-CONTRACT-20260930 · Codex 완료
+
+- 사용자 요청의 다음 단계(P1 묶음 2) 완료. `codex/p1-foundation`/`ca9e8b8`와 골격 미커밋 변경을 보존. commit/push 없음, 모든 core/app/main/reviewer 배정 종료·작성권 반환.
+- 변경: core 불변 frame·payload budget·bounded native adapter, FFI PixelSession/PixelHandle·weak ticket registry·C copy, Swift 별도 예산·불변 OwnedPixelFrame·detached 준비/복사·계약 CLI, C module/Package·internal bootstrap import, libc locked dependency, 합성 fixture generator·check/build, API/architecture/ADR·PROGRESS·P1 계획·[픽셀 기록](P1-pixel-contract.md)·[결과 JSON](results/P1-pixel-contract.json).
+- 결정: cache eviction/close 뒤 살아 있는 Rust handle/C copy의 payload도 마지막 참조까지 예약을 유지. Swift 복사본은 별도 예산으로 계수. 새 목적지만 복사해 GPU 사용 중 writable 목적지 API는 제공하지 않음. 실제입력 결합을 위해 native legacy 단일 프레임만 제한적으로 읽고 unsupported는 명시 거부.
+- 실제 최종 검증: macOS 27.0.1(26A434)/M5/16GiB/Rust1.98.1/Swift6.4에서 `bash scripts/check.sh`와 `--release` 각각 fmt/clippy·locked build·Rust core16+FFI6·Swift18·bootstrap·fixture10 원본 hash 보존 pass. debug/release 앱의 별도 UI smoke도 pass. source28/generated3/binary4 및 원시loghash를 기록함.
+- 독립 reviewer: 필수 수정 결함 0. 소스·생성물·fixture·binary·log 전 hash 대조, strict ad-hoc signature·arm64/minos27/static Rust 직접 확인, pydicom3.0.2의 기존4fixture read-only stored/RGB readback 일치. 재빌드·앱 실행·파일 변경·fixture 생성은 하지 않았음.
+- 초기 실패는 수정 후 재실행: Rust header length/JoinHandle, Swift import access/generated Error case, FFI lint. 개발용 bundle SIGKILL9·signature 오류는 실행파일 새inode교체/ad-hoc seal·strict verify로 보완. CLT 검색 경로 경고만 남음. P0 tracked 소스·결과 변경 없음.
+- not-run: 전체 FramePayload/source/generation·취소, VOI·극성·종횡비·CPU/Metal/GPU 표시, 전체 codec·engine/parser/RSS 제한·성능, Swift 실제 malloc 실패 주입, CUA 시각 재관찰·P5 설치/다른Mac. Rust allocation 실패는 시험 주입으로 rollback 검증. 전체 P1/T-11/T-13 합격으로 확대하지 않음.
+- 다음: P1 묶음 3의 VOI/표시 설명·source/request 계약·비동기 파일 열기·Metal 한 프레임 표시. 현재 앱 열기는 비활성화, bootstrap bool=false. 재현 명령은 위 check, GUI shell 포함 시 `--ui` 추가.
+
+## 2026-09-30 · P1-PIXEL-CONTRACT-20260930 · Codex 착수
+
+- 사용자 요청: 다음 단계. 기준 `ca9e8b8` + 기존 P1 골격 미커밋 변경, 브랜치 `codex/p1-foundation`. 기존 변경과 P0 증거를 보존한다.
+- [픽셀 계약 계획](P1-pixel-contract.md)에 PIXEL-1의 live payload 예산·수명·C copy·Swift 소유권·실제 파일 결합과 작성권을 등록했다. core와 Swift는 기존 역할 에이전트에 분리 배정하고 main이 FFI·공통 빌드·통합을 담당한다. 독립 검토는 최종 소스에서 실행한다.
+- 상태 running, 검증은 not-run. UI 열기·VOI/GPU 표시는 후속이다.
+
+## 2026-09-30 · P1-FOUNDATION-20260930 · Codex 완료
+
+- 범위: 사용자 요청의 1번(P1 계획·제품 골격) 완료. P1 전체는 진행 중. 기준 HEAD `ca9e8b8`, 브랜치 `codex/p1-foundation`, P1 변경은 미커밋이며 commit/push 없음.
+- 배정: 일반 서브에이전트에 역할 TOML·스킬·작성권을 전달해 dicom_core(코어 2파일), macos_app(앱 4파일), dicom_reviewer(읽기 전용)를 실행했다. 최종 통합·빌드·기동·중앙 문서는 Codex/root가 수행했다. 실행 중 작성 작업 없음.
+- 변경: Cargo workspace·lock·Rust toolchain, viewer-core/ffi 초기 연결, Swift package·ViewerBridge·AppKit 기본 창/메뉴·개발용 Info.plist, shared environment/build/check/run, .gitignore, README·docs02/04/06·진행 안내·PROGRESS와 [P1 계획](P1-single-frame.md), [결과 JSON](results/P1-foundation.json). 기존 P0 실험·결과는 동결 유지.
+- 실제 검증: `bash scripts/check.sh --ui`(fmt·clippy all-targets/all-features·locked debug Rust/Swift build·Swift→Rust bootstrap·창/메뉴/열기 비활성/마지막 창 종료) pass. `bash scripts/build.sh release` 및 debug/release 개발용 앱의 bootstrap/UI smoke pass. Mach-O arm64/minos=27.0와 static Rust 링크 확인. CUA AX/screenshot으로 실제 기본 창 배치 관찰. source 해시 21개·두 binary 해시를 결과 JSON에 기록했다.
+- 최초 native build는 CMake PATH 누락으로 fail. 기존 P0 CMake 4.4.3을 fallback으로 추가해 최종 명령 pass. CLT-only SwiftPM의 존재하지 않는 developer 검색 경로 경고는 기록하고 시스템 설정은 바꾸지 않았다.
+- 독립 검토: 필수 수정 결함 0. reviewer는 source/generated binding/bridge/app, version/checksum guard, 해시·Mach-O·링크·로그·ignored artifact·P0 보존을 대조. 읽기 전용으로 재빌드/앱 실행하지 않았고 현재 Mac 잠금으로 live CUA 재관찰은 not-run; main의 앞선 실제 관찰과 구분했다.
+- 기타 확인: shell syntax·Info.plist lint·git diff --check pass, 최종 변경 문서 링크 85개 누락 0. 원본 DICOM을 읽거나 변경하지 않았다.
+- 미실행: 실제 DICOM/픽셀/GPU, 제품 메모리·수명·요청 경합, 전체 앱 조작과 다른 Mac·설치·서명·Gatekeeper. 골격 결과로 해당 T 항목 전체를 합격 처리하지 않는다.
+- 다음: P1 계획 묶음 2(보유 handle 메모리 예산·FramePayload API·비공개 C copy/Swift 래퍼·T-11/T-13) 후 회색조 adapter/한 프레임 표시. 현재 전역 bool은 프레임 capability가 아니다.
+
+## 2026-09-30 · P1-FOUNDATION-20260930 · Codex 착수
+
+- 사용자 요청: 이전 현황 보고의 1번(P1 계획과 제품 코드 골격) 진행. 실제 프로젝트는 `~/Documents/Dicom_viewer`; 채팅 cwd의 OneDrive 폴더는 비어 있으므로 실제 저장소에서 작업한다.
+- 기준 `ca9e8b8`, 착수 시 clean. 원격 main=`49b444e`를 조회했고 로컬이 3 commit 앞섬을 확인. 새 브랜치 `codex/p1-foundation`에서 기존 P0 실험·결과를 보존한다.
+- 작성 AI/세션: Codex/root. [P1 계획](P1-single-frame.md)에 task·BOOTSTRAP-1·파일 작성권·후속 묶음을 등록했다. 일반 서브에이전트에 역할 TOML·스킬·배정을 전달하는 방식으로 core와 app shell을 위임한다.
+- 변경 허용 범위: 제품 workspace·FFI·Swift package/bridge·공통 빌드·계획/중앙 기록, core 및 앱 작성 파일은 분리. 현재 running; 최종 빌드·기동·독립 리뷰와 남은 미실행은 종료 기록에 추가한다. commit/push는 이번 완료 조건에 포함하지 않는다.
+
 ## 2026-09-30 · P0-CLOSE-20260930 · Claude(Cowork) 인수와 P0 종료
 
 - 인수: Codex/root가 사용량 한도로 중단. 중단 시점 실제 상태를 대조했다. prepare.py·README는 미실행, p0-ffi-contract는 Cargo.toml·헤더 초안만 있었고, FFI 감사 결과는 남지 않았다. 기준 `ea7e2b3` 유지, 기존 미커밋 변경은 보존. 작성권 전체를 Claude가 인수([P0-closeout](P0-closeout.md)).

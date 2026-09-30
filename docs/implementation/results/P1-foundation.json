@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "task_id": "P1-FOUNDATION-20260930",
+  "timestamp_utc": "2026-09-30T13:42:27.918572+00:00",
+  "base_commit": "ca9e8b8c972ff6e195b52c4c7fd9163fded61920",
+  "branch": "codex/p1-foundation",
+  "environment": {
+    "os": "27.0",
+    "os_build": "26A428",
+    "cpu": "Apple M5",
+    "rust": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "swift": "Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)",
+    "deployment_target": "27.0",
+    "uniffi": "0.32.2",
+    "dicom_rs": "0.10.0"
+  },
+  "scope": "Product foundation only: bootstrap and native empty window. No DICOM input, pixel transfer, GPU rendering, installation or release support acceptance.",
+  "source_sha256": {
+    "Cargo.lock": "1fe2d91015ebcc22ae2190abe220a8a55957a929b2a7adb2e5a421e167048671",
+    "Cargo.toml": "bcddc57dd1309f8714d0fc07c7dbec33227d12f1aa60848ca8fd07c74ac65a29",
+    "crates/viewer-core/Cargo.toml": "5d59296d58b0ac466961c71dbb2b05a76714c2aeb62bc3464ddc5f3e4173cc02",
+    "crates/viewer-core/src/lib.rs": "3cbe8a20de45ec1b9397b737e560557e5acba72076874096e6a6dfaecd83585b",
+    "crates/viewer-ffi/Cargo.toml": "ef057944846a2ecb1164b736c9ac5cfa467125006d823908fdb82cb4c79a3dbe",
+    "crates/viewer-ffi/src/bin/viewer-bindgen.rs": "f7a2dd11fb370e9595bdfa6c32fc41a9b67a60bbab06ec711cb7a03eb873ffa6",
+    "crates/viewer-ffi/src/lib.rs": "3088f5c8a1e00d856e4fcdb71bc1c240598fe7703315cadf0a8f3a30f0cd6451",
+    "macos/Package.swift": "432d6cefca0317cafbb6a5d23b40a504521ab5df22ac79b2337efe3f30180b27",
+    "macos/Resources/Info.plist": "0bc8bf1767fac7c63fea3fa7b3c1e02413e90c91eb90016a103533505c53f465",
+    "macos/Sources/ViewerApp/AppDelegate.swift": "6369a364493f76985fd126cdd2f5000fc1162dc37e29e82f77259ca490c01134",
+    "macos/Sources/ViewerApp/SmokeReport.swift": "6e5ee3c7cc3988e4bd8e71a76cb9a9c91151eb37d7d3e2638c7e04f1df4a6b19",
+    "macos/Sources/ViewerApp/ViewerApp.swift": "22a2ee95704e3e3845c22759f4d97b654702459e95be576d1ca042d045566e7c",
+    "macos/Sources/ViewerApp/ViewerWindow.swift": "bf5f30a758a57fd59b79f1a5896e1238de8d07a49894c94c068ee03cc4105a2d",
+    "macos/Sources/ViewerBindings/viewer_ffi.swift": "eb7f301457ccd46a6fa1ad4140d088f3f91d1b0a3e373919c15c317fe69e402e",
+    "macos/Sources/ViewerBridge/ViewerBridge.swift": "8b7b865de9c7cc145d8f42cb49f2dafabc50c9154300aeba4f9f5f60403e63ba",
+    "macos/Sources/viewer_ffiFFI/shim.c": "652f71b5d69e7d87880d3e36ebe93a3e5d57d0434d5ad3536af5c359bedda074",
+    "rust-toolchain.toml": "887f9be066a15585a2c583578e84b0fcb541126d81546276bad3d2ff00d61167",
+    "scripts/build.sh": "32c0ffc5c306dbf624c0ea8d3cbc38d5aa53ad645a6c393773ece5eb9da3b181",
+    "scripts/check.sh": "1004d31e224ac7f0d451ec3ce53de922c6ff03c967da6884f19d015058eff02b",
+    "scripts/environment.sh": "a85f8c75ca3a2f67fe6d2e2193ba8fd603be63cc8ba476a24e8314cc7e579467",
+    "scripts/run.sh": "5f0bb7972b89e759922ea44341b714b68f168b82718cea020334223c253bfe4f"
+  },
+  "binary_sha256": {
+    "debug": "a3435a2d827ea72ebd10c97fbf8099b9469df81c07346bed15b887dfe1aba910",
+    "release": "19de4160d4be7b35de88ca42a8a916ad9dc0644e4cbbebf43bf5689a38c1a122"
+  },
+  "commands": {
+    "foundation_check": "bash scripts/check.sh --ui",
+    "release_build": "bash scripts/build.sh release",
+    "rust_swift_smoke": "ViewerApp --smoke-test",
+    "native_ui_smoke": "ViewerApp --ui-smoke-test"
+  },
+  "checks": {
+    "rust_fmt": "pass",
+    "rust_clippy_all_targets_all_features": "pass",
+    "locked_debug_build": "pass",
+    "locked_release_build": "pass",
+    "static_rust_linkage": "pass",
+    "bootstrap_and_native_ui": {
+      "debug": {
+        "api_revision": 1,
+        "core_version": "0.1.0",
+        "dicom_rs_version": "0.10.0",
+        "frame_decode_implemented": false
+      },
+      "debug_ui": {
+        "bootstrap": {
+          "api_revision": 1,
+          "core_version": "0.1.0",
+          "dicom_rs_version": "0.10.0",
+          "frame_decode_implemented": false
+        },
+        "event_loop_ran": true,
+        "has_app_menu": true,
+        "has_file_menu": true,
+        "has_window_menu": true,
+        "last_window_close_triggered_termination": true,
+        "open_button_enabled": false,
+        "open_command_enabled": false,
+        "passed": true,
+        "quit_action_is_terminate": true,
+        "quit_key_equivalent": "q",
+        "quit_uses_command_modifier": true,
+        "window_visible": true
+      },
+      "release": {
+        "api_revision": 1,
+        "core_version": "0.1.0",
+        "dicom_rs_version": "0.10.0",
+        "frame_decode_implemented": false
+      },
+      "release_ui": {
+        "bootstrap": {
+          "api_revision": 1,
+          "core_version": "0.1.0",
+          "dicom_rs_version": "0.10.0",
+          "frame_decode_implemented": false
+        },
+        "event_loop_ran": true,
+        "has_app_menu": true,
+        "has_file_menu": true,
+        "has_window_menu": true,
+        "last_window_close_triggered_termination": true,
+        "open_button_enabled": false,
+        "open_command_enabled": false,
+        "passed": true,
+        "quit_action_is_terminate": true,
+        "quit_key_equivalent": "q",
+        "quit_uses_command_modifier": true,
+        "window_visible": true
+      }
+    },
+    "visual_observation": "CUA screenshot and AX: empty study list/viewport, disabled opening, readable labels, no observed overlap"
+  },
+  "not_run": [
+    "DICOM decode and pixel/golden comparison",
+    "pixel handle memory/lifetime and product T-11/T-13",
+    "Metal/GPU rendering and VOI/coordinates",
+    "full T-16 interaction",
+    "full T-20 clean-user installation/signing/Gatekeeper/other Mac"
+  ],
+  "notes": [
+    "Initial native build failed because CMake was missing from PATH; scripts/environment.sh reuses the existing P0 CMake 4.4.3 tool when available.",
+    "CLT-only SwiftPM emits missing developer framework/usr-lib search-path warnings; build and runtime passed.",
+    "No original DICOM read or modified. P0 results preserved."
+  ]
+}

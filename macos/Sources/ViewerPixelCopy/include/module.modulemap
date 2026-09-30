@@ -1,0 +1,4 @@
+module ViewerPixelCopy {
+    header "viewer_pixel_copy.h"
+    export *
+}

@@ -1,0 +1,705 @@
+{
+  "schema_revision": 1,
+  "task_id": "P1-PIXEL-CONTRACT-20260930",
+  "contract_revision": 1,
+  "recorded_at": "2026-10-01T07:24:38+09:00",
+  "state": "complete_pixel_contract_bundle_2",
+  "git": {
+    "branch": "codex/p1-foundation",
+    "base_head": "ca9e8b8c972ff6e195b52c4c7fd9163fded61920",
+    "working_tree": "uncommitted foundation plus pixel-contract changes",
+    "commit_or_push_performed": false
+  },
+  "environment": {
+    "macos": "27.0.1",
+    "os_build": "26A434",
+    "cpu": "Apple M5",
+    "memory_bytes": 17179869184,
+    "rust": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "swift": "Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)",
+    "developer_tools": "Command Line Tools",
+    "deployment_target": "27.0"
+  },
+  "dependencies": {
+    "uniffi_runtime_generator": "0.32.2",
+    "dicom_rs": "0.10.0",
+    "libc": "0.2.189"
+  },
+  "scope": {
+    "rust_default_live_payload_bytes": 536870912,
+    "rust_default_frame_bytes": 134217728,
+    "swift_default_live_copy_bytes": 536870912,
+    "native_max_input_bytes": 33554432,
+    "max_active_preparations_per_session": 1,
+    "accounting": "pixels plus mask until last owner; Rust and Swift budgets are independent, not an RSS limit"
+  },
+  "source_sha256": {
+    "Cargo.toml": "9e3a04fd1a466c17fe8da073fc67126f5355d5443342a93c562f62d428205b57",
+    "Cargo.lock": "5ace0648e94e56a5c6b18dd8bf0537d4901f4f43638504f5dd3ae7b60c9b8292",
+    "rust-toolchain.toml": "887f9be066a15585a2c583578e84b0fcb541126d81546276bad3d2ff00d61167",
+    "crates/viewer-core/Cargo.toml": "82e9ac5b64e814192e69c87b50417a59ffba8451c1933fc5511fbe602b809a1b",
+    "crates/viewer-core/src/lib.rs": "6464947562ea842ed2dafbf825af19e9351b4dc29eff52d7d0c7c17c7e1c8bfd",
+    "crates/viewer-core/src/frame.rs": "947ace36c558023541599a52a7d6ab9fc9b3ba5e39fad17d3f84d79ffe19b7c3",
+    "crates/viewer-core/src/native.rs": "043c095ec7bb50ef3c6e7a924e5c96f65b5318e9de52ce634a8a4a31e35a55dd",
+    "crates/viewer-ffi/Cargo.toml": "ef057944846a2ecb1164b736c9ac5cfa467125006d823908fdb82cb4c79a3dbe",
+    "crates/viewer-ffi/src/lib.rs": "b717cf2c408ecc21a3124189a3dbb8b46929370f372a2506f50cebc65dbfd23b",
+    "crates/viewer-ffi/src/pixels.rs": "cc9698226b0df7c5ceecd5eefcc3303e69f6873e48879e8d2095a2c42b738eee",
+    "crates/viewer-ffi/src/bin/viewer-bindgen.rs": "f7a2dd11fb370e9595bdfa6c32fc41a9b67a60bbab06ec711cb7a03eb873ffa6",
+    "macos/Package.swift": "2266a74ee290a4e4296fff9178b5cbf31e3045905c099a85acc62bc4cee24830",
+    "macos/Resources/Info.plist": "0bc8bf1767fac7c63fea3fa7b3c1e02413e90c91eb90016a103533505c53f465",
+    "macos/Sources/ViewerBridge/ViewerBridge.swift": "7cc148b72dca704064c817523254e59beb5ac56861f5fc634f31072b9abdb74f",
+    "macos/Sources/ViewerBridge/PixelFrames.swift": "c6fdd15a3100b28236df8a5e989ffd0065eacd491ed3600ab4c67dfefbb274c0",
+    "macos/Sources/ViewerPixelCopy/shim.c": "2dd8fa960ea70adf7357ce614f436eea5f815f4146f2823bbf9dd468c5cbc76d",
+    "macos/Sources/ViewerPixelCopy/include/module.modulemap": "478ac46752386c88bfcae544e5ef9ff3d0bd73f05c4c21be52d9d0e29e9264dc",
+    "macos/Sources/ViewerPixelCopy/include/viewer_pixel_copy.h": "3533dd5792cca4cfe2078577dc2bb6aed46c7b4ee531726bda2cf608098ce9d8",
+    "macos/Sources/ViewerContractChecks/ContractChecks.swift": "274c3ac730b3cfd4eff3ec3359d2a80d521940dfaa6a4c21d0045880fe90155a",
+    "macos/Sources/ViewerApp/ViewerApp.swift": "22a2ee95704e3e3845c22759f4d97b654702459e95be576d1ca042d045566e7c",
+    "macos/Sources/ViewerApp/AppDelegate.swift": "6369a364493f76985fd126cdd2f5000fc1162dc37e29e82f77259ca490c01134",
+    "macos/Sources/ViewerApp/ViewerWindow.swift": "bf5f30a758a57fd59b79f1a5896e1238de8d07a49894c94c068ee03cc4105a2d",
+    "macos/Sources/ViewerApp/SmokeReport.swift": "6e5ee3c7cc3988e4bd8e71a76cb9a9c91151eb37d7d3e2638c7e04f1df4a6b19",
+    "scripts/build.sh": "fea062e5ea18e7430a9f24bc84f0de5a73f713d8e8b17b3ff825775ac049ceb7",
+    "scripts/check.sh": "9b252076cd3b1894e8d319075ab9821a64967a28468aa8ef1c9aa4bd3422b964",
+    "scripts/environment.sh": "a85f8c75ca3a2f67fe6d2e2193ba8fd603be63cc8ba476a24e8314cc7e579467",
+    "scripts/run.sh": "5f0bb7972b89e759922ea44341b714b68f168b82718cea020334223c253bfe4f",
+    "scripts/prepare-pixel-fixtures.py": "4860cf0735fdee861799f515aaa9b5190f186c1df03565df8dd8d8f379ffa707"
+  },
+  "generated_sha256": {
+    "macos/Sources/ViewerBindings/viewer_ffi.swift": "87720575a3dedd231fb89564783a0ed8616263995d26cbe500831883e0ea5ac2",
+    "macos/Sources/viewer_ffiFFI/include/viewer_ffiFFI.h": "24bb876cfdcc18cfe6cab5025950e9d1ecb3efe82f4a5236449f27214abc50b8",
+    "macos/Sources/viewer_ffiFFI/include/module.modulemap": "5b711d39492cb5fcbcff902e74e1ace797eff1ce8d86a90f1b18e4719b37e2ef"
+  },
+  "fixture_manifest": {
+    "revision": 1,
+    "synthetic_only": true,
+    "source": "generated locally from literal samples; no patient or external source data",
+    "use": "project contract tests; generated binaries are cache-only",
+    "oracle": "independent literal stored samples, slope/intercept arithmetic and RGBA bytes",
+    "writer_sha256": "4860cf0735fdee861799f515aaa9b5190f186c1df03565df8dd8d8f379ffa707",
+    "fixtures": [
+      {
+        "id": "gray-le.dcm",
+        "bytes": 544,
+        "sha256": "cb48e9fd4e3bd075772510a8f3421e5cf4c6d42765f0c1c23c899764fb76edb6",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "gray-be.dcm",
+        "bytes": 544,
+        "sha256": "676d78b35ec2033eb98c38e925fbb11464684b72e9cec0408b98b0ef6d2ba299",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.2",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "gray-implicit.dcm",
+        "bytes": 538,
+        "sha256": "bc137762387e8f46682324b3a4c06d1786854e651bdbe824e6f1bb13e69b7c13",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "rgb.dcm",
+        "bytes": 514,
+        "sha256": "539b0dac2e4b8a7c778ff241f48920f4d1a128fcf094f5832c2c2b2f0f29d6a5",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 2,
+        "frames": 1,
+        "photometric": "RGB",
+        "bits_allocated": 8,
+        "bits_stored": 8,
+        "high_bit": 7,
+        "signed": false,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "unsupported-multiframe.dcm",
+        "bytes": 556,
+        "sha256": "ffac94a74c25c1a76d1f948ecfa151e5563ded642dfedb49fedd604f528fd785",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 2,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "unsupported",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "unsupported-compressed.dcm",
+        "bytes": 546,
+        "sha256": "728eadc183bac540b1bb93971e33f98cf496c2ae64d7cb295255398f273d3abe",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.4.50",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "unsupported",
+        "note": "deliberately unsupported syntax; native payload"
+      },
+      {
+        "id": "unsupported-enhanced.dcm",
+        "bytes": 548,
+        "sha256": "873c60ee633db028693f60152c6dfa645ae0fe56ee2f787a1257a7dae652fc8e",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2.1",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "unsupported",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "unsupported-overflow.dcm",
+        "bytes": 546,
+        "sha256": "3d7406c0aaa696ba78122fa1ee5b0090234ff95f68f8c9393f0d29316ec614a5",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "unsupported",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "malformed.dcm",
+        "bytes": 17,
+        "sha256": "b2a4dfba7cf22ed9a3b923677d087362f58f140ebf93af6a1bb66944ce169f36",
+        "expected": "decode_failed"
+      },
+      {
+        "id": "oversized.dcm",
+        "bytes": 33554433,
+        "sha256": "bdf7fbb54387c24608fd757a1b31c32cabcd7b6bee8ff3345c897139fffc072a",
+        "expected": "resource_limit_before_parse"
+      }
+    ],
+    "gray_expected": {
+      "width": 3,
+      "height": 2,
+      "stored": [
+        -2048,
+        -1,
+        0,
+        1,
+        1024,
+        2047
+      ],
+      "slope": 2,
+      "intercept": -10,
+      "f32": [
+        0,
+        -12,
+        -10,
+        -8,
+        2038,
+        4084
+      ],
+      "mask": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "accounted_bytes": 30
+    },
+    "rgba_expected": [
+      255,
+      0,
+      0,
+      255,
+      0,
+      255,
+      0,
+      255,
+      0,
+      0,
+      255,
+      255,
+      17,
+      34,
+      51,
+      255
+    ]
+  },
+  "independent_fixture_readback": {
+    "tool": "pydicom 3.0.2",
+    "status": "pass",
+    "fixtures": [
+      "gray-le.dcm",
+      "gray-be.dcm",
+      "gray-implicit.dcm",
+      "rgb.dcm"
+    ],
+    "expectation": "stored arrays equal independent literal samples"
+  },
+  "profiles": {
+    "debug": {
+      "command": "bash scripts/check.sh",
+      "status": "pass",
+      "format": "pass",
+      "clippy_all_targets_all_features": "pass",
+      "rust_unit_tests": {
+        "viewer-core": {
+          "passed": 16,
+          "failed": 0
+        },
+        "viewer-ffi": {
+          "passed": 6,
+          "failed": 0
+        }
+      },
+      "rust_test_cases": [
+        "frame::tests::dimensions_and_total_mask_bytes_are_checked_before_callback",
+        "frame::tests::allocation_failure_and_sample_failure_return_the_entire_reservation",
+        "frame::tests::finite_f64_overflow_and_non_finite_are_not_masked",
+        "frame::tests::rgb_order_and_alpha_are_independent_bytes",
+        "frame::tests::little_endian_values_mask_and_last_owner_charge",
+        "frame::tests::panic_during_construction_also_returns_the_lease",
+        "frame::tests::concurrent_admission_is_atomic_and_counts_final_owner",
+        "native::tests::stored_bits_shift_sign_and_padding_have_literal_expectations",
+        "native::tests::fifo_is_rejected_without_waiting_for_a_writer",
+        "native::tests::rgb_ct_and_mr_do_not_inherit_secondary_capture_support",
+        "native::tests::native_rgb_ob_and_implicit_ow_preserve_channel_order",
+        "native::tests::native_unsigned_8bit_ob_and_implicit_ow_use_stored_bits_and_padding_range",
+        "native::tests::file_entrypoint_uses_actual_part10_and_safe_frame_index_errors",
+        "native::tests::native_part10_le_be_implicit_have_the_same_independent_modality_golden",
+        "native::tests::unsupported_syntax_dimensions_transform_and_malformed_length_are_explicit",
+        "native::tests::bounded_read_checks_actual_bytes_even_after_a_small_metadata_observation",
+        "pixels::tests::cache_owns_once_and_budget_rolls_back_on_closed_publish",
+        "pixels::tests::metadata_exact_copy_and_failures_do_not_write",
+        "pixels::tests::color_no_mask_and_ticket_never_reused",
+        "pixels::tests::preparation_is_single_and_guard_recovers_after_unwind",
+        "pixels::tests::eviction_close_and_copy_lease_keep_live_charge",
+        "pixels::tests::concurrent_copies_with_last_owner_drop"
+      ],
+      "swift_contract": {
+        "apiRevision": 1,
+        "architecture": "arm64",
+        "checks": [
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "main_actor_background_boundary",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "golden_gray-le.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "golden_gray-be.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "golden_gray-implicit.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "golden_rgb.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "rust_handle_and_swift_copy_survive_close",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "swift_budget_alias_and_readmission",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "rust_live_budget_includes_evicted_handles",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "rust_per_frame_limit_before_payload",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "concurrent_separate_immutable_copies",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "invalid_frame_index",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_unsupported-multiframe.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_unsupported-compressed.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_unsupported-enhanced.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_unsupported-overflow.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_malformed.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_missing.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_oversized.dcm",
+            "status": "pass"
+          }
+        ],
+        "coreVersion": "0.1.0",
+        "dicomRSVersion": "0.10.0",
+        "failedCount": 0,
+        "mainActorCallerOnMainThread": true,
+        "notRun": [
+          "Metal presentation and GPU lifetime",
+          "Full DICOM codec support",
+          "Request generation and cancellation"
+        ],
+        "osVersion": "Version 27.0.1 (Build 26A434)",
+        "passed": true,
+        "passedCount": 18,
+        "schemaRevision": 1,
+        "status": "pass",
+        "suite": "P1-PIXEL-SWIFT"
+      },
+      "ui_smoke": {
+        "bootstrap": {
+          "api_revision": 1,
+          "core_version": "0.1.0",
+          "dicom_rs_version": "0.10.0",
+          "frame_decode_implemented": false
+        },
+        "event_loop_ran": true,
+        "has_app_menu": true,
+        "has_file_menu": true,
+        "has_window_menu": true,
+        "last_window_close_triggered_termination": true,
+        "open_button_enabled": false,
+        "open_command_enabled": false,
+        "passed": true,
+        "quit_action_is_terminate": true,
+        "quit_key_equivalent": "q",
+        "quit_uses_command_modifier": true,
+        "window_visible": true
+      },
+      "fixture_hash_preservation": "pass",
+      "log_sha256": "d7cd6131c19694d9e12aaa8963327662d6677b9097aebf4d0477eafdd3fb857b",
+      "binaries": {
+        "app": {
+          "cache_relative_path": "app-debug/DICOM Viewer.app/Contents/MacOS/ViewerApp",
+          "sha256": "92881b3ace69c57dcade38f81e3ff5c2f46bb6432ac55ffb59b7ea77566377ad",
+          "architecture": "arm64",
+          "minos": "27.0",
+          "sdk": "27.0",
+          "static_rust_linkage": true,
+          "ad_hoc_bundle_signature_verify": "pass"
+        },
+        "contract_runner": {
+          "cache_relative_path": "swift-debug/out/Products/Debug/ViewerContractChecks",
+          "sha256": "87acc63eb4990c1a4eca745f9cb6f0efedcd6f4e2282b923f0819398e6c7f0a4"
+        }
+      }
+    },
+    "release": {
+      "command": "bash scripts/check.sh --release",
+      "status": "pass",
+      "format": "pass",
+      "clippy_all_targets_all_features": "pass",
+      "rust_unit_tests": {
+        "viewer-core": {
+          "passed": 16,
+          "failed": 0
+        },
+        "viewer-ffi": {
+          "passed": 6,
+          "failed": 0
+        }
+      },
+      "rust_test_cases": [
+        "frame::tests::allocation_failure_and_sample_failure_return_the_entire_reservation",
+        "frame::tests::finite_f64_overflow_and_non_finite_are_not_masked",
+        "frame::tests::little_endian_values_mask_and_last_owner_charge",
+        "frame::tests::dimensions_and_total_mask_bytes_are_checked_before_callback",
+        "frame::tests::rgb_order_and_alpha_are_independent_bytes",
+        "frame::tests::panic_during_construction_also_returns_the_lease",
+        "frame::tests::concurrent_admission_is_atomic_and_counts_final_owner",
+        "native::tests::rgb_ct_and_mr_do_not_inherit_secondary_capture_support",
+        "native::tests::stored_bits_shift_sign_and_padding_have_literal_expectations",
+        "native::tests::fifo_is_rejected_without_waiting_for_a_writer",
+        "native::tests::native_rgb_ob_and_implicit_ow_preserve_channel_order",
+        "native::tests::native_unsigned_8bit_ob_and_implicit_ow_use_stored_bits_and_padding_range",
+        "native::tests::native_part10_le_be_implicit_have_the_same_independent_modality_golden",
+        "native::tests::unsupported_syntax_dimensions_transform_and_malformed_length_are_explicit",
+        "native::tests::file_entrypoint_uses_actual_part10_and_safe_frame_index_errors",
+        "native::tests::bounded_read_checks_actual_bytes_even_after_a_small_metadata_observation",
+        "pixels::tests::color_no_mask_and_ticket_never_reused",
+        "pixels::tests::cache_owns_once_and_budget_rolls_back_on_closed_publish",
+        "pixels::tests::eviction_close_and_copy_lease_keep_live_charge",
+        "pixels::tests::metadata_exact_copy_and_failures_do_not_write",
+        "pixels::tests::preparation_is_single_and_guard_recovers_after_unwind",
+        "pixels::tests::concurrent_copies_with_last_owner_drop"
+      ],
+      "swift_contract": {
+        "apiRevision": 1,
+        "architecture": "arm64",
+        "checks": [
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "main_actor_background_boundary",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "golden_gray-le.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "golden_gray-be.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "golden_gray-implicit.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "golden_rgb.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "rust_handle_and_swift_copy_survive_close",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "swift_budget_alias_and_readmission",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "rust_live_budget_includes_evicted_handles",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "rust_per_frame_limit_before_payload",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "concurrent_separate_immutable_copies",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "invalid_frame_index",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_unsupported-multiframe.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_unsupported-compressed.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_unsupported-enhanced.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_unsupported-overflow.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_malformed.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_missing.dcm",
+            "status": "pass"
+          },
+          {
+            "detail": "expected values and lifetime/budget conditions matched",
+            "id": "reject_oversized.dcm",
+            "status": "pass"
+          }
+        ],
+        "coreVersion": "0.1.0",
+        "dicomRSVersion": "0.10.0",
+        "failedCount": 0,
+        "mainActorCallerOnMainThread": true,
+        "notRun": [
+          "Metal presentation and GPU lifetime",
+          "Full DICOM codec support",
+          "Request generation and cancellation"
+        ],
+        "osVersion": "Version 27.0.1 (Build 26A434)",
+        "passed": true,
+        "passedCount": 18,
+        "schemaRevision": 1,
+        "status": "pass",
+        "suite": "P1-PIXEL-SWIFT"
+      },
+      "ui_smoke": {
+        "bootstrap": {
+          "api_revision": 1,
+          "core_version": "0.1.0",
+          "dicom_rs_version": "0.10.0",
+          "frame_decode_implemented": false
+        },
+        "event_loop_ran": true,
+        "has_app_menu": true,
+        "has_file_menu": true,
+        "has_window_menu": true,
+        "last_window_close_triggered_termination": true,
+        "open_button_enabled": false,
+        "open_command_enabled": false,
+        "passed": true,
+        "quit_action_is_terminate": true,
+        "quit_key_equivalent": "q",
+        "quit_uses_command_modifier": true,
+        "window_visible": true
+      },
+      "fixture_hash_preservation": "pass",
+      "log_sha256": "e43fc73b2e4b215b4fc049694d1fb5aad8b1ff67274acf94a539af4b843e38ea",
+      "binaries": {
+        "app": {
+          "cache_relative_path": "app-release/DICOM Viewer.app/Contents/MacOS/ViewerApp",
+          "sha256": "0b3c0957bfe505741e01f4581df6f0d00a0475f6f908ac8ad1b499f2b7f7c068",
+          "architecture": "arm64",
+          "minos": "27.0",
+          "sdk": "27.0",
+          "static_rust_linkage": true,
+          "ad_hoc_bundle_signature_verify": "pass"
+        },
+        "contract_runner": {
+          "cache_relative_path": "swift-release/out/Products/Release/ViewerContractChecks",
+          "sha256": "1a5fa2299efcd5e1f58c0e07d83d5eb73e2d7fad2b51021918ef9bfd82026372"
+        }
+      }
+    }
+  },
+  "p0_tracked_sources_and_results_unchanged": "pass",
+  "initial_failures_resolved": [
+    "Rust header length trait / moved JoinHandle compilation",
+    "Swift inconsistent import access levels and generated PixelError PascalCase",
+    "Clippy let_and_return",
+    "Development wrapper exited SIGKILL 9 and failed bundle-signature verification; fresh executable inode and ad-hoc bundle seal added"
+  ],
+  "independent_review": {
+    "status": "pass",
+    "task_id": "P1-PIXEL-REVIEW",
+    "mandatory_findings": 0,
+    "source_hashes_verified": 28,
+    "generated_hashes_verified": 3,
+    "fixture_hashes_verified": 10,
+    "binary_hashes_verified": 4,
+    "raw_log_and_report_comparison": "pass",
+    "direct_checks": [
+      "read-only pydicom3.0.2 stored/RGB readback for four existing fixtures",
+      "codesign strict verify for both bundles",
+      "arm64/minos27.0/static Rust linkage"
+    ],
+    "reviewer_did_not": [
+      "rebuild",
+      "launch app",
+      "modify files",
+      "regenerate fixtures"
+    ]
+  },
+  "not_run": [
+    "Complete FramePayload source identity, generation/cancellation and T-12",
+    "VOI/polarity/aspect descriptors, CPU/Metal presentation and GPU lifetime",
+    "Full codec/Enhanced/multiframe/color support",
+    "Global engine budget, parser/codec nested and allocation bounds; full T-13",
+    "RSS/allocator/GPU peak and performance profiling",
+    "Pixel-contract visual CUA reinspection (automated shell UI smoke only)",
+    "P5 installation, Gatekeeper, notarization and another Mac",
+    "Swift actual malloc failure injection; Rust allocator error rollback was tested with injected failures"
+  ]
+}

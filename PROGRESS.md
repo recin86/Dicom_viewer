@@ -1,20 +1,20 @@
 # DICOM Viewer 진행 상황과 인수인계
 
-최종 갱신: 2026-09-30 (Asia/Seoul, Claude(Cowork) P0 종료). 이 문서는 현재 상태의 요약이다. 코드·Git 이력·실제 시험 결과와 대조해서 읽는다. 갱신하지 않은 문서나 이전 AI의 대화만으로 완료를 판단하지 않는다.
+최종 갱신: 2026-10-01 (Asia/Seoul, Codex P1 픽셀 계약 통합 검증). 이 문서는 현재 상태의 요약이다. 코드·Git 이력·실제 시험 결과와 대조해서 읽는다. 갱신하지 않은 문서나 이전 AI의 대화만으로 완료를 판단하지 않는다.
 
 ## 현재 위치
 
-**P0 완료 (2026-09-30). 다음은 P1 계획.** 제품 코드(`crates/`, `macos/`)는 아직 없고 `experiments/`의 P0 실험 코드만 있다. P0 완료는 제품 지원이나 릴리스 합격을 뜻하지 않으며, CODEC 실패와 not-run 항목은 그대로 P1 이후 과제다([P0 종료 기록](docs/implementation/P0-closeout.md)).
+**P0·P1 골격·P1 픽셀 계약 완료, P1 전체는 진행 중.** 실제 native DICOM 단일 프레임→Rust handle→Swift 소유 버퍼와 수명·예산을 확인하고 독립 리뷰를 마쳤다([픽셀 계약](docs/implementation/P1-pixel-contract.md)). 다음은 앱 파일 열기·VOI·Metal 표시이며 P1 전체 합격은 후속이다. P0 CODEC 실패·not-run은 보존한다([P0 종료 기록](docs/implementation/P0-closeout.md)).
 
 | 항목 | 현재 상태 | 근거 |
 | --- | --- | --- |
 | 제품 설계 | 문서 0.2. OQ-01~04 확정, ADR 0002 채택(P0 종료). 나머지 ADR은 제안 | [README](README.md), [ADR](docs/adr/README.md) |
 | 에이전트 구성 | 공통 지침, 역할 4개, 전용 스킬 6개 작성·검증 | [AGENTS.md](AGENTS.md), [운영 안내](docs/07-agent-development.md) |
 | 역할 실행 | 초기 지침 전달 방식 4개 역할 확인; 이번 Codex 도구의 agent_type으로 dicom_core·dicom_fixtures·dicom_reviewer 실제 호출 | [작업 이력](docs/implementation/work-log.md) |
-| 로컬 Git | `~/Documents/Dicom_viewer`, `main`; P0-CODEC과 P0-CLOSE 변경을 각각 커밋(기준 `ea7e2b3` 이후 2 commit). push는 사용자가 Mac에서 수행 | `git log --oneline`, `git status` |
-| 원격 저장소 | `origin` = https://github.com/recin86/Dicom_viewer.git (공개). 로컬 추적 origin/main=`49b444e`, main은 1 commit 앞섬. 이번 작업에서 commit/push·원격 재조회 없음 | `git status -sb`, `git rev-parse origin/main` |
-| 구현과 자료 | 제품 코드 없음. 실험: `p0-env`, `p0-ffi`, `p0-codec`, `p0-data`, `p0-ffi-contract`. 공개 331개는 ignored local-data; CODEC 합성 50개·DATA 합성 38개·golden·binary는 저장소 밖 캐시. 결과 JSON에는 fixture ID·영상 형식·공개 출처·해시만 | [CODEC](experiments/p0-codec/README.md), [DATA](experiments/p0-data/README.md), [FFI 계약](experiments/p0-ffi-contract/README.md) |
-| 현재 작업자·작성권 | 없음. Claude(Cowork)가 P0-CLOSE-20260930을 Codex에서 인수해 종료. 실행 중 작업 없음 | [P0 종료 기록](docs/implementation/P0-closeout.md) |
+| 로컬 Git | `~/Documents/Dicom_viewer`, `codex/p1-foundation`; 기준 HEAD `ca9e8b8`, P1 변경은 미커밋 | `git log --oneline`, `git status` |
+| 원격 저장소 | `origin` = https://github.com/recin86/Dicom_viewer.git (공개). 2026-09-30 원격 main=`49b444e` 실제 조회, 로컬 main은 3 commit 앞섬. 이번 작업은 commit/push 없음 | `git ls-remote origin refs/heads/main`, `git log` |
+| 구현과 자료 | 제품: core 불변 frame/budget·좁은 native adapter, FFI session/handle·C copy, Swift 소유 버퍼·계약 runner. 앱 DICOM 열기는 비활성화. PIXEL 합성 10개와 기존 P0 자료·golden·binary는 저장소 밖 캐시. 공개 331개는 ignored local-data | [픽셀 결과](docs/implementation/results/P1-pixel-contract.json), [CODEC](experiments/p0-codec/README.md), [DATA](experiments/p0-data/README.md) |
+| 현재 작업자·작성권 | core/app/main/reviewer 모든 배정 done·작성권 반환. 진행 중 작성 작업 없음. 새 task를 등록한 뒤 다음 묶음 진행 | [픽셀 계약](docs/implementation/P1-pixel-contract.md) |
 
 ## 단계별 진행
 
@@ -22,7 +22,7 @@
 | --- | --- | --- |
 | 운영 준비 | 완료 | 설계·역할·스킬, 로컬 Git, 진행 문서와 인수인계 규칙 |
 | P0 기술·자료 확인 | **완료 (2026-09-30)**: ENV·DATA·CODEC·FFI·FFI 계약·DIST, 전체 독립 검토, OQ-01~04 확정 ([P0 계획](docs/implementation/P0-tech-data.md), [종료 기록](docs/implementation/P0-closeout.md)) | [개발·검증 계획](docs/06-development-and-validation.md)의 P0 종료 조건 |
-| P1 한 프레임 표시 | 미착수 (다음: 계획 작성) | 같은 문서의 P1 종료 조건 |
+| P1 한 프레임 표시 | 진행 중: 계획·골격과 제품 픽셀 계약 debug/release pass. 좁은 native adapter는 구현, VOI·표시 설명·파일 열기·Metal 및 전체 codec은 후속 | 같은 문서의 P1 종료 조건 |
 | P2 검사 탐색 | 미착수 | 같은 문서의 P2 종료 조건 |
 | P3 연구 도구 | 미착수 | 같은 문서의 P3 종료 조건 |
 | P4 저장·내보내기 | 미착수 | 같은 문서의 P4 종료 조건 |
@@ -35,14 +35,14 @@ P0~P5의 상세 계약과 수치 기준은 이 표에 복사하지 않는다. �
 1. [AGENTS.md](AGENTS.md), 이 문서, [진행 기록 안내](docs/implementation/README.md)를 읽는다. 필요한 제품 문서와 해당 스킬만 추가로 읽는다.
 2. 현재 브랜치·최근 커밋·미커밋 변경을 확인한다. 이 문서의 기준보다 새 변경이 있으면 실제 파일과 diff를 먼저 대조한다. 다른 작성자의 변경을 되돌리거나 자신의 완료 결과로 보고하지 않는다.
 3. 진행 중인 작업과 파일 작성권을 확인한 뒤, 자신의 task ID·AI/세션 식별자·목표·수정 범위·기준 commit을 실제 단계 계획에 등록한다. 중앙 진행 문서는 조정 담당자 한 명이 관리한다.
-4. 다음은 **P1 계획 작성**이다. [개발·검증 계획](docs/06-development-and-validation.md)의 P1 종료 조건을 단계 계획(`docs/implementation/P1-<주제>.md`)으로 나눈다. 첫 계약 과제: 보유 handle의 메모리 예산 규칙(검토 F3), FramePayload handle 모델의 API 문서화(F4 후속), C 복사 모듈을 Swift 래퍼의 비공개 의존성으로 격리(F5). CODEC 제한(저장 값 정규화·컬러·빈 BOT 다중 fragment·손상 경계·JPEG Extended)은 P1 adapter 과제로 배정한다. 제품 deployment target은 macOS 27.0.
+4. 다음은 [P1 계획](docs/implementation/P1-single-frame.md)의 **회색조 adapter·표시(묶음 3)**다. PIXEL-1에 VOI·극성·종횡비·단위·diagnostics, source/request 식별을 추가하고 비동기 파일 입력·CPU 기준·Metal 표시를 연결한다. 보유 handle은 마지막 참조까지 예산에 계수하며 C copy/생성 타입은 ViewerBridge 내부다. 압축·Enhanced·다중 프레임은 현재 adapter에서 거부하며 CODEC 제한은 후속 해소·차단 대상으로 유지한다. 제품 deployment target은 macOS 27.0.
 5. 중단하거나 작업을 마칠 때 현재 상태, 변경 파일, 실제 실행한 검증과 미실행 이유, 미해결 사항, 다음 한두 작업을 기록한다. 커밋하지 않은 파일과 이어서 실행할 명령도 구분한다.
 
 사용자 개인 DICOM 자료는 없다. `local-data/`의 공개 샘플을 쓰고, 합성 자료가 필요하면 기대값을 독립 계산한다. 실제 자료는 사용·재배포 조건과 비식별 상태를 확인한다.
 
 ### 환경과 작업 방식 메모 (2026-09-30 기준)
 
-- 대상 Mac: Apple M5, 16 GiB, macOS 27.0, **Xcode 없음**(Command Line Tools 27.0, Swift 6.4), Rust 1.98.1(aarch64), 시스템 Python 3.9.6. CODEC는 캐시의 uv Python 3.12.13·CMake 4.4.3 격리 환경을 사용한다. Intel 미지원, App Store·유료 개발자 계정 없음(사용자 결정).
+- 대상 Mac: Apple M5, 16 GiB. P0/골격은 macOS 27.0, 2026-10-01 픽셀 최종 검증은 **27.0.1(26A434)**. Xcode 대신 Command Line Tools·Swift 6.4, Rust 1.98.1(aarch64), 시스템 Python 3.9.6 사용. CODEC는 캐시의 uv Python 3.12.13·CMake 4.4.3 격리 환경을 사용한다. Intel 미지원, App Store·유료 개발자 계정 없음(사용자 결정).
 - Xcode 없이 SwiftPM으로 AppKit·Metal 빌드와 **런타임 shader 컴파일** 확인. 오프라인 `metal` 컴파일러 없음 → P1 shader는 `makeLibrary(source:)` 경로.
 - 실험 실행: `bash experiments/p0-ffi/run.sh` (전체 검사), `run.sh mem`, `run.sh real`. 빌드 산출물은 `~/Library/Caches/dicom-viewer/p0-ffi/`.
 - P0-FFI 핵심 결론: UniFFI 0.32.2 + Rust 정적 라이브러리 + SwiftPM 채택 권고. **픽셀은 레코드 `Vec<u8>` 반환 대신 Rust 보유 프레임 → Swift 소유 버퍼로 1회 복사(`copy_into`)** 권고(16 MiB 이상에서 레코드 경로 footprint 누적). 무거운 호출은 async 또는 Task.detached, 취소는 명시적 토큰.
@@ -65,10 +65,28 @@ P0~P5의 상세 계약과 수치 기준은 이 표에 복사하지 않는다. �
 - 최신 커밋의 push 여부를 `git status -sb`로 확인한다. 강제 push하지 않는다.
 - P0-FFI 메모리: 레코드 경로의 대형 버퍼 footprint 누적 원인은 할당기 수준으로 추정만 되어 있다(Rust 누수는 배제). 제품에서는 `copy_into` 경로를 쓰면 영향이 없다.
 - P0-DATA 부족 자료: tilt 없는 일반 CT 시리즈, DX, 긴 US cine. TCIA 등은 Cowork 네트워크 정책으로 막혀 있었으므로 필요하면 사용자가 직접 받는다.
-- P0 종료 후에도 남는 not-run/open 전체 목록은 [P0 종료 기록](docs/implementation/P0-closeout.md)의 마지막 절에 있다. 주요 항목: 실제 decode–handle 결합, 요청·취소(T-12), GPU 완료 순서, T-11·T-13, 최대 동시 디코딩 수와 단일 프레임 한도, OQ-06 저장 장치·전원 모드.
+- P0 종료 당시 not-run/open 전체 목록은 [P0 종료 기록](docs/implementation/P0-closeout.md)의 마지막 절에 있다. PIXEL-1은 좁은 native decode–handle 결합, payload 수명·예산, 세션당 준비 1개와 프레임 제한을 확인했다. 전체 codec, 요청·취소(T-12), GPU 완료, 정식 T-11·T-13과 engine/parser/RSS 한도, OQ-06 저장 장치·전원 모드는 남는다.
 - CODEC 제품 전제: 부호·유효 비트 저장 값 정규화, planar·색 변환, 손상 BOT/EOT·frame count 검증 및 빈 BOT의 다중 fragment 지원. Enhanced FG Modality oracle은 not-run, parser/codec 전체 할당 한도도 미검증이다.
 - `.agents/skills/dicom-orchestrate/scripts/validate_setup.py`는 PyYAML·tomli가 없는 환경에서 실행되지 않는다(스크립트 문제 아님).
 - P0에서 [README의 OQ 목록](README.md)과 [개발·검증 계획](docs/06-development-and-validation.md)을 확인한다. 아직 확정하지 않은 기술을 확정된 구현으로 재사용하지 않는다.
-- 새 AI의 출발점: 이 문서와 P0 종료 기록 확인 → 커밋 범위를 사용자와 정리 → P1 계획 작성.
+- 새 AI의 출발점: 이 문서와 P1 계획·PIXEL-1 기록 확인 → 실제 Git 변경·작성권 대조 → 회색조 표시 통합(묶음 3).
+
+최근 작업: [P1 제품 픽셀 계약](docs/implementation/P1-pixel-contract.md).
+
+## P1 골격에서 확인한 내용
+
+- `bash scripts/check.sh --ui`: Rust fmt/clippy·locked debug build, Swift의 실제 Rust 초기 호출, 기본 창·메뉴·비활성 열기·마지막 창 닫기 종료 pass.
+- `bash scripts/build.sh release`와 release 앱의 bootstrap/UI smoke pass. 두 실행파일은 arm64·minos 27.0이며 Rust 정적 링크다. CUA로 개발용 앱의 실제 기본 창을 시각 확인했다.
+- 소스·binary 해시와 기동 결과: [P1-foundation.json](docs/implementation/results/P1-foundation.json). 독립 reviewer가 필수 수정 결함 없이 소스·생성기·소비자·로그/해시를 대조했다.
+- 생성 바인딩·header·라이브러리는 Git 제외. 개발용 앱은 `~/Library/Caches/dicom-viewer/p1/app-debug/DICOM Viewer.app`; 임시 식별자이며 정식 설치·서명은 미검증이다.
+- 골격 종료 당시 실제 DICOM·픽셀·Metal/GPU·정식 T-11~13/T-20은 not-run이었다. 후속 픽셀 검증은 아래에 따로 기록한다.
+
+## P1 픽셀 계약에서 확인한 내용
+
+- `bash scripts/check.sh` 및 `--release`: 각각 Rust core 16+FFI 6, Swift 실제 DICOM 계약 18, bootstrap·원본 hash 보존 pass. 별도 debug/release UI smoke도 창·메뉴·마지막 창 닫기 종료 pass.
+- Gray LE/BE/implicit의 signed 유효 비트·rescale·padding mask와 RGB SC의 RGBA bytes를 전 픽셀 비교했다. 보유 handle은 evict/close 후에도 Rust 예산에 남고, 마지막 참조 해제 시 반환한다. Swift 별도 복사 예산·별칭·동시 복사·거부 후 재수용도 확인했다.
+- [결과 JSON](docs/implementation/results/P1-pixel-contract.json): source 28개·생성물 3개·fixture 10개 및 debug/release binary hash. 개발용 bundle은 새 inode 교체·ad-hoc 서명·strict verify를 수행하며 arm64/minos27.0·static Rust 링크다.
+- 독립 reviewer 필수 수정 결함 0. 최종 source/fixture/binary/log hash와 signed bundle·linkage를 대조하고 pydicom으로 합성 4개의 stored 값도 직접 확인했다. 재빌드·앱 실행·파일 수정은 하지 않았다.
+- 앱 영상 표시·VOI/극성/종횡비·source/generation·GPU 수명, 전체 codec/parser/engine 한도·RSS/성능·P5 설치는 미검증이다. 단계 전체 합격으로 확대하지 않는다.
 
 작업별 변경·검증·인수인계 이력은 [work-log.md](docs/implementation/work-log.md)에 있다.

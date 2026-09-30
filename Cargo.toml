@@ -1,0 +1,19 @@
+[workspace]
+members = ["crates/viewer-core", "crates/viewer-ffi"]
+resolver = "3"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.98.1"
+
+[workspace.dependencies]
+viewer-core = { path = "crates/viewer-core" }
+uniffi = "=0.32.2"
+libc = "=0.2.189"
+dicom-object = { version = "=0.10.0", default-features = false, features = ["deflate"] }
+dicom-pixeldata = { version = "=0.10.0", default-features = false, features = ["native", "charls", "openjpeg-sys"] }
+dicom-transfer-syntax-registry = { version = "=0.10.0", default-features = false, features = ["native", "deflate", "charls", "openjpeg-sys"] }
+
+[profile.release]
+panic = "unwind"
