@@ -172,4 +172,9 @@ Xcode가 없으므로 Command Line Tools(CLT) 설치 여부와 다음을 확인�
 
 ## 다음 AI에 전달할 내용
 
-현재 실행 중인 작업 없음. 다음 작업은 P0-ENV(Mac 터미널에서 환경 명령 실행, 결과를 이 문서에 기록)이며, 그 후 P0-DATA·P0-CODEC·P0-FFI를 병렬 배정한다. 이 문서와 PROGRESS/work-log 갱신은 미커밋 상태다.
+2026-09-30 Claude(Cowork) 조정 종료. 사용자가 이후 작업을 Codex로 진행한다. 실행 중인 작업과 미커밋 변경은 없다(인수인계 커밋 기준).
+
+- 완료: P0-ENV(기준 환경 기록), P0-FFI(연결·오류·async·취소·메모리·대안 픽셀 경로), P0-DATA 1차(공개 샘플 수집).
+- 다음: **P0-CODEC** (위 절 참조, 자료는 `local-data/`, 목록 CSV ver1.1). 이어서 P0-DATA 합성 fixture 계획, P0-DIST 문서 반영(방향 확정), P0-REVIEW, OQ-02~04 확정, ADR 0002·docs/04에 픽셀 전달 경로 반영(`$dicom-ffi-contract`).
+- 작업 방식: Cowork는 Mac 터미널에 입력할 수 없어 스크립트를 쓰고 사용자가 실행했다. Mac에서 직접 명령을 실행하는 도구(Codex 등)는 `experiments/p0-ffi/run.sh`를 바로 실행할 수 있다.
+- 주의: 공개 저장소. `local-data/`와 로컬 경로가 든 로그는 커밋하지 않는다.

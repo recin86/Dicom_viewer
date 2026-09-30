@@ -69,3 +69,8 @@
 
 - `run.sh real` 1차: 1 MiB CT·1.17 MiB US 반복은 footprint 일정, 16 MiB 반복은 호출당 16 MiB 증가.
 - 대안 `FrameBuffer.copy_into`(Rust 보유 프레임 → Swift 소유 버퍼로 1회 복사) 추가 후 2차: 1/16/64 MiB 모두 footprint 일정, 전달 p50 0.02/0.45/1.86 ms. 픽셀 전달 경로 권고를 P0 계획 판단 절에 기록(ADR 0002·docs/04 반영은 리뷰 후).
+
+## 2026-09-30 · HANDOFF-CLAUDE · Cowork 세션 종료
+
+- 사용자가 이후 작업을 Codex로 진행하기로 해 Claude(Cowork) 조정을 종료. PROGRESS와 P0 계획의 인수인계 절을 현재 상태로 갱신.
+- 다음 작업: P0-CODEC. 실행 중인 작업 없음.
