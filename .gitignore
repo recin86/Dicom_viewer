@@ -1,0 +1,40 @@
+# macOS and local editor files
+.DS_Store
+._*
+*.swp
+*.swo
+
+# Build outputs and caches
+target/
+.build/
+DerivedData/
+build/
+dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.xcuserstate
+xcuserdata/
+
+# Local secrets and diagnostics
+.env
+.env.*
+!.env.example
+*.log
+.codex-log/
+
+# Local source DICOM and patient data; extensionless data must stay here too
+/data/
+/local-data/
+/private-data/
+/tests/fixtures/local/
+*.dcm
+*.dicom
+
+# Only intentionally redistributable fixtures belong in tracked fixture paths
+!tests/fixtures/synthetic/**/*.dcm
+!tests/fixtures/synthetic/**/*.dicom
+!tests/fixtures/redistributable/**/*.dcm
+!tests/fixtures/redistributable/**/*.dicom

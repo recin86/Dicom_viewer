@@ -1,0 +1,4 @@
+interface:
+  display_name: "DICOM 시험 자료"
+  short_description: "합성 DICOM 자료와 출처·해시 manifest·독립 golden 기대값 작성"
+  default_prompt: "$dicom-fixtures를 사용해 배정된 시험의 합성 자료와 독립 기대값·manifest를 준비해줘."

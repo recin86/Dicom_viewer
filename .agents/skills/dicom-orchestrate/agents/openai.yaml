@@ -1,0 +1,4 @@
+interface:
+  display_name: "DICOM 개발 조정"
+  short_description: "DICOM 개발 단계를 분해하고 역할별 작업과 공유 계약·검증 결과를 통합"
+  default_prompt: "$dicom-orchestrate를 사용해 현재 단계의 작업을 분해하고 서브에이전트 배정과 통합 검증을 진행해줘."

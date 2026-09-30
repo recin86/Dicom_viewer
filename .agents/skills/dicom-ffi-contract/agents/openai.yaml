@@ -1,0 +1,4 @@
+interface:
+  display_name: "DICOM FFI 계약"
+  short_description: "Rust와 Swift 사이의 픽셀·단위·요청·버퍼 수명과 저장 계약 검증"
+  default_prompt: "$dicom-ffi-contract를 사용해 이번 변경의 Rust–Swift 계약과 양쪽 소비자·시험 영향을 확인해줘."

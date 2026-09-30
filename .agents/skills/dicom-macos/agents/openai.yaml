@@ -1,0 +1,4 @@
+interface:
+  display_name: "DICOM macOS 앱"
+  short_description: "Swift 앱 상태·입력과 Metal 표시의 좌표·요청·GPU 수명을 검증"
+  default_prompt: "$dicom-macos를 사용해 배정된 macOS 화면·표시 작업을 구현하고 실제 표시와 좌표 동작을 확인해줘."

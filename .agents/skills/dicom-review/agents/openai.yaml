@@ -1,0 +1,4 @@
+interface:
+  display_name: "DICOM 독립 리뷰"
+  short_description: "읽기 전용으로 명세·수치·수명·저장·검증과 에이전트 운영 경계 검토"
+  default_prompt: "$dicom-review를 사용해 이번 변경을 읽기 전용으로 검토하고 구체적인 결함과 미검증 범위를 보고해줘."

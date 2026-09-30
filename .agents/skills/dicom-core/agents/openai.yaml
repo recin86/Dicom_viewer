@@ -1,0 +1,4 @@
+interface:
+  display_name: "DICOM Rust 코어"
+  short_description: "DICOM 해석·프레임·측정·캐시·저장 코어를 배정된 범위에서 구현"
+  default_prompt: "$dicom-core를 사용해 배정된 Rust 코어 작업을 구현하고 관련 수치·경계 시험을 확인해줘."
