@@ -1,0 +1,49 @@
+P0-FFI report 2026-09-30 07:25:55 +0000
+core: p0ffi 0.0.1 | uniffi 0.32.2 | profile release | target aarch64-macos
+footprint at start: 2.77 MiB
+
+== 1. Structured errors and panic
+[PASS] E1 zero width -> InvalidArgument | InvalidArgument(detail: "width and height must be positive (0x10)")
+[PASS] E2 huge frame -> ResourceLimit (before allocation) | ResourceLimit(detail: "40000000000 bytes exceeds limit 536870912")
+[PASS] E3 failWith(3) -> Cancelled | Cancelled
+[PASS] E4 Rust panic -> thrown Swift error, no crash | UniffiInternalError: rustPanic("intentional P0 panic (expected)")
+[PASS] E5 library still usable after panic
+
+== 2. Rust -> Swift owned frame (Vec<u8> in record -> Data), 3 warmup + 30 runs, release
+columns: total = Swift-measured makeFrame call; fill = Rust pattern fill; ffi = total - fill - rust checksum (lower + lift + copies)
+[PASS] T2 512x512 GrayF32 (1 MiB) length/stride/checksum/sample | bytes 1048576, checksum match, sample ok
+[INFO] B 512x512 GrayF32 (1 MiB) | total p50 0.44 / p95 0.47 ms; fill p50 0.10 ms; ffi p50 0.33 / p95 0.35 ms; footprint 2.89->7.06 MiB; maxRSS 13.66 MiB
+[PASS] T2 2048x2048 RGBA8 (16 MiB) length/stride/checksum/sample | bytes 16777216, checksum match, sample ok
+[INFO] B 2048x2048 RGBA8 (16 MiB) | total p50 9.06 / p95 9.23 ms; fill p50 1.63 ms; ffi p50 7.27 / p95 7.42 ms; footprint 7.08->568.69 MiB; maxRSS 574.77 MiB
+[PASS] T2 4096x4096 GrayF32 (64 MiB) length/stride/checksum/sample | bytes 67108864, checksum match, sample ok
+[INFO] B 4096x4096 GrayF32 (64 MiB) | total p50 42.41 / p95 67.87 ms; fill p50 7.14 ms; ffi p50 34.19 / p95 51.43 ms; footprint 568.72->2715.08 MiB; maxRSS 1558.42 MiB
+
+== 3. Swift -> Rust 64 MiB Data: owned (copy) vs borrowed (&[u8]), 10 runs
+[PASS] T3 checksums match (owned and borrowed)
+[INFO] B Swift->Rust 64 MiB | owned p50 67.05 ms, borrowed p50 1.00 ms
+
+== 4. Returned payload outlives Rust cache eviction and object release
+[PASS] L1 cache cleared
+[PASS] L2 get after clear -> error
+[PASS] L3 payload still valid after clear and release
+
+== 5. 200 x 16 MiB frames, footprint drift
+[PASS] M1 footprint drift < 64 MiB | 2780.11 -> 1082.06 MiB
+
+== 6. MainActor responsiveness during a 300 ms Rust call (ticker every 2 ms)
+[PASS] A1 async Rust fn keeps MainActor responsive | rust slept 305 ms, max MainActor gap 4.08 ms, ticks 117
+[PASS] A2 sync Rust fn called on MainActor blocks it (expected, confirms rule) | rust slept 300 ms, max MainActor gap 302.70 ms
+[PASS] A3 sync Rust fn inside Task.detached keeps MainActor responsive | rust slept 303 ms, max MainActor gap 3.08 ms
+
+== 7. Cancellation of a long Rust task (200 steps x 10 ms)
+[PASS] C1 explicit token cancels Rust work | Cancelled, latency 8.58 ms
+[INFO] C2 Swift Task.cancel() without token | result success(50), returned 548.78 ms after cancel (about 450 ms means the cancel did not reach the Rust work)
+
+== Summary
+failures: 0
+footprint at end: 1082.19 MiB, maxRSS 1949.45 MiB
+
+== /usr/bin/time -l (exit 0)
+        6.25 real         3.97 user         0.47 sys
+          2044149760  maximum resident set size
+          2950631072  peak memory footprint

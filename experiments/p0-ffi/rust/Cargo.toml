@@ -1,0 +1,27 @@
+[package]
+name = "p0ffi"
+version = "0.0.1"
+edition = "2021"
+publish = false
+description = "P0-FFI experiment: UniFFI Rust <-> Swift connection and large buffer transfer. Throwaway, not product code."
+
+[lib]
+name = "p0ffi"
+crate-type = ["lib", "staticlib", "cdylib"]
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"
+required-features = ["bindgen"]
+
+[features]
+bindgen = ["uniffi/cli"]
+
+[dependencies]
+uniffi = "=0.32.2"
+thiserror = "2"
+futures-channel = "0.3"
+
+[profile.release]
+opt-level = 3
+debug = false

@@ -5,11 +5,12 @@ description: "DICOM Viewer의 P0~P5 개발 작업을 분해하고 서브에이�
 
 # DICOM 개발 작업 조정
 
-프로젝트 루트는 이 파일에서 `../../..`이다. 그곳의 `AGENTS.md`, `README.md`와 작업에 해당하는 `docs/06-development-and-validation.md` 절을 읽는다. 이 스킬은 메인 에이전트용이며 서브에이전트의 추가 위임을 허용하지 않는다.
+프로젝트 루트는 이 파일에서 `../../..`이다. 그곳의 `AGENTS.md`, `README.md`, `PROGRESS.md`, `docs/implementation/README.md`와 작업에 해당하는 `docs/06-development-and-validation.md` 절을 읽는다. 이 스킬은 메인 에이전트용이며 서브에이전트의 추가 위임을 허용하지 않는다.
 
 ## 계획과 배정
 
 - 실제 코드·manifest·fixture·Git 상태와 현재 단계를 확인한다. 문서만 있는 프로젝트에서는 P0 환경·자료·연결 실험부터 계획한다.
+- 새 AI가 인수할 때 PROGRESS와 작업 이력에 적힌 기준을 실제 HEAD·브랜치·working tree·diff·활성 작성권과 대조한다. 더 최근의 변경과 다른 AI의 진행 중인 작업을 보존하고 task ID·AI/세션·기준 commit·허용 경로를 등록한다.
 - 단계 규모의 작업은 `docs/implementation/<단계>-<주제>.md`에서 목표, 의존성, 판단 근거, 파일 작성자와 완료 증거를 관리한다. 필요한 경우 [단계 계획 양식](assets/stage-plan.md)을 복사해 구체화한다. 양식을 복사했다는 사실은 단계 시작이나 완료가 아니다.
 - 결과를 확인할 수 있는 작은 단위로 분해한다. P1의 기본 단위는 실제 한 프레임의 읽기→코어 변환→FFI→화면 표시와 기준값 검증이다.
 - 독립적인 과업은 `dicom_core`, `macos_app`, `dicom_fixtures`에 배정한다. 중요한 계약·여러 모듈·운영 지침 변경은 `dicom_reviewer`에 독립 검토를 배정한다. 동시 서브에이전트는 최대 3개다.
@@ -31,6 +32,7 @@ Git을 사용할 수 있으면 배정의 기준 commit과 반환 commit을 확�
 - 최종 수정 상태에서 영향받는 시험을 실행한다. 코어·FFI·Swift/Metal·release smoke test 중 적용되는 범위를 `docs/06`에 연결한다. 실제 명령이 없으면 먼저 빌드 경로를 확인하고 `not-run` 이유를 적는다.
 - fixture 준비, 문서/지침 검토, 앱 실행, DICOM 지원과 성능 측정을 서로 다른 증거로 보고한다. 필수 시험의 fail/not-run이 남으면 해당 완료·지원 판정을 보류한다.
 - 사용자에게 변경한 동작, 검증 근거와 남은 의존성만 간결하게 전달한다. 작업 로그 전체를 메인 채팅에 다시 붙이지 않는다.
+- 중단/종료 전에 단계 계획과 `docs/implementation/work-log.md`에 변경·명령·검증·미실행·미커밋·남은 의존성·다음 작업을 남기고 PROGRESS의 현재 상태를 맞춘다. 중앙 기록은 조정 담당자가 작성하고 서브에이전트는 결과를 전달한다. 완료하지 못한 부분을 다음 AI가 곧바로 재개할 수 있게 적는다.
 
 ## 지침 묶음 검증
 

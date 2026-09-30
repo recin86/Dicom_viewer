@@ -1,0 +1,102 @@
+P0-ENV report  2026-09-30 16:08:14 KST
+== OS / hardware
+
+$ sw_vers
+ProductName:		macOS
+ProductVersion:		27.0
+BuildVersion:		26A428
+
+$ uname -m
+arm64
+
+$ sysctl -n machdep.cpu.brand_string
+Apple M5
+
+$ sysctl -n hw.memsize
+17179869184
+
+$ sysctl -n hw.perflevel0.physicalcpu hw.perflevel1.physicalcpu
+4
+6
+
+$ system_profiler SPDisplaysDataType (filtered)
+      Chipset Model: Apple M5
+      Total Number of Cores: 8
+      Metal Support: Metal 4
+          Resolution: 3840 x 2160 (2160p/4K UHD 1 - Ultra High Definition)
+          UI Looks like: 1920 x 1080 @ 60.00Hz
+
+== Apple developer tools
+
+$ xcode-select -p
+/Library/Developer/CommandLineTools
+
+$ xcodebuild -version
+xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line tools instance
+(exit 1)
+
+$ pkgutil CLT version
+version: 27.0.0.0.1788430756
+install-time: 1789120365
+
+$ xcrun --show-sdk-version
+27.0
+
+$ xcrun --show-sdk-path
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
+
+$ swift --version
+swift-driver version: 1.168.6 Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)
+Target: arm64-apple-macosx27.0.0
+
+$ xcrun -f metal
+xcrun: error: unable to find utility "metal", not a developer tool or in PATH
+(exit 72)
+
+$ xcrun -f metallib
+xcrun: error: unable to find utility "metallib", not a developer tool or in PATH
+(exit 72)
+
+$ which codesign
+/usr/bin/codesign
+
+== Rust
+
+$ rustup --version
+rustup 1.29.0 (28d1352db 2026-03-05)
+info: This is the version for the rustup toolchain manager, not the rustc compiler.
+info: the currently active `rustc` version is `rustc 1.95.0 (59807616e 2026-04-14)`
+
+$ rustup show active-toolchain
+stable-aarch64-apple-darwin (default)
+
+$ rustc --version
+rustc 1.95.0 (59807616e 2026-04-14)
+
+$ cargo --version
+cargo 1.95.0 (f2d3ce0bd 2026-03-21)
+
+$ rustup target list --installed
+aarch64-apple-darwin
+CARGO_TARGET_DIR=(unset)
+
+== Other tools
+
+$ brew --version
+Homebrew 7.0.6
+
+$ cmake --version
+experiments/p0-env/check-env.sh: line 8: cmake: command not found
+(exit 127)
+
+$ python3 --version
+Python 3.9.6
+
+$ git --version
+git version 2.54.0 (Apple Git-157)
+
+== Swift + Metal runtime test (compile in temp dir, nothing installed)
+$ swiftc -O m.swift
+Metal device: Apple M5 | unified memory: true | maxBuffer MiB: 9093
+runtime shader compile: OK, functions: ["k"]
+AppKit linked: NSApplication

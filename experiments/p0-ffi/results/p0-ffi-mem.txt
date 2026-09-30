@@ -1,0 +1,9 @@
+P0-FFI memory follow-up 2026-09-30 16:29:49 KST
+units: MiB (phys_footprint); peakFrames/retainedFrames are in units of one 64 MiB frame
+variant=single n=1 frameMiB=64.00 base=1.83 peak=196.17 peakOverBase=194.34 peakFrames=3.04 maxEach=196.17 afterLoop=196.17 afterSleep1s=196.17 afterPressureRelief=196.17 relievedMiB=0.00 retainedFrames=3.04 sink=67108864
+variant=single-bytes n=1 frameMiB=64.00 base=1.83 peak=196.17 peakOverBase=194.34 peakFrames=3.04 maxEach=196.17 afterLoop=196.17 afterSleep1s=196.17 afterPressureRelief=196.17 relievedMiB=0.00 retainedFrames=3.04 sink=67108864
+variant=rust-only n=20 frameMiB=64.00 base=1.83 peak=65.94 peakOverBase=64.11 peakFrames=1.00 maxEach=65.94 afterLoop=65.94 afterSleep1s=65.94 afterPressureRelief=65.94 relievedMiB=0.00 retainedFrames=1.00 sink=0
+variant=record n=20 frameMiB=64.00 base=1.83 peak=1415.81 peakOverBase=1413.99 peakFrames=22.09 maxEach=1415.81 afterLoop=1415.81 afterSleep1s=1415.81 afterPressureRelief=1415.81 relievedMiB=0.00 retainedFrames=22.09 sink=1342177280
+variant=record-pool n=20 frameMiB=64.00 base=1.83 peak=1413.78 peakOverBase=1411.95 peakFrames=22.06 maxEach=1413.78 afterLoop=1413.78 afterSleep1s=1413.78 afterPressureRelief=1413.78 relievedMiB=0.00 retainedFrames=22.06 sink=1342177280
+variant=bytes n=20 frameMiB=64.00 base=1.83 peak=1413.74 peakOverBase=1411.91 peakFrames=22.06 maxEach=1413.74 afterLoop=1413.74 afterSleep1s=1413.74 afterPressureRelief=1413.74 relievedMiB=0.00 retainedFrames=22.06 sink=1342177280
+variant=bytes-pool n=20 frameMiB=64.00 base=1.83 peak=1413.77 peakOverBase=1411.94 peakFrames=22.06 maxEach=1413.77 afterLoop=1413.77 afterSleep1s=1413.77 afterPressureRelief=1413.77 relievedMiB=0.00 retainedFrames=22.06 sink=1342177280
