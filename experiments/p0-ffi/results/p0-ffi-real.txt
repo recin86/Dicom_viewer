@@ -1,0 +1,18 @@
+P0-FFI realistic sizes 2026-09-30 16:45:59 KST
+units: MiB (phys_footprint); overExpected = afterLoop - base - frames kept alive by the ring
+variant=real-ct frame=512x512 frameMiB=1.00 n=300 ring=0 base=1.83 expectedLiveAtEnd=0.00 afterLoop=6.20 overExpected=4.38 afterClear=6.20 afterSleep1s=6.20 peak=6.20 secondHalfSlopeMiBPerCall=0.000 callP50ms=0.45 callP95ms=0.49 rustLiveDeltaMiB=0.00
+variant=real-ct footprintSamples=6.16,6.17,6.19,6.19,6.20,6.20,6.20,6.20,6.20,6.20
+variant=real-dx frame=2048x2048 frameMiB=16.00 n=50 ring=0 base=1.83 expectedLiveAtEnd=0.00 afterLoop=840.56 overExpected=838.74 afterClear=840.56 afterSleep1s=840.56 peak=840.56 secondHalfSlopeMiBPerCall=16.047 callP50ms=9.64 callP95ms=12.49 rustLiveDeltaMiB=0.00
+variant=real-dx footprintSamples=118.36,198.64,278.91,359.16,439.39,519.63,599.86,680.10,760.33,840.56
+variant=cache-dx frame=2048x2048 frameMiB=16.00 n=100 ring=8 base=1.83 expectedLiveAtEnd=128.00 afterLoop=1158.72 overExpected=1028.89 afterClear=1030.35 afterSleep1s=1030.38 peak=1175.35 secondHalfSlopeMiBPerCall=3.840 callP50ms=10.00 callP95ms=12.12 rustLiveDeltaMiB=0.00
+variant=cache-dx footprintSamples=324.78,485.30,645.78,806.25,966.72,1127.21,1159.21,1159.03,1158.88,1158.72
+variant=into-ct verified=true frame=512x512 frameMiB=1.00 n=300 ring=0 reuse=false base=1.83 expectedLiveAtEnd=0.00 afterLoop=4.03 overExpected=2.20 afterClear=4.03 afterSleep1s=4.03 peak=4.05 secondHalfSlopeMiBPerCall=0.000 transferP50ms=0.02 transferP95ms=0.03 rustCopyP50ms=0.01 rustLiveDeltaMiB=0.00
+variant=into-ct footprintSamples=3.98,4.00,4.00,4.02,4.02,4.03,4.03,4.03,4.03,4.03
+variant=into-dx verified=true frame=2048x2048 frameMiB=16.00 n=50 ring=0 reuse=false base=1.83 expectedLiveAtEnd=0.00 afterLoop=38.02 overExpected=36.19 afterClear=38.02 afterSleep1s=38.02 peak=38.03 secondHalfSlopeMiBPerCall=0.001 transferP50ms=0.45 transferP95ms=0.62 rustCopyP50ms=0.31 rustLiveDeltaMiB=0.00
+variant=into-dx footprintSamples=37.95,37.95,37.98,37.98,38.00,38.02,38.02,38.02,38.02,38.02
+variant=into-dx-reuse verified=true frame=2048x2048 frameMiB=16.00 n=50 ring=0 reuse=true base=1.83 expectedLiveAtEnd=16.00 afterLoop=34.00 overExpected=16.17 afterClear=34.00 afterSleep1s=34.00 peak=34.02 secondHalfSlopeMiBPerCall=0.001 transferP50ms=0.31 transferP95ms=0.53 rustCopyP50ms=0.31 rustLiveDeltaMiB=0.00
+variant=into-dx-reuse footprintSamples=33.95,33.95,33.98,33.98,33.98,33.98,34.00,34.00,34.00,34.00
+variant=into-cache-dx verified=true frame=2048x2048 frameMiB=16.00 n=100 ring=8 reuse=false base=1.83 expectedLiveAtEnd=128.00 afterLoop=198.25 overExpected=68.42 afterClear=198.25 afterSleep1s=198.25 peak=198.28 secondHalfSlopeMiBPerCall=0.000 transferP50ms=0.46 transferP95ms=1.07 rustCopyP50ms=0.30 rustLiveDeltaMiB=0.00
+variant=into-cache-dx footprintSamples=166.16,198.22,198.23,198.25,198.25,198.25,198.25,198.25,198.25,198.25
+variant=into-64m verified=true frame=4096x4096 frameMiB=64.00 n=20 ring=0 reuse=false base=1.83 expectedLiveAtEnd=0.00 afterLoop=146.03 overExpected=144.20 afterClear=146.03 afterSleep1s=146.03 peak=146.05 secondHalfSlopeMiBPerCall=0.003 transferP50ms=1.86 transferP95ms=2.58 rustCopyP50ms=1.19 rustLiveDeltaMiB=0.00
+variant=into-64m footprintSamples=146.00,146.00,146.00,146.00,146.00,146.00,146.03,146.03,146.03,146.03

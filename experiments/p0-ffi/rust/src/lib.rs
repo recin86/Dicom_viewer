@@ -9,6 +9,86 @@ use std::time::{Duration, Instant};
 
 uniffi::setup_scaffolding!();
 
+// ---- Counting global allocator (P0-FFI memory follow-up) ----
+// Counts every allocation made through Rust's global allocator, including the
+// RustBuffers that carry return values to Swift and are later freed by Swift
+// calling back into Rust (rustbuffer_free).
+use std::alloc::{GlobalAlloc, Layout, System};
+use std::sync::atomic::AtomicU64;
+
+struct CountingAlloc;
+static LIVE_BYTES: AtomicU64 = AtomicU64::new(0);
+static PEAK_BYTES: AtomicU64 = AtomicU64::new(0);
+static ALLOCS: AtomicU64 = AtomicU64::new(0);
+static FREES: AtomicU64 = AtomicU64::new(0);
+
+fn note_alloc(size: usize) {
+    ALLOCS.fetch_add(1, Ordering::Relaxed);
+    let live = LIVE_BYTES.fetch_add(size as u64, Ordering::Relaxed) + size as u64;
+    PEAK_BYTES.fetch_max(live, Ordering::Relaxed);
+}
+fn note_free(size: usize) {
+    FREES.fetch_add(1, Ordering::Relaxed);
+    LIVE_BYTES.fetch_sub(size as u64, Ordering::Relaxed);
+}
+
+unsafe impl GlobalAlloc for CountingAlloc {
+    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        let p = System.alloc(layout);
+        if !p.is_null() {
+            note_alloc(layout.size());
+        }
+        p
+    }
+    unsafe fn alloc_zeroed(&self, layout: Layout) -> *mut u8 {
+        let p = System.alloc_zeroed(layout);
+        if !p.is_null() {
+            note_alloc(layout.size());
+        }
+        p
+    }
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+        System.dealloc(ptr, layout);
+        note_free(layout.size());
+    }
+    unsafe fn realloc(&self, ptr: *mut u8, layout: Layout, new_size: usize) -> *mut u8 {
+        let q = System.realloc(ptr, layout, new_size);
+        if !q.is_null() {
+            if new_size >= layout.size() {
+                let live = LIVE_BYTES.fetch_add((new_size - layout.size()) as u64, Ordering::Relaxed)
+                    + (new_size - layout.size()) as u64;
+                PEAK_BYTES.fetch_max(live, Ordering::Relaxed);
+            } else {
+                LIVE_BYTES.fetch_sub((layout.size() - new_size) as u64, Ordering::Relaxed);
+            }
+        }
+        q
+    }
+}
+
+#[global_allocator]
+static GLOBAL: CountingAlloc = CountingAlloc;
+
+#[derive(Debug, Clone, uniffi::Record)]
+pub struct AllocStats {
+    pub live_bytes: u64,
+    pub peak_live_bytes: u64,
+    pub allocs: u64,
+    pub frees: u64,
+}
+
+/// Snapshot of Rust-side allocation counters.
+#[uniffi::export]
+pub fn alloc_stats() -> AllocStats {
+    AllocStats {
+        live_bytes: LIVE_BYTES.load(Ordering::Relaxed),
+        peak_live_bytes: PEAK_BYTES.load(Ordering::Relaxed),
+        allocs: ALLOCS.load(Ordering::Relaxed),
+        frees: FREES.load(Ordering::Relaxed),
+    }
+}
+
+
 /// Upper bound for a single experimental frame (512 MiB).
 const MAX_FRAME_BYTES: u64 = 512 * 1024 * 1024;
 
@@ -203,6 +283,61 @@ pub async fn async_sleep_ms(ms: u64) -> u64 {
         let _ = tx.send(t.elapsed().as_millis() as u64);
     });
     rx.await.unwrap_or(0)
+}
+
+/// Frame kept on the Rust side; Swift copies pixels into a buffer it owns.
+/// Alternative pixel path for large frames (P0-FFI realistic-size results).
+#[derive(uniffi::Object)]
+pub struct FrameBuffer {
+    width: u32,
+    height: u32,
+    bytes: Vec<u8>,
+    checksum: u64,
+}
+
+#[uniffi::export]
+impl FrameBuffer {
+    #[uniffi::constructor]
+    pub fn render(width: u32, height: u32, format: PixelFormat) -> Result<Arc<Self>, P0Error> {
+        let len = frame_len(width, height)?;
+        let bytes = fill(width, height, format, len);
+        let checksum = checksum_of(&bytes);
+        Ok(Arc::new(Self { width, height, bytes, checksum }))
+    }
+    pub fn byte_len(&self) -> u64 {
+        self.bytes.len() as u64
+    }
+    pub fn checksum(&self) -> u64 {
+        self.checksum
+    }
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+    /// Copy the pixels into a caller-owned buffer and return the copy time in ns.
+    ///
+    /// Contract (experiment only): `dst_addr` points to at least `dst_len` writable bytes
+    /// that stay valid and are not accessed by anyone else for the duration of this
+    /// synchronous call. A future UniFFI `&mut [u8]` argument would express this safely.
+    pub fn copy_into(&self, dst_addr: u64, dst_len: u64) -> Result<u64, P0Error> {
+        if dst_addr == 0 {
+            return Err(P0Error::InvalidArgument { detail: "null destination".into() });
+        }
+        if dst_len < self.bytes.len() as u64 {
+            return Err(P0Error::InvalidArgument {
+                detail: format!("destination {dst_len} bytes < frame {} bytes", self.bytes.len()),
+            });
+        }
+        let t = Instant::now();
+        // SAFETY: guaranteed by the caller contract above; regions cannot overlap because
+        // the source is a Rust-owned Vec and the destination is caller-owned memory.
+        unsafe {
+            std::ptr::copy_nonoverlapping(self.bytes.as_ptr(), dst_addr as usize as *mut u8, self.bytes.len());
+        }
+        Ok(t.elapsed().as_nanos() as u64)
+    }
 }
 
 /// Explicit cancellation token shared between Swift and Rust.

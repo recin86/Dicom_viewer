@@ -58,3 +58,14 @@
 
 - 사용자가 프로젝트를 OneDrive에서 로컬 `~/Documents/Dicom_viewer`로 옮김. Git 이력·origin·local-data·실험 결과 유지 확인. 기기 간 공유는 GitHub로 한다.
 - 공개 저장소이므로 로컬 경로가 들어가는 빌드 로그(`p0-ffi-build.log`, `p0-ffi-time.txt`)는 Git에서 제외.
+
+## 2026-09-30 · P0-FFI-MEM2 · 메모리 원인 분리
+
+- Rust 전역 할당 계수기와 Swift 단독 모사 변형 추가(`experiments/p0-ffi`), 사용자 Mac에서 `run.sh mem` 실행.
+- 결과: Rust 할당·해제 수 일치(누수 없음). Swift 복사 과정 단독 모사는 증가 없음. 64 MiB 반복 전달에서만 호출당 약 1프레임 footprint 증가, 일부 시간 경과 후 감소 → 할당기 수준 해제 지연으로 추정. 한 번 전달 시 Rust 3장 + Swift 3장 규모의 순간 복사 발생.
+- 다음: 실사용 크기 반복 시험 후 픽셀 전달 경로(UniFFI 유지 / C ABI 보조 경로 / UniFFI &mut [u8] 대기) 결정. 미커밋.
+
+## 2026-09-30 · P0-FFI-REAL · 실사용 크기와 대안 픽셀 경로
+
+- `run.sh real` 1차: 1 MiB CT·1.17 MiB US 반복은 footprint 일정, 16 MiB 반복은 호출당 16 MiB 증가.
+- 대안 `FrameBuffer.copy_into`(Rust 보유 프레임 → Swift 소유 버퍼로 1회 복사) 추가 후 2차: 1/16/64 MiB 모두 footprint 일정, 전달 p50 0.02/0.45/1.86 ms. 픽셀 전달 경로 권고를 P0 계획 판단 절에 기록(ADR 0002·docs/04 반영은 리뷰 후).

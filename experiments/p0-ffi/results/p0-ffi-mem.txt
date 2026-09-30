@@ -1,9 +1,22 @@
-P0-FFI memory follow-up 2026-09-30 16:29:49 KST
-units: MiB (phys_footprint); peakFrames/retainedFrames are in units of one 64 MiB frame
+P0-FFI memory follow-up 2026-09-30 16:36:20 KST
+units: MiB (phys_footprint); peakFrames/retainedFrames are in units of one 64 MiB frame; rust* = Rust global allocator counters
+variant=single rustLiveDeltaMiB=0.00 rustPeakLiveMiB=192.00 rustAllocs=4 rustFrees=4
 variant=single n=1 frameMiB=64.00 base=1.83 peak=196.17 peakOverBase=194.34 peakFrames=3.04 maxEach=196.17 afterLoop=196.17 afterSleep1s=196.17 afterPressureRelief=196.17 relievedMiB=0.00 retainedFrames=3.04 sink=67108864
-variant=single-bytes n=1 frameMiB=64.00 base=1.83 peak=196.17 peakOverBase=194.34 peakFrames=3.04 maxEach=196.17 afterLoop=196.17 afterSleep1s=196.17 afterPressureRelief=196.17 relievedMiB=0.00 retainedFrames=3.04 sink=67108864
-variant=rust-only n=20 frameMiB=64.00 base=1.83 peak=65.94 peakOverBase=64.11 peakFrames=1.00 maxEach=65.94 afterLoop=65.94 afterSleep1s=65.94 afterPressureRelief=65.94 relievedMiB=0.00 retainedFrames=1.00 sink=0
-variant=record n=20 frameMiB=64.00 base=1.83 peak=1415.81 peakOverBase=1413.99 peakFrames=22.09 maxEach=1415.81 afterLoop=1415.81 afterSleep1s=1415.81 afterPressureRelief=1415.81 relievedMiB=0.00 retainedFrames=22.09 sink=1342177280
+variant=single-bytes rustLiveDeltaMiB=0.00 rustPeakLiveMiB=192.00 rustAllocs=4 rustFrees=4
+variant=single-bytes n=1 frameMiB=64.00 base=1.83 peak=196.19 peakOverBase=194.36 peakFrames=3.04 maxEach=196.19 afterLoop=196.19 afterSleep1s=196.19 afterPressureRelief=196.19 relievedMiB=0.00 retainedFrames=3.04 sink=67108864
+variant=rust-only rustLiveDeltaMiB=0.00 rustPeakLiveMiB=64.00 rustAllocs=41 rustFrees=41
+variant=rust-only n=20 frameMiB=64.00 base=1.81 peak=65.97 peakOverBase=64.16 peakFrames=1.00 maxEach=65.97 afterLoop=65.97 afterSleep1s=65.97 afterPressureRelief=65.97 relievedMiB=0.00 retainedFrames=1.00 sink=0
+variant=record rustLiveDeltaMiB=0.00 rustPeakLiveMiB=192.00 rustAllocs=61 rustFrees=61
+variant=record n=20 frameMiB=64.00 base=1.83 peak=1413.81 peakOverBase=1411.99 peakFrames=22.06 maxEach=1413.81 afterLoop=1413.81 afterSleep1s=899.35 afterPressureRelief=899.35 relievedMiB=0.00 retainedFrames=14.02 sink=1342177280
+variant=record-pool rustLiveDeltaMiB=0.00 rustPeakLiveMiB=192.00 rustAllocs=61 rustFrees=61
 variant=record-pool n=20 frameMiB=64.00 base=1.83 peak=1413.78 peakOverBase=1411.95 peakFrames=22.06 maxEach=1413.78 afterLoop=1413.78 afterSleep1s=1413.78 afterPressureRelief=1413.78 relievedMiB=0.00 retainedFrames=22.06 sink=1342177280
-variant=bytes n=20 frameMiB=64.00 base=1.83 peak=1413.74 peakOverBase=1411.91 peakFrames=22.06 maxEach=1413.74 afterLoop=1413.74 afterSleep1s=1413.74 afterPressureRelief=1413.74 relievedMiB=0.00 retainedFrames=22.06 sink=1342177280
-variant=bytes-pool n=20 frameMiB=64.00 base=1.83 peak=1413.77 peakOverBase=1411.94 peakFrames=22.06 maxEach=1413.77 afterLoop=1413.77 afterSleep1s=1413.77 afterPressureRelief=1413.77 relievedMiB=0.00 retainedFrames=22.06 sink=1342177280
+variant=bytes rustLiveDeltaMiB=0.00 rustPeakLiveMiB=192.00 rustAllocs=61 rustFrees=61
+variant=bytes n=20 frameMiB=64.00 base=1.83 peak=1413.78 peakOverBase=1411.95 peakFrames=22.06 maxEach=1413.78 afterLoop=1413.78 afterSleep1s=1413.78 afterPressureRelief=1413.78 relievedMiB=0.00 retainedFrames=22.06 sink=1342177280
+variant=bytes-pool rustLiveDeltaMiB=0.00 rustPeakLiveMiB=192.00 rustAllocs=61 rustFrees=61
+variant=bytes-pool n=20 frameMiB=64.00 base=1.83 peak=1413.75 peakOverBase=1411.92 peakFrames=22.06 maxEach=1413.75 afterLoop=1413.75 afterSleep1s=1413.75 afterPressureRelief=1413.75 relievedMiB=0.00 retainedFrames=22.06 sink=1342177280
+variant=swift-emulate rustLiveDeltaMiB=0.00 rustPeakLiveMiB=0.00 rustAllocs=1 rustFrees=1
+variant=swift-emulate n=20 frameMiB=64.00 base=1.83 peak=194.09 peakOverBase=192.27 peakFrames=3.00 maxEach=194.09 afterLoop=194.09 afterSleep1s=194.09 afterPressureRelief=194.09 relievedMiB=0.00 retainedFrames=3.00 sink=1342177280
+variant=swift-array rustLiveDeltaMiB=0.00 rustPeakLiveMiB=0.00 rustAllocs=1 rustFrees=1
+variant=swift-array n=20 frameMiB=64.00 base=1.83 peak=65.97 peakOverBase=64.14 peakFrames=1.00 maxEach=65.97 afterLoop=65.97 afterSleep1s=65.97 afterPressureRelief=65.97 relievedMiB=0.00 retainedFrames=1.00 sink=1342177280
+variant=swift-data rustLiveDeltaMiB=0.00 rustPeakLiveMiB=0.00 rustAllocs=1 rustFrees=1
+variant=swift-data n=20 frameMiB=64.00 base=1.83 peak=81.95 peakOverBase=80.13 peakFrames=1.25 maxEach=81.95 afterLoop=81.95 afterSleep1s=81.95 afterPressureRelief=81.95 relievedMiB=0.00 retainedFrames=1.25 sink=1342177280

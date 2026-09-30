@@ -81,6 +81,7 @@ func runMemVariant(_ variant: String) -> Int32 {
     let frameMiB = Double(w) * Double(h) * 4 / 1_048_576
     let n = variant.hasPrefix("single") ? 1 : 20
     let base = footprintMiB()
+    let rustBefore = allocStats()
     var sink = 0
     var afterEach: [Double] = []
     do {
@@ -100,6 +101,28 @@ func runMemVariant(_ variant: String) -> Int32 {
                 try autoreleasepool {
                     let d = try makeFrameBytes(width: w, height: h, format: .grayF32Le); sink &+= d.count
                 }
+            case "swift-emulate":
+                // Same steps as the generated lift path, without Rust:
+                // raw buffer -> Data(bytesNoCopy) -> [UInt8] copy -> Data(array) -> free raw buffer.
+                let len = Int(w) * Int(h) * 4
+                let raw = UnsafeMutableRawPointer.allocate(byteCount: len + 4, alignment: 16)
+                memset(raw, 1, len + 4)
+                let view = Data(bytesNoCopy: raw, count: len + 4, deallocator: .none)
+                var arr = [UInt8](repeating: 0, count: len)
+                arr.withUnsafeMutableBufferPointer { view.copyBytes(to: $0, from: 4..<(len + 4)) }
+                let d = Data(arr)
+                raw.deallocate()
+                sink &+= d.count
+            case "swift-array":
+                let len = Int(w) * Int(h) * 4
+                var arr = [UInt8](repeating: 0, count: len)
+                arr[len - 1] = 1
+                sink &+= arr.count
+            case "swift-data":
+                let len = Int(w) * Int(h) * 4
+                var d = Data(count: len)
+                d[len - 1] = 1
+                sink &+= d.count
             default:
                 print("unknown variant \(variant)"); return 2
             }
@@ -114,11 +137,137 @@ func runMemVariant(_ variant: String) -> Int32 {
     let relieved = malloc_zone_pressure_relief(nil, 0)
     let afterRelief = footprintMiB()
     let peak = peakFootprintMiB()
+    let rustAfter = allocStats()
+    let rustLiveDelta = (Double(rustAfter.liveBytes) - Double(rustBefore.liveBytes)) / 1_048_576
+    print("variant=\(variant) rustLiveDeltaMiB=\(f2(rustLiveDelta)) rustPeakLiveMiB=\(f2(Double(rustAfter.peakLiveBytes) / 1_048_576)) rustAllocs=\(rustAfter.allocs - rustBefore.allocs) rustFrees=\(rustAfter.frees - rustBefore.frees)")
     print("variant=\(variant) n=\(n) frameMiB=\(f2(frameMiB)) base=\(f2(base)) peak=\(f2(peak)) peakOverBase=\(f2(peak - base)) peakFrames=\(f2((peak - base) / frameMiB)) maxEach=\(f2(afterEach.max() ?? -1)) afterLoop=\(f2(afterLoop)) afterSleep1s=\(f2(afterSleep)) afterPressureRelief=\(f2(afterRelief)) relievedMiB=\(f2(Double(relieved) / 1_048_576)) retainedFrames=\(f2((afterRelief - base) / frameMiB)) sink=\(sink)")
     return 0
 }
 
+// Realistic-size repeated transfers. Optional ring buffer keeps the last `ring` frames alive,
+// like a small decoded-frame cache. Reports footprint trend to separate bounded vs growing memory.
+func runRealVariant(_ variant: String) -> Int32? {
+    let cfg: (w: UInt32, h: UInt32, fmt: PixelFormat, n: Int, ring: Int)
+    switch variant {
+    case "real-ct":        cfg = (512, 512, .grayF32Le, 300, 0)    // 1 MiB CT slice
+    case "real-us":        cfg = (640, 480, .rgba8, 300, 0)        // 1.17 MiB US cine frame
+    case "real-dx":        cfg = (2048, 2048, .rgba8, 50, 0)       // 16 MiB large X-ray
+    case "cache-ct":       cfg = (512, 512, .grayF32Le, 300, 32)   // keep last 32 CT slices
+    case "cache-dx":       cfg = (2048, 2048, .rgba8, 100, 8)      // keep last 8 large frames
+    default: return nil
+    }
+    let frameMiB = Double(cfg.w) * Double(cfg.h) * 4 / 1_048_576
+    let base = footprintMiB()
+    let rustBefore = allocStats()
+    var ring: [Data] = []
+    var samples: [Double] = []
+    var times: [Double] = []
+    do {
+        for i in 0..<cfg.n {
+            let t0 = clock.now
+            let f = try makeFrame(width: cfg.w, height: cfg.h, format: cfg.fmt)
+            times.append(ms(clock.now - t0))
+            if cfg.ring > 0 {
+                ring.append(f.bytes)
+                if ring.count > cfg.ring { ring.removeFirst() }
+            }
+            if (i + 1) % max(cfg.n / 10, 1) == 0 { samples.append(footprintMiB()) }
+        }
+    } catch {
+        print("variant=\(variant) error=\(error)"); return 1
+    }
+    let afterLoop = footprintMiB()
+    let expectedLive = Double(ring.count) * frameMiB
+    ring.removeAll()
+    let afterClear = footprintMiB()
+    Thread.sleep(forTimeInterval: 1.0)
+    let afterSleep = footprintMiB()
+    let peak = peakFootprintMiB()
+    let rustAfter = allocStats()
+    let half = samples.count / 2
+    let step = max(cfg.n / 10, 1)
+    let slope = (samples.count >= 2 && half >= 1) ? (samples.last! - samples[half - 1]) / Double((samples.count - half) * step) : .nan
+    print("variant=\(variant) frame=\(cfg.w)x\(cfg.h) frameMiB=\(f2(frameMiB)) n=\(cfg.n) ring=\(cfg.ring) base=\(f2(base)) expectedLiveAtEnd=\(f2(expectedLive)) afterLoop=\(f2(afterLoop)) overExpected=\(f2(afterLoop - base - expectedLive)) afterClear=\(f2(afterClear)) afterSleep1s=\(f2(afterSleep)) peak=\(f2(peak)) secondHalfSlopeMiBPerCall=\(String(format: "%.3f", slope)) callP50ms=\(f2(pct(times, 50))) callP95ms=\(f2(pct(times, 95))) rustLiveDeltaMiB=\(f2((Double(rustAfter.liveBytes) - Double(rustBefore.liveBytes)) / 1_048_576))")
+    print("variant=\(variant) footprintSamples=\(samples.map { f2($0) }.joined(separator: ","))")
+    return 0
+}
+
+// Alternative path: Rust keeps the frame, Swift allocates the destination and Rust copies once.
+func runIntoVariant(_ variant: String) -> Int32? {
+    let cfg: (w: UInt32, h: UInt32, fmt: PixelFormat, n: Int, ring: Int, reuse: Bool)
+    switch variant {
+    case "into-ct":       cfg = (512, 512, .grayF32Le, 300, 0, false)
+    case "into-dx":       cfg = (2048, 2048, .rgba8, 50, 0, false)
+    case "into-dx-reuse": cfg = (2048, 2048, .rgba8, 50, 0, true)    // one staging buffer reused
+    case "into-cache-dx": cfg = (2048, 2048, .rgba8, 100, 8, false)
+    case "into-64m":      cfg = (4096, 4096, .grayF32Le, 20, 0, false)
+    default: return nil
+    }
+    let len = Int(cfg.w) * Int(cfg.h) * 4
+    let frameMiB = Double(len) / 1_048_576
+    let base = footprintMiB()
+    let rustBefore = allocStats()
+    var ring: [Data] = []
+    var samples: [Double] = []
+    var total: [Double] = [], copy: [Double] = []
+    var staging = cfg.reuse ? Data(count: len) : Data()
+    var verified = false
+    do {
+        for i in 0..<cfg.n {
+            let t0 = clock.now
+            let fb = try FrameBuffer.render(width: cfg.w, height: cfg.h, format: cfg.fmt)
+            let tRendered = clock.now
+            // Copy directly into the destination. For `reuse`, mutate `staging` in place
+            // (no local copy, so copy-on-write never allocates a new buffer).
+            func fill(_ d: inout Data) throws -> UInt64 {
+                try d.withUnsafeMutableBytes { raw -> UInt64 in
+                    try fb.copyInto(dstAddr: UInt64(UInt(bitPattern: raw.baseAddress!)), dstLen: UInt64(raw.count))
+                }
+            }
+            var dst = Data()
+            let copyNs: UInt64
+            if cfg.reuse {
+                copyNs = try fill(&staging)
+            } else {
+                dst = Data(count: len)
+                copyNs = try fill(&dst)
+            }
+            let tDone = clock.now
+            total.append(ms(tDone - tRendered))   // transfer only: allocation of dst + copy
+            copy.append(Double(copyNs) / 1e6)
+            _ = t0
+            if i == 0 {
+                let got = cfg.reuse ? staging : dst
+                verified = got.count == len && swiftChecksum(got) == fb.checksum()
+            }
+            if cfg.ring > 0 {
+                ring.append(dst)
+                if ring.count > cfg.ring { ring.removeFirst() }
+            }
+            if (i + 1) % max(cfg.n / 10, 1) == 0 { samples.append(footprintMiB()) }
+        }
+    } catch {
+        print("variant=\(variant) error=\(error)"); return 1
+    }
+    let afterLoop = footprintMiB()
+    let expectedLive = Double(ring.count) * frameMiB + (cfg.reuse ? frameMiB : 0)
+    ring.removeAll()
+    staging = Data()
+    let afterClear = footprintMiB()
+    Thread.sleep(forTimeInterval: 1.0)
+    let afterSleep = footprintMiB()
+    let rustAfter = allocStats()
+    let half = samples.count / 2
+    let step = max(cfg.n / 10, 1)
+    let slope = (samples.count >= 2 && half >= 1) ? (samples.last! - samples[half - 1]) / Double((samples.count - half) * step) : .nan
+    print("variant=\(variant) verified=\(verified) frame=\(cfg.w)x\(cfg.h) frameMiB=\(f2(frameMiB)) n=\(cfg.n) ring=\(cfg.ring) reuse=\(cfg.reuse) base=\(f2(base)) expectedLiveAtEnd=\(f2(expectedLive)) afterLoop=\(f2(afterLoop)) overExpected=\(f2(afterLoop - base - expectedLive)) afterClear=\(f2(afterClear)) afterSleep1s=\(f2(afterSleep)) peak=\(f2(peakFootprintMiB())) secondHalfSlopeMiBPerCall=\(String(format: "%.3f", slope)) transferP50ms=\(f2(pct(total, 50))) transferP95ms=\(f2(pct(total, 95))) rustCopyP50ms=\(f2(pct(copy, 50))) rustLiveDeltaMiB=\(f2((Double(rustAfter.liveBytes) - Double(rustBefore.liveBytes)) / 1_048_576))")
+    print("variant=\(variant) footprintSamples=\(samples.map { f2($0) }.joined(separator: ","))")
+    return verified ? 0 : 1
+}
+
 if CommandLine.arguments.count >= 3 && CommandLine.arguments[1] == "mem" {
+    if let rc = runRealVariant(CommandLine.arguments[2]) { exit(rc) }
+    if let rc = runIntoVariant(CommandLine.arguments[2]) { exit(rc) }
     exit(runMemVariant(CommandLine.arguments[2]))
 }
 
