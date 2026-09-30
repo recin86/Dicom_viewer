@@ -1,0 +1,29 @@
+[package]
+name = "p0contract"
+version = "0.0.1"
+edition = "2024"
+rust-version = "1.98.1"
+publish = false
+description = "P0-only immutable frame and typed copy contract experiment"
+
+[lib]
+name = "p0contract"
+crate-type = ["lib", "staticlib", "cdylib"]
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"
+required-features = ["bindgen"]
+
+[features]
+default = []
+bindgen = ["uniffi/cli"]
+
+[dependencies]
+uniffi = "=0.32.2"
+thiserror = "=2.0.18"
+
+[profile.release]
+panic = "unwind"
+
+[workspace]

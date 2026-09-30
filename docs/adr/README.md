@@ -2,14 +2,14 @@
 
 ADR은 중요한 기술 선택의 이유와 결과를 보존하는 짧은 문서다. 현재 설계는 [시스템 아키텍처](../02-system-architecture.md)와 [API와 데이터 모델](../04-core-api-and-data-model.md)에 기술하고, 여기에는 왜 그 선택을 했는지 기록한다.
 
-작성일 2026-09-30. 대화에서 명시적으로 선택한 Rust/dicom-rs와 Swift 구성만 채택 상태다. 나머지 기록은 기술 검증 전 제안이다.
+작성일 2026-09-30. 대화에서 명시적으로 선택한 Rust/dicom-rs와 Swift 구성, P0 실험으로 결정한 0002가 채택 상태다. 나머지 기록은 기술 검증 전 제안이다.
 
 ## 기록 목록
 
 | 기록 | 상태 | 검증 또는 결정 시점 |
 | --- | --- | --- |
 | [0001 Rust 코어와 Swift 앱 분리](0001-rust-core-swift-app.md) | 채택된 방향 | 세부 모듈 경계는 P0/P1에서 검증 |
-| [0002 UniFFI 연결과 픽셀 버퍼](0002-uniffi-and-pixel-buffers.md) | 제안 | P0 |
+| [0002 UniFFI 연결과 픽셀 버퍼](0002-uniffi-and-pixel-buffers.md) | 채택 (2026-09-30, P0 종료) | 제품 결합은 P1 계약 시험 |
 | [0003 Metal 표시와 프레임 모델](0003-metal-and-frame-model.md) | 제안 | P0/P1 |
 | [0004 로컬 인덱스와 연구 프로젝트](0004-local-storage.md) | 제안 | P3 시작 전, P4에서 검증 |
 

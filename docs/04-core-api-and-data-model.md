@@ -69,7 +69,7 @@ F는 원본 영상의 수평·수직 뒤집기, R은 화면에서 시계방향 9
 
 ## 픽셀 전달 계약
 
-초기 반환 모델 `FramePayload`는 아래 필드를 갖는다. payload는 한 프레임을 나타내며 전체 시리즈 복사를 기본 API로 제공하지 않는다.
+반환 모델 `FramePayload`는 아래 필드를 갖는다. payload는 한 프레임을 나타내며 전체 시리즈 복사를 기본 API로 제공하지 않는다. [ADR 0002](adr/0002-uniffi-and-pixel-buffers.md) 채택 후 `FramePayload`는 Rust가 보유한 불변 프레임의 UniFFI 객체(handle)이다. 아래 필드 중 bytes와 valid_mask는 값으로 들어 있지 않고, handle의 복사 연산으로 Swift 버퍼에 받는다(아래 메모리 소유권). 나머지 필드는 handle에서 조회한다.
 
 | 필드 | 계약 |
 | --- | --- |
@@ -79,8 +79,8 @@ F는 원본 영상의 수평·수직 뒤집기, R은 화면에서 시계방향 9
 | width, height | 양의 정수, 크기 곱 overflow 검증 |
 | pixel_format | GrayF32LE 또는 RGBA8 |
 | row_stride_bytes | GrayF32LE는 width × 4, RGBA8은 width × 4인 연속 행 버퍼로 시작 |
-| bytes | row_stride_bytes × height 길이의 소유된 버퍼 |
-| valid_mask | 회색조는 width × height 바이트, 0은 무효 또는 padding, 1은 유효; 모두 유효하면 생략 가능 |
+| bytes | row_stride_bytes × height 길이. Swift 소유 버퍼로 한 번 복사해 받는다(아래 메모리 소유권) |
+| valid_mask | 회색조는 width × height 바이트, 0은 무효 또는 padding, 1은 유효; 모두 유효하면 생략 가능. 생략은 mask 길이 0으로 표현하며 Swift 래퍼는 nil을 돌려주고, 이때 mask 복사 요청은 NoMask 오류다. RGBA8은 mask가 없다 |
 | value_domain | GrayF32LE는 ModalityApplied, RGBA8은 DisplayColor |
 | unit | HU, arbitrary, 명시 단위 또는 unknown; 근거 포함 |
 | display_descriptor | VOI와 기본 극성 등 표시 설명 |
@@ -99,11 +99,17 @@ RGBA8은 R,G,B,A 순서이며 기본 alpha는 255이다. 색상 변환과 palett
 
 ## 메모리 소유권
 
-초기 UniFFI 경계에서는 소유된 bytes를 반환하고 포인터를 공개하지 않는다. Swift가 받은 payload는 Rust cache eviction과 무관하게 유효해야 한다. 실제 생성된 Swift 타입과 복사 횟수는 P0에서 확인한다.
+[ADR 0002](adr/0002-uniffi-and-pixel-buffers.md) 채택안(P0 종료 2026-09-30)을 따른다. `decode_frame`의 결과는 Rust가 보유하는 불변 프레임의 UniFFI handle이며, 위 표의 bytes 외 필드와 불투명 copy ticket을 제공한다. bytes와 valid_mask는 타입 있는 C 복사 함수로 Swift 소유 버퍼에 정확히 한 번 복사한다. Rust 포인터는 Swift로 나가지 않고, Rust는 Swift 목적지 포인터를 보관하지 않는다.
+
+- 목적지 길이는 bytes는 row_stride_bytes × height, mask는 width × height와 정확히 같아야 한다. 오류(만료된 ticket, null, mask 없음, 길이 불일치)는 목적지에 쓰지 않는다. 경계 안의 panic은 상태 코드로 격리한다.
+- Swift 코드는 C 함수를 직접 부르지 않고 안전 래퍼만 사용한다. 래퍼는 호출 동안 handle 수명을 연장하고, 정확한 크기의 버퍼를 할당하거나 배타적 버퍼·shared `MTLBuffer`를 길이 검사 후 채운다.
+- 이미 받은 handle과 복사된 Swift 버퍼는 Rust cache eviction·세션 close와 무관하게 유효하다. handle과 캐시가 모두 해제되면 ticket은 만료되고 재사용되지 않는다.
+- handle을 보유하는 동안 Rust 프레임은 eviction·close 뒤에도 해제되지 않는다. 이 bytes가 캐시 바이트 한도 밖에서 살아남지 않도록, P1 계약에서 "복사 직후 handle 해제" 또는 "살아 있는 handle의 bytes를 진행 중 버퍼 예산으로 계수" 중 하나를 정하고 T-13에서 계측한다(P0 종료 검토 F3).
+- P0 계약 실험의 증거와 한계는 [P0-FFI-CONTRACT](../experiments/p0-ffi-contract/README.md)에 있다. 실제 decode·요청 generation·GPU 사용과의 결합은 P1 계약 시험에서 확인한다.
 
 Swift는 Metal 업로드를 위해 byte storage를 사용하는 동안 해당 storage를 유지한다. 비동기 command buffer가 사용하는 리소스를 먼저 해제하지 않는다. Rust 메모리를 Swift allocator로 해제하거나 반대로 해제하지 않는다.
 
-borrowed byte API를 도입할 때는 채택한 UniFFI 버전의 지원 방향과 수명을 확인해야 한다. 현재 설계는 Rust → Swift 출력의 zero-copy에 의존하지 않는다. 출력 공유를 최적화하려면 별도 buffer handle, retain/release, GPU 완료 시점 계약을 설계한다. [UniFFI byte buffers](https://mozilla.github.io/uniffi-rs/latest/types/bytes.html)
+shared `MTLBuffer`를 목적지로 쓸 때는 해당 범위를 사용하는 GPU command buffer가 없을 때만 복사한다. borrowed byte API(예: UniFFI의 `&mut [u8]` 인자)를 도입할 때는 채택한 UniFFI 버전의 지원 방향과 수명을 확인해야 한다. 현재 설계는 Rust → Swift 출력의 zero-copy에 의존하지 않는다. 출력 공유를 최적화하려면 별도 buffer handle, retain/release, GPU 완료 시점 계약을 설계한다. [UniFFI byte buffers](https://mozilla.github.io/uniffi-rs/latest/types/bytes.html)
 
 ## 공개 작업 API 제안
 
@@ -147,7 +153,7 @@ EngineConfig는 CPU/GPU 전달 예산과 입력·디코딩 제한을 명시한�
 
 cancel은 best-effort 자원 중단이며 즉시 모든 코덱 작업이 멈춘다는 보장이 아니다. callback을 사용하는 구현에서도 UI thread를 직접 호출하지 않는다. 진행 이벤트는 묶거나 합칠 수 있지만 파일별 실패 결과와 최종 요약은 잃지 않는다. 이벤트 sequence가 보존 범위를 벗어나면 최신 snapshot을 반환하는 복구 경로를 둔다.
 
-세션 close 이후에는 새 요청에 SessionClosed를 반환한다. 진행 중 작업은 세션 내부 참조를 소유하고 정상 종료 시 해제한다. Swift에 이미 반환된 immutable payload의 수명은 세션 close와 독립적이다.
+세션 close 이후에는 새 요청에 SessionClosed를 반환한다. 진행 중 작업은 세션 내부 참조를 소유하고 정상 종료 시 해제한다. Swift에 이미 반환된 payload handle과 그 handle에서 복사한 Swift 버퍼의 수명은 세션 close와 독립적이다.
 
 ## 오류 모델
 

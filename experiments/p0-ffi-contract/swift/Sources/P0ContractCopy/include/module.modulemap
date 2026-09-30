@@ -1,0 +1,4 @@
+module P0ContractCopy {
+    header "p0_contract_copy.h"
+    export *
+}

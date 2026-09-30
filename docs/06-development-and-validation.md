@@ -138,6 +138,8 @@ Rust 문서는 macOS 대상으로 aarch64-apple-darwin과 x86_64-apple-darwin을
 
 P0에서 Rust toolchain, Cargo.lock, UniFFI runtime/generator, Xcode와 Swift 버전, 추가 codec 버전을 고정한다. Swift Package 의존성이 있으면 Package.resolved도 관리한다. Rust, 앱과 네이티브 의존성의 deployment target을 일치시킨다.
 
+P0 종료(2026-09-30)에서 고정한 값: Rust 1.98.1(aarch64-apple-darwin), UniFFI 0.32.2 runtime/generator, Swift 6.4 Command Line Tools와 SwiftPM(Xcode 없음), dicom-rs 0.10.0 baseline + charls + openjpeg-sys(각 Cargo.lock은 [P0-CODEC](../experiments/p0-codec/README.md)·[P0-FFI-CONTRACT](../experiments/p0-ffi-contract/README.md)). 지원 대상은 Apple Silicon과 macOS 27.0 이상(OQ-01)이며 제품의 Rust·Swift·네이티브 codec deployment target은 27.0으로 맞춘다. P0 FFI 실험 두 개는 deployment target 14.0으로 빌드했으므로 그 값은 제품 기준이 아니다. Intel은 지원하지 않으므로 아래 범용 패키징 문단은 현재 적용되지 않는다.
+
 검증 자동화는 Rust format/lint/test → 코어 기준 영상 시험 → FFI 계약 시험 → Swift/Metal 빌드와 시험 → release 패키지 smoke test 순서로 설계한다. macOS 앱과 GPU 시험은 실제 macOS 환경에서 수행한다. Windows/Linux에서 통과한 코어 시험으로 macOS 통합을 대체하지 않는다.
 
 개인용 설치는 일반 `.app` 패키지를 목표로 한다. Apple Silicon/Intel 모두 지원할 경우 각 아키텍처 라이브러리와 모든 codec 의존성을 검사하고 적절한 범용 패키징을 수행한다. Intel 지원을 실제 Intel에서 검증했는지 Rosetta에서만 검증했는지 구분한다.

@@ -1,0 +1,25 @@
+{
+  "task_id": "P0-FFI-CONTRACT",
+  "timestamp": "2026-09-30T13:04:03Z",
+  "base_commit": "ea7e2b351fad35a1e8871e6e21bf226739913d67",
+  "macos": "27.0",
+  "macos_build": "26A428",
+  "cpu": "Apple M5",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "swift": "swift-driver version: 1.168.6 Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)",
+  "xcode_select": "/Library/Developer/CommandLineTools",
+  "deployment_target": "14.0",
+  "uniffi": "0.32.2",
+  "static_link_only": true,
+  "sha256": {
+    "rust/src/lib.rs": "d2001b48384e11422be8f9f2a5b5f2d13afbabd14c1fbe5866d15098a9d9b40e",
+    "rust/Cargo.lock": "96b01bf96b6b325b867fc804ca76939f178f66ce0ee48d8cad6eed4ecc1abc41",
+    "include/p0_contract_copy.h": "4141b5f8aaa1feee5ed584123cadc7fdb847517fb6670e7a4d6fbc2fa0c118f0",
+    "swift/Sources/P0ContractCheck/main.swift": "f1254b4bf656d88d7d97e85608b9e9bcccb05271255e94c130d614ca59a64dd7",
+    "swift/Sources/P0ContractCheck/FrameCopy.swift": "82eae00c6e9cbf784ebc56ede7d0161c6527fd26f50540ab9b9b03319cdfccec",
+    "generated/p0contract.swift": "c45f7cba0b79e5442cfec99c4db7c9a31acdb998287694dcb69f2f6e19294465",
+    "libp0contract.a": "cade070da3ba354cb67068c2c4eb6044baf1cdd9919d61153a049a52611d87bb",
+    "P0ContractCheck": "a15114f629e777dab80c32fe60986b0de8ce8127af680b0996c3cf7db1f45d9d"
+  }
+}

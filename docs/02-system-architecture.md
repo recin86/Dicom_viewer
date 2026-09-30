@@ -2,7 +2,7 @@
 
 이 문서는 Rust 영상 코어와 Swift macOS 앱의 책임 및 실행 흐름을 정의한다. 목표는 DICOM의 의미와 수치 처리를 화면에서 독립적으로 검증하고, macOS의 입력과 GPU 표시 기능을 직접 활용하는 구조다.
 
-문서 버전 0.2 · 작성·검토일 2026-09-30 · 상태 검토·보완한 설계 초안. Rust/dicom-rs와 Swift의 사용은 확정 사항이다. UniFFI, SwiftUI/AppKit/Metal, SQLite와 아래 모듈 분할은 설계 제안이다.
+문서 버전 0.2 · 작성·검토일 2026-09-30 · 상태 검토·보완한 설계 초안. Rust/dicom-rs와 Swift의 사용은 확정 사항이다. UniFFI 연결과 픽셀 전달 방식은 P0 종료에서 채택했다(ADR 0002). SwiftUI/AppKit/Metal, SQLite와 아래 모듈 분할은 설계 제안이다.
 
 ## 구성과 책임
 
@@ -14,7 +14,7 @@ Rust core ── DICOM 읽기와 디코딩
    │         프레임 해석과 공간 정보
    │         캐시, 측정, 인덱스와 프로젝트 저장
    │
-UniFFI ──── 요약 정보, 명령, 오류, 소유된 픽셀 버퍼
+UniFFI ──── 요약 정보, 명령, 오류, 프레임 handle (픽셀은 타입 있는 C 복사 함수로 Swift 버퍼에 1회 복사)
    │
 Swift app ─ 탐색 상태, 도구 상태, cine 스케줄링
    ├─────── SwiftUI 앱 화면
@@ -38,7 +38,7 @@ SwiftUI에 AppKit 뷰를 넣는 경계에는 NSViewRepresentable을 사용하고
 
 ## 코어 경계와 빌드
 
-코어는 정적 라이브러리로 빌드해 앱에 연결하고 UniFFI로 Swift 바인딩을 생성하는 작업안을 사용한다. UniFFI는 이 연결 방식을 문서화하고 있지만 프로젝트의 빌드 설정과 패키징은 P0에서 직접 확인해야 한다. 생성기와 런타임 버전은 함께 고정한다. [UniFFI Xcode 연동](https://mozilla.github.io/uniffi-rs/latest/swift/xcode.html)
+코어는 정적 라이브러리로 빌드해 앱에 연결하고 UniFFI 0.32.2로 Swift 바인딩을 생성한다(P0 종료 채택). 대상 Mac에서 Xcode 없이 Command Line Tools와 SwiftPM으로 빌드·정적 링크를 확인했다. 앱 번들 패키징과 서명은 P5에서 검증한다. 생성기와 런타임 버전은 함께 고정한다. [UniFFI Xcode 연동](https://mozilla.github.io/uniffi-rs/latest/swift/xcode.html)
 
 초기에는 Rust 모듈로 책임을 나누고, 실제 재사용이나 빌드 시간의 이점이 있을 때 crate를 분리한다. 범용성을 이유로 첫 단계부터 과도한 인터페이스 계층이나 플러그인 시스템을 만들지 않는다.
 
@@ -98,11 +98,11 @@ source revision, display set의 grouping revision 또는 세션이 바뀔 때도
 | --- | --- | --- |
 | 파일 메타데이터 | Rust | Source ID와 파일 revision, 파일 변경 시 무효화 |
 | 디코딩 픽셀 | Rust | Frame ID, source revision, decoder revision, 출력 단계 |
-| 표시 버퍼 | Rust 및 Swift 전달 결과 | 디코딩 키와 표시 버퍼 형식, 소유된 값으로 전달 |
+| 표시 버퍼 | Rust 보유 불변 프레임, Swift 복사본 | 디코딩 키와 표시 버퍼 형식, Swift 소유 버퍼로 1회 복사 |
 | GPU 텍스처 | Swift renderer | Frame ID와 payload revision, GPU 사용 종료 후 재활용 |
 | 썸네일 | Rust 및 디스크 캐시 | 원본 revision과 thumbnail recipe version |
 
-초기 FFI는 소유된 bytes를 반환한다. FFI 전달과 GPU 업로드의 복사 비용을 자원 예산에 포함하며 zero-copy라고 표현하지 않는다. 포인터 공유는 성능 병목이 확인된 뒤 별도 ADR로 도입한다.
+FFI는 Rust 보유 프레임을 Swift 소유 버퍼로 한 번 복사해 전달한다([ADR 0002](adr/0002-uniffi-and-pixel-buffers.md), P0 종료 채택). Rust 포인터를 Swift에 빌려주지 않는다. FFI 복사와 GPU 업로드의 비용, Rust 보유본과 Swift 버퍼가 함께 존재하는 메모리(복사 중과 Swift가 handle을 보유하는 동안)를 자원 예산에 포함하며 zero-copy라고 표현하지 않는다. 포인터 공유는 성능 병목이 확인된 뒤 별도 ADR로 도입한다.
 
 캐시는 프레임 개수보다 바이트 기준으로 제한한다. 현재 화면 리소스, 재생 준비 프레임, 일반 미리 읽기의 순서로 우선순위를 둔다. CPU/GPU 리소스와 전송 중 버퍼를 함께 계측한다. Metal 리소스 해제는 해당 command buffer의 사용 완료 이후에만 한다.
 

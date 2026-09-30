@@ -1,0 +1,182 @@
+{
+  "checks" : [
+    {
+      "detail" : {
+        "metadata_ok" : true,
+        "mismatches" : 0
+      },
+      "id" : "C01",
+      "status" : "pass",
+      "title" : "GrayF32LE 512x512 all-valid: every value bit-exact vs Swift formula, stride\/len\/domain"
+    },
+    {
+      "detail" : {
+        "expected_invalid" : 11939,
+        "invalid_pixels" : 11939,
+        "mismatches" : 0
+      },
+      "id" : "C02",
+      "status" : "pass",
+      "title" : "GrayF32LE 511x257 with valid_mask: masked pixels are finite +0.0, mask 0\/1 exact"
+    },
+    {
+      "detail" : {
+        "mask_status" : 5,
+        "mismatches" : 0
+      },
+      "id" : "C03",
+      "status" : "pass",
+      "title" : "RGBA8 300x200: R,G,B,A order exact, DisplayColor, mask copy -> NO_MASK without write"
+    },
+    {
+      "detail" : {
+        "destination_untouched" : true,
+        "prepare_over_limit" : true,
+        "prepare_rgba_mask" : true,
+        "prepare_size_overflow" : true,
+        "prepare_zero" : true,
+        "statuses" : {
+          "long" : 3,
+          "mask_short" : 3,
+          "null" : 2,
+          "short" : 3,
+          "ticket_unknown" : 1,
+          "ticket0" : 1,
+          "zero" : 3
+        },
+        "wrapper_wrong_length" : "copy-status-3"
+      },
+      "id" : "C04",
+      "status" : "pass",
+      "title" : "Errors: exact-length\/null\/unknown ticket statuses, destination unchanged, invalid prepare rejected"
+    },
+    {
+      "detail" : {
+        "after_cache_evict_status" : 1,
+        "after_close" : "ok",
+        "after_evict" : "ok",
+        "after_last_release_status" : 1,
+        "cache_only_owner_status" : 0,
+        "evicted_and_cache_empty" : true,
+        "prepare_after_close_session_closed" : true
+      },
+      "id" : "C05",
+      "status" : "pass",
+      "title" : "Lifetime: payload valid after eviction\/close while owned; SessionClosed for new work; ticket expires with last owner"
+    },
+    {
+      "detail" : {
+        "copies" : 8,
+        "mismatches" : 0
+      },
+      "id" : "C06",
+      "status" : "pass",
+      "title" : "8 concurrent copies of one ticket into separate Swift buffers"
+    },
+    {
+      "detail" : {
+        "corrupt" : 0,
+        "expired" : 3589,
+        "ok_copies" : 4411,
+        "other" : 0,
+        "revived" : 0,
+        "rounds" : 200
+      },
+      "id" : "C07",
+      "status" : "pass",
+      "title" : "Copy racing the last release: each copy is complete or INVALID_TICKET, never partial\/revived"
+    },
+    {
+      "detail" : {
+        "returned_status" : 4
+      },
+      "id" : "C08",
+      "status" : "pass",
+      "title" : "Panic inside the C bridge returns PANIC status; process continues"
+    },
+    {
+      "detail" : {
+        "rust_allocs_during_copies" : 0,
+        "rust_live_delta_bytes" : 0
+      },
+      "id" : "C09",
+      "status" : "pass",
+      "title" : "40 copies (16 MiB pixels + 4 MiB mask) allocate nothing in Rust"
+    },
+    {
+      "detail" : {
+        "after_release_MiB" : 272.18799999999999,
+        "base_MiB" : 80.016000000000005,
+        "fresh_first_MiB" : 272.18799999999999,
+        "fresh_last_MiB" : 272.18799999999999,
+        "reuse_first_MiB" : 208.126,
+        "reuse_last_MiB" : 208.126,
+        "rust_live_delta_bytes" : 0,
+        "verified" : true
+      },
+      "id" : "C10",
+      "status" : "pass",
+      "title" : "64 MiB GrayF32 (+16 MiB mask): footprint flat over 20 reused and 20 fresh-buffer copies; Rust bytes returned after release"
+    },
+    {
+      "detail" : {
+        "timing" : [
+          {
+            "fresh_alloc_p50_ms" : 0.012999999999999999,
+            "fresh_alloc_p95_ms" : 0.012999999999999999,
+            "reps" : 60,
+            "reuse_p50_ms" : 0.012999999999999999,
+            "reuse_p95_ms" : 0.012999999999999999,
+            "size" : "1MiB"
+          },
+          {
+            "fresh_alloc_p50_ms" : 0.27000000000000002,
+            "fresh_alloc_p95_ms" : 0.33600000000000002,
+            "reps" : 30,
+            "reuse_p50_ms" : 0.28100000000000003,
+            "reuse_p95_ms" : 0.28699999999999998,
+            "size" : "16MiB"
+          },
+          {
+            "fresh_alloc_p50_ms" : 1.0880000000000001,
+            "fresh_alloc_p95_ms" : 1.119,
+            "reps" : 15,
+            "reuse_p50_ms" : 1.0880000000000001,
+            "reuse_p95_ms" : 1.1259999999999999,
+            "size" : "64MiB"
+          }
+        ]
+      },
+      "id" : "C11",
+      "status" : "info",
+      "title" : "Copy timing into Swift-owned buffers (not an app display latency)"
+    },
+    {
+      "detail" : {
+        "device" : "Apple M5",
+        "mismatches" : 0,
+        "wrong_length" : "copy-status-3"
+      },
+      "id" : "C12",
+      "status" : "pass",
+      "title" : "Copy into MTLBuffer (shared storage) matches; wrong-size Metal buffer rejected (CPU copy only, no GPU pass)"
+    }
+  ],
+  "environment" : {
+    "core_info" : "p0contract 0.0.1 | uniffi 0.32.2 | profile release | target aarch64-macos",
+    "cpu" : "Apple M5",
+    "hw_model" : "Mac17,3",
+    "memory_GiB" : 16,
+    "os" : "Version 27.0 (Build 26A428)"
+  },
+  "schema_version" : 1,
+  "scope" : "P0 contract experiment with synthetic frames; not decode_frame, not GPU rendering, not product T-11..T-13 acceptance",
+  "summary" : {
+    "fail" : 0,
+    "info" : 1,
+    "not_run" : 0,
+    "pass" : 11
+  },
+  "task_id" : "P0-FFI-CONTRACT",
+  "timestamp" : "2026-09-30T13:04:04Z"
+}

@@ -45,12 +45,12 @@
 
 | ID | 항목 | 현재 작업안 | 결정 시점 |
 | --- | --- | --- | --- |
-| OQ-01 | 최소 macOS와 CPU 지원 | **CPU: Apple Silicon(arm64)만 지원, Intel 제외 (사용자 확정 2026-09-30).** 최소 macOS는 빌드와 시험 후 확정 | P0 종료 |
-| OQ-02 | Rust와 Swift 연결 | UniFFI와 Rust 정적 라이브러리 | P0 종료 |
-| OQ-03 | 추가 압축 코덱 | JPEG-LS와 JPEG 2000을 우선 평가 | P0 종료 |
-| OQ-04 | Enhanced CT/MR 우선순위 | v0.2 후보, 대표 자료 비중에 따라 조정 | P0 종료 |
+| OQ-01 | 최소 macOS와 CPU 지원 | **확정(P0 종료 2026-09-30): Apple Silicon(arm64)만, 최소 macOS 27.0.** CPU와 최소 OS 모두 사용자 확인(2026-09-30). 시험 가능한 기기가 macOS 27.0 한 대뿐이라 더 낮은 OS는 지원하지 않는다. 하위 OS 지원은 실제 기기 시험 후 새 결정으로 연다 | 확정 |
+| OQ-02 | Rust와 Swift 연결 | **확정(P0 종료 2026-09-30): UniFFI 0.32.2 + Rust 정적 라이브러리 + SwiftPM(Command Line Tools).** 픽셀·mask는 Rust 보유 불변 프레임에서 Swift 소유 버퍼로 1회 복사하는 타입 있는 C 함수(불투명 ticket)와 Swift 안전 래퍼로 전달. 근거 [ADR 0002](docs/adr/0002-uniffi-and-pixel-buffers.md), [P0-FFI-CONTRACT](experiments/p0-ffi-contract/README.md) | 확정 |
+| OQ-03 | 추가 압축 코덱 | **확정(P0 종료 2026-09-30): dicom-rs 0.10.0 baseline(native·deflate·jpeg·rle) + charls(JPEG-LS) + openjpeg-sys(JPEG 2000, C OpenJPEG)를 v0.1 대상으로 포함.** 저장 값 정규화·컬러·빈 BOT 다중 fragment·손상 경계·JPEG Extended·일부 공개 Modality 불일치 등 [제한 표](experiments/p0-codec/README.md#픽셀-변환-호출-규칙과-제한)의 실패와 not-run 5건은 P1 adapter에서 해소하거나 capability로 차단한 뒤 지원 판정. HTJ2K·JPEG XL·video 제외 유지. 근거 [P0-CODEC](experiments/p0-codec/README.md) | 확정 |
+| OQ-04 | Enhanced CT/MR 우선순위 | **확정(P0 종료 2026-09-30): v0.2 후보 유지.** 사용자 실제 자료가 없고 공개 331개 중 Enhanced CT 1·MR 5개(파일 수는 임상 빈도가 아님)라 v0.1 필수로 올릴 근거가 없다. v0.1은 Enhanced를 식별해 제한 상태로 보이고 일반 스택으로 오인하지 않는다. 사용자가 Enhanced 자료를 주로 쓰게 되면 범위 변경으로 다시 논의 | 확정 |
 | OQ-05 | 배포 방식과 앱 파일 권한 | **App Store 등록 안 함, 유료 Apple 개발자 계정 없음 (사용자 확정 2026-09-30).** 개인용 직접 빌드·설치, ad-hoc 서명, App Sandbox 미사용 작업안 | 방향 확정, P5에서 검증 |
-| OQ-06 | 성능 기준 장비와 자료 | **기준 장비 초안: Apple M5 MacBook Air, 16 GiB, macOS 27.0, 외부 4K(UI 1920×1080, 2×) (P0-ENV 2026-09-30).** 샘플 특성은 P0-DATA에서 기록 | P0에서 지정, P2에서 목표 검토 |
+| OQ-06 | 성능 기준 장비와 자료 | **기준 장비 초안: Apple M5 MacBook Air, 16 GiB, macOS 27.0, 외부 4K(UI 1920×1080, 2×) (P0-ENV 2026-09-30).** 샘플 특성은 P0-DATA에서 기록(DATA 준비 [preparation.json](experiments/p0-data/results/preparation.json)). 저장 장치와 전원 모드는 아직 기록하지 않았으므로 P2 성능 측정 전에 보완 | P0에서 지정, P2에서 목표 검토 |
 | OQ-07 | 연구 프로젝트 저장 | 원본 참조와 별도 프로젝트 문서, 앱 인덱스는 SQLite | P3 시작 전 |
 | OQ-08 | 첫 버전의 측정 범위 | CT/MR과 보정 가능한 X-ray의 기본 측정, US 물리 측정은 후속 후보 | P3 시작 전 |
 | OQ-09 | 앱 이름과 식별자 | DICOM Viewer는 작업용 이름 | P5 시작 전 |

@@ -47,9 +47,9 @@
 | Explicit VR Big Endian | 기본 지원 | v0.1 필수 시험, endian 회귀 시험 |
 | Deflated Explicit VR Little Endian | deflate | v0.1 필수 시험 |
 | RLE Lossless | rle | v0.1 필수 시험 |
-| JPEG Baseline, Extended, Lossless | jpeg | v0.1 목표, 각각 별도 사례로 검증 |
-| JPEG-LS lossless 및 near-lossless | charls | P0 우선 평가 후 v0.1 포함 여부 결정 |
-| JPEG 2000 | openjp2 또는 openjpeg-sys | P0 우선 평가 후 v0.1 포함 여부 결정 |
+| JPEG Baseline, Extended, Lossless | jpeg | v0.1 목표, 각각 별도 사례로 검증. P0-CODEC에서 JPEG Extended 공개 사례는 pass 0·fail 1·not-run 1이라 별도 검증 전 capability를 제한 |
+| JPEG-LS lossless 및 near-lossless | charls | v0.1 대상 (OQ-03, P0 종료). 빈 BOT 다중 fragment 실패 등 [P0-CODEC](../experiments/p0-codec/README.md) 제한 해소 후 지원 판정 |
+| JPEG 2000 | openjpeg-sys (C OpenJPEG 2.5.3 정적 빌드); openjp2는 사용하지 않음 | v0.1 대상 (OQ-03, P0 종료). 같은 조건으로 지원 판정 |
 | HTJ2K | 레지스트리 표에 openjp2 또는 openjpeg-sys 경로가 있으나 대상 빌드의 실제 동작은 미검증 | v0.1 기본 범위에서 제외; 후속 평가 |
 | JPEG XL | jxl-oxide 디코딩 경로가 문서화됨 | v0.1 기본 범위에서 제외; 후속 평가 |
 | MPEG/H.264/H.265 기반 video | 이번 앱의 decoder 경로 미확정 | 초기 지원 약속에서 제외 |
