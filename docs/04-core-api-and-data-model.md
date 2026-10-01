@@ -13,13 +13,13 @@ P1 골격의 [Rust facade](../crates/viewer-ffi/src/lib.rs)는 초기 연결 확
 | api_revision | u32 | 초기 연결 계약 revision 1; 프로젝트 schema나 DICOM revision 아님 |
 | core_version | String | 빌드한 제품 코어 crate 버전 |
 | dicom_rs_version | String | 고정한 dicom-rs 버전이며 지원 판정 아님 |
-| frame_decode_implemented | bool | 현재 false. 앱 표시 경로가 없어 열기 버튼과 메뉴를 비활성화; 아래 제한된 PIXEL-1 adapter의 존재와 구분 |
+| frame_decode_implemented | bool | 골격의 동결된 초기 호출은 false. native 표시 가능 여부는 아래 DISPLAY-1의 별도 함수로 조회하며 전체 DICOM capability를 의미하지 않음 |
 
 짧은 동기 호출이며 파일 I/O·환자 태그·픽셀·세션·캐시를 다루지 않는다. Swift `ViewerReadiness`는 이를 `apiRevision/coreVersion/dicomRSVersion/canOpenDicom`으로 전달한다. 영상 디코딩 capability는 이 전역 bool로 대신하지 않고 후속 프레임 계약에서 정의한다.
 
 ## 구현한 버퍼 계약 · PIXEL-1
 
-[Rust API](../crates/viewer-ffi/src/pixels.rs)와 [Swift 래퍼](../macos/Sources/ViewerBridge/PixelFrames.swift)는 실제 native 단일 프레임을 불변 버퍼로 전달한다. 아직 아래 전체 `FramePayload`/`decode_frame`은 아니다. source/frame reference, 요청 generation, 단위·VOI·표시 극성·종횡비·진단 모델은 후속 표시 통합에서 추가한다. 따라서 이 API로 받은 픽셀만으로 앱 표시나 측정을 활성화하지 않는다.
+[Rust API](../crates/viewer-ffi/src/pixels.rs)와 [Swift 래퍼](../macos/Sources/ViewerBridge/PixelFrames.swift)는 실제 native 단일 프레임을 불변 버퍼로 전달한다. 아직 아래 전체 `FramePayload`/`decode_frame`은 아니다. 표시에는 다음 DISPLAY-1 설명을 함께 사용하며 픽셀 버퍼만으로 물리 측정을 활성화하지 않는다.
 
 | Rust 선언 (생성 Swift 이름은 camelCase) | 의미 |
 | --- | --- |
@@ -36,7 +36,32 @@ Swift는 `PreparedPixelFrame`으로 Rust handle을 유지하며, `copy(using: Pi
 
 기본값은 Rust live 512 MiB/한 프레임 128 MiB, Swift 복사본 live 512 MiB다. Rust cache·반환 handle·진행 중 C copy가 같은 payload 예약을 공유하고 마지막 참조가 해제될 때 반환한다. Swift도 같은 소유 객체의 여러 참조는 한 번, 별도 복사본은 각각 계수하며 마지막 객체 해제 시 반환한다. 두 예산은 독립적이므로 RSS 총합 512 MiB를 보장하지 않는다. parser·입력·allocator overhead·GPU는 payload 예산 밖이다. 좁은 native adapter는 입력 32 MiB와 세션당 준비 1개를 제한하며 parser 전체 할당/중첩 한도는 미검증이다.
 
-입력 범위와 실제 검증/남은 항목은 [PIXEL-1 작업 기록](implementation/P1-pixel-contract.md)에 둔다. 앱 파일 열기, 전체 codec 및 T-11/T-13 정식 합격과 구분한다.
+입력 범위와 당시 검증은 [PIXEL-1 작업 기록](implementation/P1-pixel-contract.md)에 둔다. 후속 표시 검증은 아래 기록을 따르며 전체 codec 및 T-11/T-13 정식 합격과 구분한다.
+
+## 구현한 표시 설명 · DISPLAY-1
+
+[Rust display facade](../crates/viewer-ffi/src/display.rs)와 [Swift 표시 타입](../macos/Sources/ViewerBridge/DisplayFrames.swift)은 PIXEL-1 handle에 불변 표시 설명을 연결한다. 실제 입력은 같은 file handle에서 최대 32 MiB로 읽은 바이트를 한 번 parse하며 그 바이트의 SHA-256을 source revision으로 사용한다. 세션마다 새로 준비하므로 경로 기반 캐시 재사용이나 외부 변경 감시를 뜻하지 않는다.
+
+| 계약 | 의미 |
+| --- | --- |
+| `native_display_available() -> bool` | 현재 좁은 native adapter와 표시 backend 연결 여부. 파일별 지원은 실제 준비 결과로 판정 |
+| `PixelHandle.display_info() -> DisplayInfo` | descriptor_revision=1, source_revision=64 lowercase hex, frame_index=0. windows/default_window·automatic_window·inverted·pixel_height_over_width·aspect_source/estimated·unit·safe diagnostics·can_window |
+| `VoiWindow` | center/width F64, Linear/LinearExact/Sigmoid. LINEAR width≥1, 나머지 width>0, 유한 값. file VOI 오류는 Unsupported, caller override 오류는 InvalidArgument |
+| `PixelHandle.reference_rgba(window?, user_invert)` | 시험 전용 최대 16,384 pixels/64 KiB, nearest source grid, alpha255. 같은 F32LE 픽셀에서 계산하며 gray8은 half-up 양자화. 제품 대형 표시 경로가 아님 |
+| Swift `PreparedPixelFrame.display`, `OwnedPixelFrame.display` | Rust descriptor를 함께 보유하고 revision/형식/범위를 검사. 생성 타입은 ViewerBridge 내부 |
+| viewport generation | 새 열기마다 단조 증가. decode/upload 후 generation이 현재와 같을 때만 frame와 label을 함께 설치. 파일별 session은 성공/실패/폐기 때 close |
+
+VOI가 없으면 padding을 제외한 실제 F32 입력 범위로 LINEAR_EXACT를 만들며 균일 영상은 중심값/폭1로 중간 회색을 표시한다. 전부 padding이면 default_window는 없고 window 조작을 비활성화한다. MONOCHROME1과 자연 INVERSE 또는 MONOCHROME2와 IDENTITY를 한 번만 적용하며 반대 조합은 현재 거부한다. padding은 사용자 반전에도 검정이다. RGB SC는 window·반전을 적용하지 않는다.
+
+표시 비율은 PixelSpacing→ImagerPixelSpacing→NominalScannedPixelSpacing→PixelAspectRatio→square 순서로 해석한다. 유효한 양수 비율과 provenance만 전달하며 mm 측정 capability는 부여하지 않는다. 단위는 신뢰 가능한 명시 CT HU 또는 unknown이다. overlay/shutter는 미적용 진단으로 드러낸다.
+
+Metal은 GrayF32LE를 r32Float, mask를 r8Uint, 색을 rgba8Unorm으로 올린다. 실제 drawable은 bgra8Unorm이며 offscreen 비교는 rgba8Unorm이다. 선형 보간에서 가장 가까운 픽셀이 padding이면 검정, 그 밖에는 유효한 이웃만 가중한다. 각 업로드는 새 텍스처이고 command 완료까지 source/GPU 객체를 유지한다. GPU 표현 범위를 넘는 표시 설정은 오류로 처리한다. 구현·검증과 남은 범위는 [native 표시 기록](implementation/P1-native-display.md)에 둔다.
+
+## SC 컬러 확장 · COLOR-1
+
+[컬러 과업](implementation/P1-native-color.md)은 같은PIXEL-1/DISPLAY-1 공개선언과revision1을 유지하며 private native producer를 확장한다. unsigned8 RGB planar0/1·YBR_FULL planar0/1·even-width YBR_FULL_422 planar0가 대상이다. nominal spp3인422의입력은 `rows×columns×2` bytes로검증하고 `Y1,Y2,Cb,Cr`를같은행의두픽셀에대응시킨다. YBR_FULL은full-range BT.601 inverse를F64에서계산하고nearest integer·0..255clamp한RGBA8/alpha255로정규화한다. 이미RGB인입력에는색변환을다시적용하지않는다.
+
+출력은DisplayColor/mask없음·기본극성false·VOI없음·can_windowfalse·unitunknown·unprofiled_rgb이며Swift/Metal은그대로RGBA8을사용한다. payload/source/close/evict/GPUowner계약은동일하다. US/Palette·고비트/odd422·ICC·미구현color transforms·압축/Enhanced/다중frame은현재제외하고structured error를반환한다. 작은 CPU reference·owned bytes·Metal·literal 비교와 최신 source/binary 근거는 [컬러 결과](implementation/results/P1-native-color.json)에 둔다. debug/release에서 각각 Rust 38+FFI 7, PIXEL 18, DISPLAY 26, COLOR 29 pass다. 범위구현과실제사용자UI완료를구분한다.
 
 ## 공통 규칙
 

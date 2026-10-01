@@ -1,0 +1,3187 @@
+{
+  "schema_revision": 1,
+  "task": "P1-ADAPTER-PREP-20261001",
+  "date": "2026-10-01",
+  "baseline_commit": "c68c9208be771e366fe0824d0a7a8291eb679597",
+  "branch": "codex/p1-foundation",
+  "snapshot": "uncommitted independent preparation; DISPLAY final UI pending",
+  "scope": "fixture preparation and read-only investigation only",
+  "preparation_complete": true,
+  "product_complete": false,
+  "review": {
+    "state": "complete_for_independent_preparation_only",
+    "reviewer_rebuilt_or_launched_app": false,
+    "addressed_finding": "US native YBR moved to unsupported product target with generic raw color oracle separated",
+    "mandatory_findings_open": 0,
+    "source_hash_count": 2,
+    "fixture_count": 26,
+    "repeat_fixture_count": 26,
+    "raw_color_readback_count": 14,
+    "negative_metadata_count": 15,
+    "reviewer_independent_pydicom_readback": true,
+    "reviewer_independent_bt601_and_palette_check": true,
+    "display_preservation_confirmed": true,
+    "p0_tracked_diff_empty_confirmed": true,
+    "reviewer_regenerated_fixtures_or_reran_verifier": false
+  },
+  "source_hashes": [
+    {
+      "path": "scripts/prepare-color-fixtures.py",
+      "bytes": 12462,
+      "sha256": "1dfa0aadcba84aff334abe711a91376dc5c46f4df6460ecae2041066fbac3b24"
+    },
+    {
+      "path": "scripts/verify-color-fixtures.py",
+      "bytes": 8974,
+      "sha256": "5aae6e929837c699ae0c572cfd9770031484d8f248c2b463ae0e1be901f262df"
+    }
+  ],
+  "commands": [
+    {
+      "command": "python3 scripts/prepare-color-fixtures.py \"$P1_CACHE/color-fixtures-v2\"",
+      "exit": 0
+    },
+    {
+      "command": "python3 scripts/prepare-color-fixtures.py \"$P1_CACHE/color-fixtures-v2-repeat\"",
+      "exit": 0
+    },
+    {
+      "command": "\"$REFERENCE_VENV/bin/python\" scripts/verify-color-fixtures.py \"$P1_CACHE/color-fixtures-v2\" \"$P1_CACHE/color-fixtures-v2-repeat\" \"$P1_CACHE/color-preparation.json\"",
+      "exit": 0
+    }
+  ],
+  "readback_report_evidence": {
+    "path": "$P1_CACHE/color-preparation.json",
+    "bytes": 65314,
+    "sha256": "37a4636ce8f2ad7bbc8e349c608b13b5d75fbd538018a5fe733455069a354715"
+  },
+  "readback_report": {
+    "task_id": "P1-ADAPTER-PREP-20261001",
+    "scope": "independent fixture preparation/readback only",
+    "environment": {
+      "python": "3.12.13",
+      "pydicom": "3.0.2",
+      "numpy": "2.5.3"
+    },
+    "verifier_sha256": "5aae6e929837c699ae0c572cfd9770031484d8f248c2b463ae0e1be901f262df",
+    "manifest_sha256": "703744c3c8e367fd8593393fe8417497e7b621e76d0522833ff9404c8988340c",
+    "manifest": {
+      "task_id": "P1-ADAPTER-PREP-20261001",
+      "revision": 2,
+      "synthetic_only": true,
+      "scope": "fixture preparation only; minimal pixel-module files, not full IOD conformance or product support",
+      "standard": "DICOM PS3.3 2026d C.7.6.3 and C.8.5.6, consulted 2026-10-01",
+      "standard_sources": [
+        "https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html",
+        "https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.8.5.6.html"
+      ],
+      "oracle": "literal stored/RGB/RGBA arrays; independent reader checks; no product decoder output",
+      "writer_sha256": "1dfa0aadcba84aff334abe711a91376dc5c46f4df6460ecae2041066fbac3b24",
+      "pixel_data_vr": "explicit OB for 8-bit pixels, OW for 16-bit pixels; implicit VR inferred by reader; palette tables OW with source syntax endian",
+      "us_policy": "C.8.5.6.1.2 requires RGB for native multi-sample US. C.8-23 YBR_FULL planar0/1 row does not grant native Photometric acceptance; US YBR is unsupported target with generic raw color readback only. C.8-20 specializes dense16 palette to 16-bit unsigned indices.",
+      "ybr_policy": "full-range BT.601 inverse, nearest integer then clamp; target tolerance <=1",
+      "fixtures": [
+        {
+          "id": "sc-rgb-interleaved-le.dcm",
+          "bytes": 548,
+          "sha256": "397624c7d2aeeecac27919670a9266a4a8ce0ebbc537640bf2443dc20c080cb9",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "RGB",
+          "planar": 0,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 18,
+          "pixel_data_sha256": "a10556fa584cc00dfe38332b66da790e654dcd2c76dea85d0b4718075834e457",
+          "target_expectation": "future_decode",
+          "reason": "",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgb8": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgba8": [
+            255,
+            0,
+            0,
+            255,
+            0,
+            255,
+            0,
+            255,
+            0,
+            0,
+            255,
+            255,
+            0,
+            0,
+            0,
+            255,
+            255,
+            255,
+            255,
+            255,
+            17,
+            34,
+            51,
+            255
+          ],
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "sc-rgb-planar-le.dcm",
+          "bytes": 548,
+          "sha256": "448103f7661c3af68d50a16b8e8e6d275c9b8bd4d55048bb2b55ac8de9c0ddfc",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "RGB",
+          "planar": 1,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 18,
+          "pixel_data_sha256": "b0beddcf7ca0153c65d36f90a4d4b7db198deb76a872483f14f813dbf51b92ae",
+          "target_expectation": "future_decode",
+          "reason": "",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgb8": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgba8": [
+            255,
+            0,
+            0,
+            255,
+            0,
+            255,
+            0,
+            255,
+            0,
+            0,
+            255,
+            255,
+            0,
+            0,
+            0,
+            255,
+            255,
+            255,
+            255,
+            255,
+            17,
+            34,
+            51,
+            255
+          ],
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "sc-rgb-planar-implicit.dcm",
+          "bytes": 542,
+          "sha256": "55c8910d08a6bcfb7b1483a1ef8a0905a8094c39093a0801c97f5efecb210bad",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2",
+          "frames": 1,
+          "photometric": "RGB",
+          "planar": 1,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 18,
+          "pixel_data_sha256": "b0beddcf7ca0153c65d36f90a4d4b7db198deb76a872483f14f813dbf51b92ae",
+          "target_expectation": "future_decode",
+          "reason": "",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgb8": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgba8": [
+            255,
+            0,
+            0,
+            255,
+            0,
+            255,
+            0,
+            255,
+            0,
+            0,
+            255,
+            255,
+            0,
+            0,
+            0,
+            255,
+            255,
+            255,
+            255,
+            255,
+            17,
+            34,
+            51,
+            255
+          ],
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "sc-rgb-interleaved-be.dcm",
+          "bytes": 548,
+          "sha256": "48bbfafcc1f93161b433d5ce7b347b265e06f09bdd7034728e73b66f22fab68d",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.2",
+          "frames": 1,
+          "photometric": "RGB",
+          "planar": 0,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 18,
+          "pixel_data_sha256": "a10556fa584cc00dfe38332b66da790e654dcd2c76dea85d0b4718075834e457",
+          "target_expectation": "future_decode",
+          "reason": "",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgb8": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgba8": [
+            255,
+            0,
+            0,
+            255,
+            0,
+            255,
+            0,
+            255,
+            0,
+            0,
+            255,
+            255,
+            0,
+            0,
+            0,
+            255,
+            255,
+            255,
+            255,
+            255,
+            17,
+            34,
+            51,
+            255
+          ],
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "us-rgb-interleaved.dcm",
+          "bytes": 552,
+          "sha256": "8f1b9f7723683e119945c9f0b993704948eb08c2b99ff80c45b69bb437bcebf4",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.6.1",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "RGB",
+          "planar": 0,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 18,
+          "pixel_data_sha256": "a10556fa584cc00dfe38332b66da790e654dcd2c76dea85d0b4718075834e457",
+          "target_expectation": "future_decode",
+          "reason": "",
+          "substep": "color-us",
+          "product_status": "not-run",
+          "stored_expanded": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgb8": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgba8": [
+            255,
+            0,
+            0,
+            255,
+            0,
+            255,
+            0,
+            255,
+            0,
+            0,
+            255,
+            255,
+            0,
+            0,
+            0,
+            255,
+            255,
+            255,
+            255,
+            255,
+            17,
+            34,
+            51,
+            255
+          ],
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "sc-ybr-full-interleaved.dcm",
+          "bytes": 552,
+          "sha256": "182d245e0375efaf6f30236e25f4c5a05ef411a91e1b274e199cbfcf3161ebcf",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "YBR_FULL",
+          "planar": 0,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 18,
+          "pixel_data_sha256": "2eabe9bfc77792968bc2a8a8b1b53468114529a6e62557a44fa274a186a861b3",
+          "target_expectation": "future_decode",
+          "reason": "",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": [
+            [
+              76,
+              85,
+              255
+            ],
+            [
+              150,
+              44,
+              21
+            ],
+            [
+              29,
+              255,
+              107
+            ],
+            [
+              0,
+              128,
+              128
+            ],
+            [
+              255,
+              128,
+              128
+            ],
+            [
+              128,
+              128,
+              128
+            ]
+          ],
+          "rgb8": [
+            [
+              254,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              1
+            ],
+            [
+              0,
+              0,
+              254
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              128,
+              128,
+              128
+            ]
+          ],
+          "rgba8": [
+            254,
+            0,
+            0,
+            255,
+            0,
+            255,
+            1,
+            255,
+            0,
+            0,
+            254,
+            255,
+            0,
+            0,
+            0,
+            255,
+            255,
+            255,
+            255,
+            255,
+            128,
+            128,
+            128,
+            255
+          ],
+          "rgb_tolerance": 1,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "sc-ybr-full-planar.dcm",
+          "bytes": 552,
+          "sha256": "b1a81fbd2660483b72155adf445d6342e616b7a8468c17763d5496f193737e96",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "YBR_FULL",
+          "planar": 1,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 18,
+          "pixel_data_sha256": "5d17c3aa36ac756d29aa5fa1bc188d22841d23be2aa910a43139ee70a6277345",
+          "target_expectation": "future_decode",
+          "reason": "",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": [
+            [
+              76,
+              85,
+              255
+            ],
+            [
+              150,
+              44,
+              21
+            ],
+            [
+              29,
+              255,
+              107
+            ],
+            [
+              0,
+              128,
+              128
+            ],
+            [
+              255,
+              128,
+              128
+            ],
+            [
+              128,
+              128,
+              128
+            ]
+          ],
+          "rgb8": [
+            [
+              254,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              1
+            ],
+            [
+              0,
+              0,
+              254
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              128,
+              128,
+              128
+            ]
+          ],
+          "rgba8": [
+            254,
+            0,
+            0,
+            255,
+            0,
+            255,
+            1,
+            255,
+            0,
+            0,
+            254,
+            255,
+            0,
+            0,
+            0,
+            255,
+            255,
+            255,
+            255,
+            255,
+            128,
+            128,
+            128,
+            255
+          ],
+          "rgb_tolerance": 1,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "defer-us-ybr-full-planar.dcm",
+          "bytes": 556,
+          "sha256": "ae7441b1e4bca894ac133163b3fde3b575515cf8989053516e931b4654dc0653",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.6.1",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "YBR_FULL",
+          "planar": 1,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 18,
+          "pixel_data_sha256": "5d17c3aa36ac756d29aa5fa1bc188d22841d23be2aa910a43139ee70a6277345",
+          "target_expectation": "unsupported",
+          "reason": "us_native_color_requires_rgb",
+          "substep": "color-us",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 1,
+          "raw_reader_expected": {
+            "stored_expanded": [
+              [
+                76,
+                85,
+                255
+              ],
+              [
+                150,
+                44,
+                21
+              ],
+              [
+                29,
+                255,
+                107
+              ],
+              [
+                0,
+                128,
+                128
+              ],
+              [
+                255,
+                128,
+                128
+              ],
+              [
+                128,
+                128,
+                128
+              ]
+            ],
+            "rgb8": [
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                255,
+                255,
+                255
+              ],
+              [
+                128,
+                128,
+                128
+              ]
+            ],
+            "rgba8": [
+              254,
+              0,
+              0,
+              255,
+              0,
+              255,
+              1,
+              255,
+              0,
+              0,
+              254,
+              255,
+              0,
+              0,
+              0,
+              255,
+              255,
+              255,
+              255,
+              255,
+              128,
+              128,
+              128,
+              255
+            ]
+          }
+        },
+        {
+          "id": "defer-us-ybr-full-interleaved.dcm",
+          "bytes": 556,
+          "sha256": "390a7e960bf16247888169b0ff7d95d31812ef3c2f366cdb799c33b1f17b71db",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.6.1",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "YBR_FULL",
+          "planar": 0,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 18,
+          "pixel_data_sha256": "2eabe9bfc77792968bc2a8a8b1b53468114529a6e62557a44fa274a186a861b3",
+          "target_expectation": "unsupported",
+          "reason": "us_native_color_requires_rgb",
+          "substep": "color-us",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 1,
+          "raw_reader_expected": {
+            "stored_expanded": [
+              [
+                76,
+                85,
+                255
+              ],
+              [
+                150,
+                44,
+                21
+              ],
+              [
+                29,
+                255,
+                107
+              ],
+              [
+                0,
+                128,
+                128
+              ],
+              [
+                255,
+                128,
+                128
+              ],
+              [
+                128,
+                128,
+                128
+              ]
+            ],
+            "rgb8": [
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                0,
+                255,
+                1
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                255,
+                255,
+                255
+              ],
+              [
+                128,
+                128,
+                128
+              ]
+            ],
+            "rgba8": [
+              254,
+              0,
+              0,
+              255,
+              0,
+              255,
+              1,
+              255,
+              0,
+              0,
+              254,
+              255,
+              0,
+              0,
+              0,
+              255,
+              255,
+              255,
+              255,
+              255,
+              128,
+              128,
+              128,
+              255
+            ]
+          }
+        },
+        {
+          "id": "sc-ybr-full-422.dcm",
+          "bytes": 554,
+          "sha256": "b9ec81a09c992720b2f2405b1ee0f728d21969b4da479eeb936dc0b23f425135",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "YBR_FULL_422",
+          "planar": 0,
+          "rows": 2,
+          "columns": 4,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 16,
+          "pixel_data_sha256": "be141ecb22082cee8d66b7229906afc9403d354bfc7c00158d3275360cd7e6f4",
+          "target_expectation": "future_decode",
+          "reason": "",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": [
+            [
+              76,
+              85,
+              255
+            ],
+            [
+              100,
+              85,
+              255
+            ],
+            [
+              29,
+              255,
+              107
+            ],
+            [
+              60,
+              255,
+              107
+            ],
+            [
+              0,
+              128,
+              128
+            ],
+            [
+              255,
+              128,
+              128
+            ],
+            [
+              128,
+              128,
+              128
+            ],
+            [
+              64,
+              128,
+              128
+            ]
+          ],
+          "rgb8": [
+            [
+              254,
+              0,
+              0
+            ],
+            [
+              255,
+              24,
+              24
+            ],
+            [
+              0,
+              0,
+              254
+            ],
+            [
+              31,
+              31,
+              255
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              128,
+              128,
+              128
+            ],
+            [
+              64,
+              64,
+              64
+            ]
+          ],
+          "rgba8": [
+            254,
+            0,
+            0,
+            255,
+            255,
+            24,
+            24,
+            255,
+            0,
+            0,
+            254,
+            255,
+            31,
+            31,
+            255,
+            255,
+            0,
+            0,
+            0,
+            255,
+            255,
+            255,
+            255,
+            255,
+            128,
+            128,
+            128,
+            255,
+            64,
+            64,
+            64,
+            255
+          ],
+          "rgb_tolerance": 1,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "defer-us-ybr-full-422.dcm",
+          "bytes": 558,
+          "sha256": "b8fbac15dae480b70df45b18535eda97bb347a72e8f6bfb5373df0266af8fab3",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.6.1",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "YBR_FULL_422",
+          "planar": 0,
+          "rows": 2,
+          "columns": 4,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 16,
+          "pixel_data_sha256": "be141ecb22082cee8d66b7229906afc9403d354bfc7c00158d3275360cd7e6f4",
+          "target_expectation": "unsupported",
+          "reason": "us_native_color_requires_rgb",
+          "substep": "color-us",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 1,
+          "raw_reader_expected": {
+            "stored_expanded": [
+              [
+                76,
+                85,
+                255
+              ],
+              [
+                100,
+                85,
+                255
+              ],
+              [
+                29,
+                255,
+                107
+              ],
+              [
+                60,
+                255,
+                107
+              ],
+              [
+                0,
+                128,
+                128
+              ],
+              [
+                255,
+                128,
+                128
+              ],
+              [
+                128,
+                128,
+                128
+              ],
+              [
+                64,
+                128,
+                128
+              ]
+            ],
+            "rgb8": [
+              [
+                254,
+                0,
+                0
+              ],
+              [
+                255,
+                24,
+                24
+              ],
+              [
+                0,
+                0,
+                254
+              ],
+              [
+                31,
+                31,
+                255
+              ],
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                255,
+                255,
+                255
+              ],
+              [
+                128,
+                128,
+                128
+              ],
+              [
+                64,
+                64,
+                64
+              ]
+            ],
+            "rgba8": [
+              254,
+              0,
+              0,
+              255,
+              255,
+              24,
+              24,
+              255,
+              0,
+              0,
+              254,
+              255,
+              31,
+              31,
+              255,
+              255,
+              0,
+              0,
+              0,
+              255,
+              255,
+              255,
+              255,
+              255,
+              128,
+              128,
+              128,
+              255,
+              64,
+              64,
+              64,
+              255
+            ]
+          }
+        },
+        {
+          "id": "sc-palette16-le.dcm",
+          "bytes": 638,
+          "sha256": "f4cc7c5871d22918eb06ba16155aabe5d89b6cfe769551298a2c1c931e1f95bf",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "PALETTE COLOR",
+          "planar": null,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 6,
+          "pixel_data_sha256": "40d2af4d7ac41bb624d396eabbe5f30b8b3b70f451f7ad251cd193e02b7b9338",
+          "target_expectation": "future_decode",
+          "reason": "",
+          "substep": "color-palette",
+          "product_status": "not-run",
+          "stored_expanded": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            255
+          ],
+          "rgb8": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgba8": [
+            255,
+            0,
+            0,
+            255,
+            255,
+            0,
+            0,
+            255,
+            0,
+            255,
+            0,
+            255,
+            0,
+            0,
+            255,
+            255,
+            17,
+            34,
+            51,
+            255,
+            17,
+            34,
+            51,
+            255
+          ],
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "sc-palette16-be.dcm",
+          "bytes": 638,
+          "sha256": "92b4adf5d10698706ae6e85756a5012cb47ee79d8c8342a7555d1482392b3d7f",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.2",
+          "frames": 1,
+          "photometric": "PALETTE COLOR",
+          "planar": null,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 6,
+          "pixel_data_sha256": "40d2af4d7ac41bb624d396eabbe5f30b8b3b70f451f7ad251cd193e02b7b9338",
+          "target_expectation": "future_decode",
+          "reason": "",
+          "substep": "color-palette",
+          "product_status": "not-run",
+          "stored_expanded": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            255
+          ],
+          "rgb8": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgba8": [
+            255,
+            0,
+            0,
+            255,
+            255,
+            0,
+            0,
+            255,
+            0,
+            255,
+            0,
+            255,
+            0,
+            0,
+            255,
+            255,
+            17,
+            34,
+            51,
+            255,
+            17,
+            34,
+            51,
+            255
+          ],
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "us-palette16.dcm",
+          "bytes": 648,
+          "sha256": "696f879e5ac29436689490e58f366daff5fcb55fe056ef93d69aefe8309091f0",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.6.1",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "PALETTE COLOR",
+          "planar": null,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 16,
+          "signed": false,
+          "bits_stored": 16,
+          "high_bit": 15,
+          "pixel_data_vr": "OW",
+          "pixel_data_bytes": 12,
+          "pixel_data_sha256": "7f0294df3340d3fd7ef6f4ccca3c65cff095d98c5476dddf568c718630f62fa4",
+          "target_expectation": "future_decode",
+          "reason": "",
+          "substep": "color-palette-us",
+          "product_status": "not-run",
+          "stored_expanded": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            255
+          ],
+          "rgb8": [
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              255,
+              0,
+              0
+            ],
+            [
+              0,
+              255,
+              0
+            ],
+            [
+              0,
+              0,
+              255
+            ],
+            [
+              17,
+              34,
+              51
+            ],
+            [
+              17,
+              34,
+              51
+            ]
+          ],
+          "rgba8": [
+            255,
+            0,
+            0,
+            255,
+            255,
+            0,
+            0,
+            255,
+            0,
+            255,
+            0,
+            255,
+            0,
+            0,
+            255,
+            255,
+            17,
+            34,
+            51,
+            255,
+            17,
+            34,
+            51,
+            255
+          ],
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "reject-rgb-planar2.dcm",
+          "bytes": 548,
+          "sha256": "396bdaade3ba8838798aec907fbe0dfb0202e9cbd88f4d3c235885072a1f240d",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "RGB",
+          "planar": 2,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 18,
+          "pixel_data_sha256": "a10556fa584cc00dfe38332b66da790e654dcd2c76dea85d0b4718075834e457",
+          "target_expectation": "reject",
+          "reason": "undefined_planar",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "reject-rgb-short.dcm",
+          "bytes": 546,
+          "sha256": "9ce14657db732ee01a4de23277046ebc715613522e0c5679890acec22a7c5902",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "RGB",
+          "planar": 0,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 16,
+          "pixel_data_sha256": "ca1fdbc9e80d876e59f187f45f7c77ccb3de28120c999875ea56b340b02a0715",
+          "target_expectation": "reject",
+          "reason": "short_pixel_data",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "reject-rgb-extra.dcm",
+          "bytes": 550,
+          "sha256": "a429c947d5da020a3acfaabb43f4be5487238647f44f974abad4411e114007c0",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "RGB",
+          "planar": 0,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 20,
+          "pixel_data_sha256": "c4b62573e711b516c607aad03b898896a0dcacadf98b92a93913e08a647c34e2",
+          "target_expectation": "reject",
+          "reason": "extra_pixel_data",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "reject-rgb-signed.dcm",
+          "bytes": 548,
+          "sha256": "2171c4da34e70e469c5200f45925a528a679bd01a40757ed748367c587bf2f56",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "RGB",
+          "planar": 0,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": true,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 18,
+          "pixel_data_sha256": "a10556fa584cc00dfe38332b66da790e654dcd2c76dea85d0b4718075834e457",
+          "target_expectation": "reject",
+          "reason": "unsigned_color_only",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "reject-rgb-rescale.dcm",
+          "bytes": 568,
+          "sha256": "f73c9e62c268c87c03c2678ad23ba9ab975ca8ac2fb172d7419d74ad5f7d8fb0",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "RGB",
+          "planar": 0,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 18,
+          "pixel_data_sha256": "a10556fa584cc00dfe38332b66da790e654dcd2c76dea85d0b4718075834e457",
+          "target_expectation": "reject",
+          "reason": "color_rescale_not_supported",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "reject-422-planar1.dcm",
+          "bytes": 554,
+          "sha256": "7d26ea8185218f90da817d6064c801e28ea5039a18cb072cac72d9708da64b84",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "YBR_FULL_422",
+          "planar": 1,
+          "rows": 2,
+          "columns": 4,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 16,
+          "pixel_data_sha256": "be141ecb22082cee8d66b7229906afc9403d354bfc7c00158d3275360cd7e6f4",
+          "target_expectation": "reject",
+          "reason": "ybr422_requires_planar0",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 1,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "reject-422-short.dcm",
+          "bytes": 552,
+          "sha256": "c9e824234669ab653911151d4c8389911c4195a471ab29f37a114d33240ebf0d",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "YBR_FULL_422",
+          "planar": 0,
+          "rows": 2,
+          "columns": 4,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 14,
+          "pixel_data_sha256": "97ec21bc834dab34a5cec8df4a71830603a3549bbb3bd958060af8ac06fb4d42",
+          "target_expectation": "reject",
+          "reason": "short_ybr422_pixel_data",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 1,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "defer-422-odd-width.dcm",
+          "bytes": 550,
+          "sha256": "0ea4c7e1cd07545adea05375cade43088b78f273199e18ec1f3bdd08c9317fbb",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "YBR_FULL_422",
+          "planar": 0,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 12,
+          "pixel_data_sha256": "685112a1fee0dfb5660f48f88da7867ac16004ed5f445c20229b4188e9daa7b4",
+          "target_expectation": "unsupported",
+          "reason": "initial_adapter_even_columns_only",
+          "substep": "color-1",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 1,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "reject-palette-short.dcm",
+          "bytes": 636,
+          "sha256": "31c099edb5a24bed7e3896616b76e8cdc7545bdfeb931af0024bc8e158647d77",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "PALETTE COLOR",
+          "planar": null,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 6,
+          "pixel_data_sha256": "40d2af4d7ac41bb624d396eabbe5f30b8b3b70f451f7ad251cd193e02b7b9338",
+          "target_expectation": "reject",
+          "reason": "palette_length_mismatch",
+          "substep": "color-palette",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "reject-palette-descriptor.dcm",
+          "bytes": 638,
+          "sha256": "8c124adc4224504ee9f9d842a7df46fa9ce21cb6440814ed5bee8f0a05958050",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "PALETTE COLOR",
+          "planar": null,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 6,
+          "pixel_data_sha256": "40d2af4d7ac41bb624d396eabbe5f30b8b3b70f451f7ad251cd193e02b7b9338",
+          "target_expectation": "reject",
+          "reason": "palette_channel_descriptor_disagreement",
+          "substep": "color-palette",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "defer-palette8.dcm",
+          "bytes": 626,
+          "sha256": "4217fc2ffc8d62d056d506822725b6d2403a8af26c070762754020a578e3eadc",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "PALETTE COLOR",
+          "planar": null,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 6,
+          "pixel_data_sha256": "40d2af4d7ac41bb624d396eabbe5f30b8b3b70f451f7ad251cd193e02b7b9338",
+          "target_expectation": "unsupported",
+          "reason": "initial_palette_dense16_only",
+          "substep": "color-palette",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        },
+        {
+          "id": "defer-palette-segmented.dcm",
+          "bytes": 650,
+          "sha256": "d4d73a3f654b4d769fa52c18eddde330d0ce658a79a3f0f4395cb8168ae5922a",
+          "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+          "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+          "frames": 1,
+          "photometric": "PALETTE COLOR",
+          "planar": null,
+          "rows": 2,
+          "columns": 3,
+          "bits_allocated": 8,
+          "signed": false,
+          "bits_stored": 8,
+          "high_bit": 7,
+          "pixel_data_vr": "OB",
+          "pixel_data_bytes": 6,
+          "pixel_data_sha256": "40d2af4d7ac41bb624d396eabbe5f30b8b3b70f451f7ad251cd193e02b7b9338",
+          "target_expectation": "unsupported",
+          "reason": "segmented_palette_not_in_initial_scope",
+          "substep": "color-palette",
+          "product_status": "not-run",
+          "stored_expanded": null,
+          "rgb8": null,
+          "rgba8": null,
+          "rgb_tolerance": 0,
+          "raw_reader_expected": null
+        }
+      ]
+    },
+    "preparation": {
+      "pass": 26,
+      "fail": 0,
+      "normal_color_readback": 11,
+      "raw_color_readback_only": 3,
+      "normal_expected": 11,
+      "product_checks": "not-run",
+      "deterministic_repeat": "pass"
+    },
+    "cases": [
+      {
+        "id": "sc-rgb-interleaved-le.dcm",
+        "fixture_sha256": "397624c7d2aeeecac27919670a9266a4a8ce0ebbc537640bf2443dc20c080cb9",
+        "preparation_status": "pass",
+        "target_expectation": "future_decode",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/stored/RGB/RGBA",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": false,
+        "observed_stored": [
+          [
+            255,
+            0,
+            0
+          ],
+          [
+            0,
+            255,
+            0
+          ],
+          [
+            0,
+            0,
+            255
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            17,
+            34,
+            51
+          ]
+        ],
+        "observed_rgba8": [
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255,
+          0,
+          0,
+          255,
+          255,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          255,
+          255,
+          17,
+          34,
+          51,
+          255
+        ]
+      },
+      {
+        "id": "sc-rgb-planar-le.dcm",
+        "fixture_sha256": "448103f7661c3af68d50a16b8e8e6d275c9b8bd4d55048bb2b55ac8de9c0ddfc",
+        "preparation_status": "pass",
+        "target_expectation": "future_decode",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/stored/RGB/RGBA",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": false,
+        "observed_stored": [
+          [
+            255,
+            0,
+            0
+          ],
+          [
+            0,
+            255,
+            0
+          ],
+          [
+            0,
+            0,
+            255
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            17,
+            34,
+            51
+          ]
+        ],
+        "observed_rgba8": [
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255,
+          0,
+          0,
+          255,
+          255,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          255,
+          255,
+          17,
+          34,
+          51,
+          255
+        ]
+      },
+      {
+        "id": "sc-rgb-planar-implicit.dcm",
+        "fixture_sha256": "55c8910d08a6bcfb7b1483a1ef8a0905a8094c39093a0801c97f5efecb210bad",
+        "preparation_status": "pass",
+        "target_expectation": "future_decode",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/stored/RGB/RGBA",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": false,
+        "observed_stored": [
+          [
+            255,
+            0,
+            0
+          ],
+          [
+            0,
+            255,
+            0
+          ],
+          [
+            0,
+            0,
+            255
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            17,
+            34,
+            51
+          ]
+        ],
+        "observed_rgba8": [
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255,
+          0,
+          0,
+          255,
+          255,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          255,
+          255,
+          17,
+          34,
+          51,
+          255
+        ]
+      },
+      {
+        "id": "sc-rgb-interleaved-be.dcm",
+        "fixture_sha256": "48bbfafcc1f93161b433d5ce7b347b265e06f09bdd7034728e73b66f22fab68d",
+        "preparation_status": "pass",
+        "target_expectation": "future_decode",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/stored/RGB/RGBA",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": false,
+        "observed_stored": [
+          [
+            255,
+            0,
+            0
+          ],
+          [
+            0,
+            255,
+            0
+          ],
+          [
+            0,
+            0,
+            255
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            17,
+            34,
+            51
+          ]
+        ],
+        "observed_rgba8": [
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255,
+          0,
+          0,
+          255,
+          255,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          255,
+          255,
+          17,
+          34,
+          51,
+          255
+        ]
+      },
+      {
+        "id": "us-rgb-interleaved.dcm",
+        "fixture_sha256": "8f1b9f7723683e119945c9f0b993704948eb08c2b99ff80c45b69bb437bcebf4",
+        "preparation_status": "pass",
+        "target_expectation": "future_decode",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/stored/RGB/RGBA",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": false,
+        "observed_stored": [
+          [
+            255,
+            0,
+            0
+          ],
+          [
+            0,
+            255,
+            0
+          ],
+          [
+            0,
+            0,
+            255
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            255,
+            255,
+            255
+          ],
+          [
+            17,
+            34,
+            51
+          ]
+        ],
+        "observed_rgba8": [
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255,
+          0,
+          0,
+          255,
+          255,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          255,
+          255,
+          17,
+          34,
+          51,
+          255
+        ]
+      },
+      {
+        "id": "sc-ybr-full-interleaved.dcm",
+        "fixture_sha256": "182d245e0375efaf6f30236e25f4c5a05ef411a91e1b274e199cbfcf3161ebcf",
+        "preparation_status": "pass",
+        "target_expectation": "future_decode",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/stored/RGB/RGBA",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": false,
+        "observed_stored": [
+          [
+            76,
+            85,
+            255
+          ],
+          [
+            150,
+            44,
+            21
+          ],
+          [
+            29,
+            255,
+            107
+          ],
+          [
+            0,
+            128,
+            128
+          ],
+          [
+            255,
+            128,
+            128
+          ],
+          [
+            128,
+            128,
+            128
+          ]
+        ],
+        "observed_rgba8": [
+          254,
+          0,
+          0,
+          255,
+          0,
+          255,
+          1,
+          255,
+          0,
+          0,
+          254,
+          255,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          255,
+          255,
+          128,
+          128,
+          128,
+          255
+        ]
+      },
+      {
+        "id": "sc-ybr-full-planar.dcm",
+        "fixture_sha256": "b1a81fbd2660483b72155adf445d6342e616b7a8468c17763d5496f193737e96",
+        "preparation_status": "pass",
+        "target_expectation": "future_decode",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/stored/RGB/RGBA",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": false,
+        "observed_stored": [
+          [
+            76,
+            85,
+            255
+          ],
+          [
+            150,
+            44,
+            21
+          ],
+          [
+            29,
+            255,
+            107
+          ],
+          [
+            0,
+            128,
+            128
+          ],
+          [
+            255,
+            128,
+            128
+          ],
+          [
+            128,
+            128,
+            128
+          ]
+        ],
+        "observed_rgba8": [
+          254,
+          0,
+          0,
+          255,
+          0,
+          255,
+          1,
+          255,
+          0,
+          0,
+          254,
+          255,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          255,
+          255,
+          128,
+          128,
+          128,
+          255
+        ]
+      },
+      {
+        "id": "defer-us-ybr-full-planar.dcm",
+        "fixture_sha256": "ae7441b1e4bca894ac133163b3fde3b575515cf8989053516e931b4654dc0653",
+        "preparation_status": "pass",
+        "target_expectation": "unsupported",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary/stored/RGB/RGBA",
+        "reason": "us_native_color_requires_rgb",
+        "note": "adapter rejection not executed",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": true,
+        "observed_stored": [
+          [
+            76,
+            85,
+            255
+          ],
+          [
+            150,
+            44,
+            21
+          ],
+          [
+            29,
+            255,
+            107
+          ],
+          [
+            0,
+            128,
+            128
+          ],
+          [
+            255,
+            128,
+            128
+          ],
+          [
+            128,
+            128,
+            128
+          ]
+        ],
+        "observed_rgba8": [
+          254,
+          0,
+          0,
+          255,
+          0,
+          255,
+          1,
+          255,
+          0,
+          0,
+          254,
+          255,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          255,
+          255,
+          128,
+          128,
+          128,
+          255
+        ]
+      },
+      {
+        "id": "defer-us-ybr-full-interleaved.dcm",
+        "fixture_sha256": "390a7e960bf16247888169b0ff7d95d31812ef3c2f366cdb799c33b1f17b71db",
+        "preparation_status": "pass",
+        "target_expectation": "unsupported",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary/stored/RGB/RGBA",
+        "reason": "us_native_color_requires_rgb",
+        "note": "adapter rejection not executed",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": true,
+        "observed_stored": [
+          [
+            76,
+            85,
+            255
+          ],
+          [
+            150,
+            44,
+            21
+          ],
+          [
+            29,
+            255,
+            107
+          ],
+          [
+            0,
+            128,
+            128
+          ],
+          [
+            255,
+            128,
+            128
+          ],
+          [
+            128,
+            128,
+            128
+          ]
+        ],
+        "observed_rgba8": [
+          254,
+          0,
+          0,
+          255,
+          0,
+          255,
+          1,
+          255,
+          0,
+          0,
+          254,
+          255,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          255,
+          255,
+          128,
+          128,
+          128,
+          255
+        ]
+      },
+      {
+        "id": "sc-ybr-full-422.dcm",
+        "fixture_sha256": "b9ec81a09c992720b2f2405b1ee0f728d21969b4da479eeb936dc0b23f425135",
+        "preparation_status": "pass",
+        "target_expectation": "future_decode",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/stored/RGB/RGBA",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": false,
+        "observed_stored": [
+          [
+            76,
+            85,
+            255
+          ],
+          [
+            100,
+            85,
+            255
+          ],
+          [
+            29,
+            255,
+            107
+          ],
+          [
+            60,
+            255,
+            107
+          ],
+          [
+            0,
+            128,
+            128
+          ],
+          [
+            255,
+            128,
+            128
+          ],
+          [
+            128,
+            128,
+            128
+          ],
+          [
+            64,
+            128,
+            128
+          ]
+        ],
+        "observed_rgba8": [
+          254,
+          0,
+          0,
+          255,
+          255,
+          24,
+          24,
+          255,
+          0,
+          0,
+          254,
+          255,
+          31,
+          31,
+          255,
+          255,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          255,
+          255,
+          128,
+          128,
+          128,
+          255,
+          64,
+          64,
+          64,
+          255
+        ]
+      },
+      {
+        "id": "defer-us-ybr-full-422.dcm",
+        "fixture_sha256": "b8fbac15dae480b70df45b18535eda97bb347a72e8f6bfb5373df0266af8fab3",
+        "preparation_status": "pass",
+        "target_expectation": "unsupported",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary/stored/RGB/RGBA",
+        "reason": "us_native_color_requires_rgb",
+        "note": "adapter rejection not executed",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": true,
+        "observed_stored": [
+          [
+            76,
+            85,
+            255
+          ],
+          [
+            100,
+            85,
+            255
+          ],
+          [
+            29,
+            255,
+            107
+          ],
+          [
+            60,
+            255,
+            107
+          ],
+          [
+            0,
+            128,
+            128
+          ],
+          [
+            255,
+            128,
+            128
+          ],
+          [
+            128,
+            128,
+            128
+          ],
+          [
+            64,
+            128,
+            128
+          ]
+        ],
+        "observed_rgba8": [
+          254,
+          0,
+          0,
+          255,
+          255,
+          24,
+          24,
+          255,
+          0,
+          0,
+          254,
+          255,
+          31,
+          31,
+          255,
+          255,
+          0,
+          0,
+          0,
+          255,
+          255,
+          255,
+          255,
+          255,
+          128,
+          128,
+          128,
+          255,
+          64,
+          64,
+          64,
+          255
+        ]
+      },
+      {
+        "id": "sc-palette16-le.dcm",
+        "fixture_sha256": "f4cc7c5871d22918eb06ba16155aabe5d89b6cfe769551298a2c1c931e1f95bf",
+        "preparation_status": "pass",
+        "target_expectation": "future_decode",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/stored/RGB/RGBA",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": false,
+        "observed_stored": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          255
+        ],
+        "observed_rgba8": [
+          255,
+          0,
+          0,
+          255,
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255,
+          0,
+          0,
+          255,
+          255,
+          17,
+          34,
+          51,
+          255,
+          17,
+          34,
+          51,
+          255
+        ]
+      },
+      {
+        "id": "sc-palette16-be.dcm",
+        "fixture_sha256": "92b4adf5d10698706ae6e85756a5012cb47ee79d8c8342a7555d1482392b3d7f",
+        "preparation_status": "pass",
+        "target_expectation": "future_decode",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/stored/RGB/RGBA",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": false,
+        "observed_stored": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          255
+        ],
+        "observed_rgba8": [
+          255,
+          0,
+          0,
+          255,
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255,
+          0,
+          0,
+          255,
+          255,
+          17,
+          34,
+          51,
+          255,
+          17,
+          34,
+          51,
+          255
+        ]
+      },
+      {
+        "id": "us-palette16.dcm",
+        "fixture_sha256": "696f879e5ac29436689490e58f366daff5fcb55fe056ef93d69aefe8309091f0",
+        "preparation_status": "pass",
+        "target_expectation": "future_decode",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/stored/RGB/RGBA",
+        "max_rgb_error": 0,
+        "raw_color_readback_only": false,
+        "observed_stored": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          255
+        ],
+        "observed_rgba8": [
+          255,
+          0,
+          0,
+          255,
+          255,
+          0,
+          0,
+          255,
+          0,
+          255,
+          0,
+          255,
+          0,
+          0,
+          255,
+          255,
+          17,
+          34,
+          51,
+          255,
+          17,
+          34,
+          51,
+          255
+        ]
+      },
+      {
+        "id": "reject-rgb-planar2.dcm",
+        "fixture_sha256": "396bdaade3ba8838798aec907fbe0dfb0202e9cbd88f4d3c235885072a1f240d",
+        "preparation_status": "pass",
+        "target_expectation": "reject",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary",
+        "reason": "undefined_planar",
+        "note": "adapter rejection not executed"
+      },
+      {
+        "id": "reject-rgb-short.dcm",
+        "fixture_sha256": "9ce14657db732ee01a4de23277046ebc715613522e0c5679890acec22a7c5902",
+        "preparation_status": "pass",
+        "target_expectation": "reject",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary",
+        "reason": "short_pixel_data",
+        "note": "adapter rejection not executed"
+      },
+      {
+        "id": "reject-rgb-extra.dcm",
+        "fixture_sha256": "a429c947d5da020a3acfaabb43f4be5487238647f44f974abad4411e114007c0",
+        "preparation_status": "pass",
+        "target_expectation": "reject",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary",
+        "reason": "extra_pixel_data",
+        "note": "adapter rejection not executed"
+      },
+      {
+        "id": "reject-rgb-signed.dcm",
+        "fixture_sha256": "2171c4da34e70e469c5200f45925a528a679bd01a40757ed748367c587bf2f56",
+        "preparation_status": "pass",
+        "target_expectation": "reject",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary",
+        "reason": "unsigned_color_only",
+        "note": "adapter rejection not executed"
+      },
+      {
+        "id": "reject-rgb-rescale.dcm",
+        "fixture_sha256": "f73c9e62c268c87c03c2678ad23ba9ab975ca8ac2fb172d7419d74ad5f7d8fb0",
+        "preparation_status": "pass",
+        "target_expectation": "reject",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary",
+        "reason": "color_rescale_not_supported",
+        "note": "adapter rejection not executed"
+      },
+      {
+        "id": "reject-422-planar1.dcm",
+        "fixture_sha256": "7d26ea8185218f90da817d6064c801e28ea5039a18cb072cac72d9708da64b84",
+        "preparation_status": "pass",
+        "target_expectation": "reject",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary",
+        "reason": "ybr422_requires_planar0",
+        "note": "adapter rejection not executed"
+      },
+      {
+        "id": "reject-422-short.dcm",
+        "fixture_sha256": "c9e824234669ab653911151d4c8389911c4195a471ab29f37a114d33240ebf0d",
+        "preparation_status": "pass",
+        "target_expectation": "reject",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary",
+        "reason": "short_ybr422_pixel_data",
+        "note": "adapter rejection not executed"
+      },
+      {
+        "id": "defer-422-odd-width.dcm",
+        "fixture_sha256": "0ea4c7e1cd07545adea05375cade43088b78f273199e18ec1f3bdd08c9317fbb",
+        "preparation_status": "pass",
+        "target_expectation": "unsupported",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary",
+        "reason": "initial_adapter_even_columns_only",
+        "note": "adapter rejection not executed"
+      },
+      {
+        "id": "reject-palette-short.dcm",
+        "fixture_sha256": "31c099edb5a24bed7e3896616b76e8cdc7545bdfeb931af0024bc8e158647d77",
+        "preparation_status": "pass",
+        "target_expectation": "reject",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary",
+        "reason": "palette_length_mismatch",
+        "note": "adapter rejection not executed"
+      },
+      {
+        "id": "reject-palette-descriptor.dcm",
+        "fixture_sha256": "8c124adc4224504ee9f9d842a7df46fa9ce21cb6440814ed5bee8f0a05958050",
+        "preparation_status": "pass",
+        "target_expectation": "reject",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary",
+        "reason": "palette_channel_descriptor_disagreement",
+        "note": "adapter rejection not executed"
+      },
+      {
+        "id": "defer-palette8.dcm",
+        "fixture_sha256": "4217fc2ffc8d62d056d506822725b6d2403a8af26c070762754020a578e3eadc",
+        "preparation_status": "pass",
+        "target_expectation": "unsupported",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary",
+        "reason": "initial_palette_dense16_only",
+        "note": "adapter rejection not executed"
+      },
+      {
+        "id": "defer-palette-segmented.dcm",
+        "fixture_sha256": "d4d73a3f654b4d769fa52c18eddde330d0ce658a79a3f0f4395cb8168ae5922a",
+        "preparation_status": "pass",
+        "target_expectation": "unsupported",
+        "repeat_status": "pass",
+        "product_status": "not-run",
+        "checks": "metadata/hash/repeat/boundary",
+        "reason": "segmented_palette_not_in_initial_scope",
+        "note": "adapter rejection not executed"
+      }
+    ]
+  },
+  "verifier_controls_evidence": {
+    "path": "$P1_CACHE/color-verifier-controls.json",
+    "bytes": 1099,
+    "sha256": "869b325741bcf38004c8dfcac7d3c9e57ede829f58dbe58292bc6d4e3aaa19ff"
+  },
+  "verifier_controls": [
+    {
+      "id": "wrong-golden",
+      "cache_id": "color-control-v2-wrong-golden",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "expected_check": "rgb_literal",
+      "actual_failures": [
+        {
+          "id": "sc-rgb-interleaved-le.dcm",
+          "preparation_status": "fail",
+          "error_type": "VerificationError",
+          "check": "rgb_literal",
+          "repeat_status": "pass",
+          "product_status": "not-run"
+        }
+      ],
+      "report_sha256": "a5015026d03079062b5c0343a6cd644b60055096021b6e8685a0293a29f77c84",
+      "status": "pass"
+    },
+    {
+      "id": "changed-file",
+      "cache_id": "color-control-v2-changed-file",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "expected_check": "file_hash",
+      "actual_failures": [
+        {
+          "id": "sc-rgb-interleaved-le.dcm",
+          "preparation_status": "fail",
+          "error_type": "VerificationError",
+          "check": "file_hash",
+          "repeat_status": "pass",
+          "product_status": "not-run"
+        }
+      ],
+      "report_sha256": "707395fe4679faf733a1904205d3dd65090058ac7458091bcd8dd926bbaf02be",
+      "status": "pass"
+    }
+  ],
+  "investigation": {
+    "p0_result": "combined-c",
+    "pass": 284,
+    "fail": 33,
+    "not_run": 5,
+    "not_applicable": 59,
+    "fail_contract_categories": {
+      "stored_normalization": 11,
+      "color_layout": 12,
+      "valid_empty_bot_multifragment": 2,
+      "corrupt_structure_accepted": 5,
+      "jpeg_extended": 1,
+      "modality": 2
+    },
+    "classification_note": "observed contract groups; not all root causes established; P0 not reexecuted",
+    "recommended_first_product_substep": "native 8-bit single-frame SC RGB planar0/1, YBR_FULL, even-width YBR_FULL_422; Palette/US/compression follow separately"
+  },
+  "preservation": {
+    "display_source_count": 35,
+    "display_generated_count": 3,
+    "display_fixture_count": 24,
+    "matches_display_snapshot": true,
+    "p0_tracked_diff_empty": true
+  },
+  "remaining_not_run": [
+    "Final DISPLAY user UI regression (Mac locked)",
+    "COLOR core/FFI/Swift/Metal/user UI product checks",
+    "Full codec/LUT/US/X-ray support, parser/engine/RSS limits"
+  ],
+  "corrections": [
+    "US native YBR success target incorrectly inferred from Planar table; corrected to unsupported with raw-readback-only oracle (manifest revision 2)",
+    "US dense16 palette indices corrected to unsigned16",
+    "Implicit-VR reader-inferred Pixel Data OW accepted for 8-bit data; byte semantics checked independently"
+  ]
+}

@@ -1,11 +1,13 @@
 //! P1 foundation for the Rust DICOM core.
 //!
-//! A limited native adapter prepares immutable pixel buffers for contract
-//! checks. UI file opening, full display descriptors, and the general decoder
-//! are not implemented. Pinned dependencies do not establish DICOM support.
+//! A limited native adapter prepares immutable pixel buffers and display
+//! descriptors. The general decoder and measurement path are not implemented.
+//! Pinned dependencies do not establish DICOM support.
 
+pub mod display;
 pub mod frame;
 pub mod native;
+mod native_color;
 
 /// Build identity and implementation readiness for the bootstrap connection.
 ///
@@ -17,7 +19,8 @@ pub struct BuildInfo {
     pub dicom_rs_version: &'static str,
     /// Whether the product is ready for general UI frame decoding.
     ///
-    /// The limited pixel-contract adapter does not enable UI file opening.
+    /// This legacy bootstrap flag is unchanged; native display readiness is
+    /// provided by the separate display contract rather than this global flag.
     pub frame_decode_implemented: bool,
 }
 

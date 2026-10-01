@@ -7,6 +7,8 @@ let package = Package(
     products: [
         .executable(name: "ViewerApp", targets: ["ViewerApp"]),
         .executable(name: "ViewerContractChecks", targets: ["ViewerContractChecks"]),
+        .executable(name: "ViewerDisplayChecks", targets: ["ViewerDisplayChecks"]),
+        .executable(name: "ViewerColorChecks", targets: ["ViewerColorChecks"]),
     ],
     targets: [
         .target(name: "viewer_ffiFFI", path: "Sources/viewer_ffiFFI"),
@@ -23,10 +25,16 @@ let package = Package(
             ]
         ),
         .target(name: "ViewerBridge", dependencies: ["ViewerBindings", "ViewerPixelCopy"]),
+        .target(
+            name: "ViewerRendering", dependencies: ["ViewerBridge"],
+            linkerSettings: [.linkedFramework("AppKit"), .linkedFramework("Metal"), .linkedFramework("MetalKit")]
+        ),
         .executableTarget(name: "ViewerContractChecks", dependencies: ["ViewerBridge"]),
+        .executableTarget(name: "ViewerDisplayChecks", dependencies: ["ViewerBridge", "ViewerRendering"]),
+        .executableTarget(name: "ViewerColorChecks", dependencies: ["ViewerBridge", "ViewerRendering"]),
         .executableTarget(
             name: "ViewerApp",
-            dependencies: ["ViewerBridge"],
+            dependencies: ["ViewerBridge", "ViewerRendering"],
             linkerSettings: [.linkedFramework("AppKit")]
         ),
     ]

@@ -1,6 +1,8 @@
 //! Product boundary. PIXEL-1 is a bounded native-frame contract, not UI readiness.
 
+mod display;
 mod pixels;
+pub use display::*;
 pub use pixels::*;
 
 uniffi::setup_scaffolding!();

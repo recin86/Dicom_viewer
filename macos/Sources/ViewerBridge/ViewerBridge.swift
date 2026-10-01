@@ -11,6 +11,8 @@ public struct ViewerReadiness: Sendable {
 /// Generated bindings stay behind this module. Pixel handles and typed copies
 /// will be added with the product memory/lifetime contract in the next task.
 public enum ViewerBridge {
+    /// Narrow native single-frame backend, separate from historical BOOTSTRAP-1.
+    public static func nativeDisplayAvailable() -> Bool { ViewerBindings.nativeDisplayAvailable() }
     public static func readiness() -> ViewerReadiness {
         let info = bootstrapInfo()
         return ViewerReadiness(

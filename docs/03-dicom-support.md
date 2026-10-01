@@ -2,7 +2,7 @@
 
 이 문서는 어떤 DICOM을 표시하고 어떻게 해석할지 정의한다. 파일 파싱, 픽셀 디코딩, 프레임 의미 해석, 화면 표시와 측정은 각각 별도의 지원 단계다. 라이브러리가 파일을 읽었다는 사실만으로 앱이 해당 영상을 완전히 지원한다고 판정하지 않는다.
 
-문서 버전 0.2 · 작성·검토일 2026-09-30 · 상태 검토·보완한 설계 초안. 아래 표는 개발 목표이며 **현재 검증된 앱 지원 항목은 없다**. v0.1은 앱 버전 제안이고, 문서 버전과 별개의 개념이다.
+문서 버전 0.2 · 작성·검토일 2026-09-30 · 상태 검토·보완한 설계 초안. 아래 표는 개발 목표이며 **정식 앱 지원 합격 판정은 아직 없다**. 제한된 native 단일 프레임의 구현은 [P1 표시 기록](implementation/P1-native-display.md), 최신 SC 색 변환과 자동 시험은 [컬러 기록](implementation/P1-native-color.md)에 따로 둔다. v0.1은 앱 버전 제안이고, 문서 버전과 별개의 개념이다.
 
 ## 지원 상태 기록
 
@@ -102,6 +102,12 @@ Embedded Presentation LUT의 IDENTITY/INVERSE를 목표로 하고, 별도 Presen
 DX Image Module은 slope=1, intercept=0인 identity 변환과 MONOCHROME2/IDENTITY 또는 MONOCHROME1/INVERSE 조합을 사용한다. MONOCHROME1과 INVERSE를 각각 반전시켜 상쇄하지 않는다. Pixel Intensity Relationship Sign을 추가 화면 반전의 근거로 사용하지 않는다. DX VOI LUT의 항목 비트 수는 10~16이라는 특수화가 있으므로 일반 VOI LUT의 8/16비트 검사만 재사용하지 않는다. [DICOM DX Image Module](https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.8.11.3.html)
 
 컬러 decoder의 실제 반환 색 표현과 채널 배치를 adapter에서 확인한다. 이미 RGB로 바뀐 출력에 원본 YBR 태그를 근거로 변환을 다시 적용하지 않는다. v0.1 기본 컬러 시험은 8비트 RGB, YBR_FULL/YBR_FULL_422 및 일반 Palette Color LUT로 한정한다. 고비트 RGB, segmented/enhanced palette와 추가 YBR 표현은 별도 검증 전 미지원으로 표시한다. [DICOM Image Pixel Module](https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html)
+
+### 현재 SC 컬러 구현의 검증 범위 (2026-10-01)
+
+COLOR-1은 비압축 단일 Secondary Capture의 unsigned8 RGB planar 0/1, YBR_FULL planar 0/1과 짝수 폭 YBR_FULL_422 planar 0을 처리한다. 422 입력 길이는 픽셀당 2 bytes이며 행별 `Y1,Y2,Cb,Cr`에서 RGBA를 만든다. 기존 공개 API와 revision 1은 유지한다. RGB는 그대로 전달하고 YBR은 Rust에서 한 번만 변환한다.
+
+두 빌드의 [컬러 결과](implementation/results/P1-native-color.json)에서 독립 literal 7종, 예상 structured 거부 19종, FFI 복사·GPU 수명·확장 payload 예산을 확인했다. 실제 파일 선택 창과 최신 drawable 표시 회귀는 not-run이므로 앱 지원 완료로 판정하지 않는다. 합성 파일은 pixel module 시험 자료이며 완전한 IOD 적합성 증거가 아니다. US·Palette·고비트 컬러·odd-width 422·ICC·미구현 필수 컬러 변환과 압축/Enhanced/다중 프레임은 제외한다. US native Photometric에는 일반 Image Pixel Module 외에 US 전용 제약을 적용해야 한다. [DICOM US Image Module](https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.8.5.6.html)
 
 ## 표시 종횡비와 물리 보정의 구분
 

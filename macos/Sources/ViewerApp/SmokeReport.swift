@@ -61,7 +61,7 @@ struct UISmokeReport: Encodable {
     var passed: Bool {
         bootstrap.validationFailure == nil
             && windowVisible && hasAppMenu && hasFileMenu && hasWindowMenu
-            && !openCommandEnabled && !openButtonEnabled
+            && openCommandEnabled && openButtonEnabled
             && quitKeyEquivalent == "q" && quitUsesCommandModifier
             && quitActionIsTerminate && eventLoopRan
             && lastWindowCloseTriggeredTermination
@@ -99,6 +99,16 @@ struct UISmokeReport: Encodable {
         try container.encode(lastWindowCloseTriggeredTermination, forKey: .lastWindowCloseTriggeredTermination)
         try container.encode(passed, forKey: .passed)
     }
+}
+
+struct DisplaySmokeReport: Encodable {
+    var passed: Bool
+    let caseID = "native_single_frame"
+    let generation: UInt64
+    let presentation: Bool
+    let width: UInt32?
+    let height: UInt32?
+    var lastWindowCloseTriggeredTermination = false
 }
 
 enum SmokeOutput {

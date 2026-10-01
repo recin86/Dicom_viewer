@@ -84,4 +84,7 @@ Build ID `P1-FOUNDATION-20260930` / 기준 `ca9e8b8` + working tree. 환경은 �
 
 묶음 2의 [제품 픽셀 계약](P1-pixel-contract.md)에서 불변 frame·live 예산·native adapter·FFI handle/C copy·Swift 소유 버퍼를 구현했다. 최종 debug/release는 각각 Rust 22+Swift 18 및 bootstrap·UI smoke·원본 hash 보존 pass다. 현재 스냅샷은 [P1-pixel-contract.json](results/P1-pixel-contract.json)이며 위 foundation 결과는 당시 골격의 역사적 스냅샷이다. 개발용 앱은 새 실행파일 inode로 교체하고 로컬 ad-hoc 서명·strict verify를 수행한다.
 
-다음은 묶음 3: 좁은 회색조 adapter에 VOI·극성·표시 종횡비·단위·diagnostics 및 source/request 식별 계약을 추가하고, 비동기 파일 입력·CPU 기준 변환·Metal 표시를 연결한다. 앱 열기는 아직 비활성화이며 bootstrap bool은 false다. P0 codec/Enhanced/전체 자원 한도 및 P1 정식 합격은 남는다. 같은 브랜치에서 변경은 미커밋이며 commit/push하지 않았다.
+후속 [묶음3 native 표시](P1-native-display.md)는 VOI·극성·표시 종횡비·안전 단위/diagnostics·동일 source hash·generation과 AppKit 파일 입력/Metal을 연결했다. 앱 열기는 활성화됐고 BOOTSTRAP-1 bool은 역사적 초기 호출로 false를 유지한다. 최신 debug/release는 각각 Rust35·PIXEL18·Metal26 pass이며 마지막 수동 파일 선택 창 회귀는 Mac 잠금으로 대기 중이다. 전체 P1 정식 합격은 보류한다. 골격/픽셀 계약은 `c68c920`으로 커밋했고 이번 표시 변경은 미커밋, push는 없다.
+
+
+묶음4 첫 [native SC 컬러](P1-native-color.md)는 unsigned8 RGB planar0/1·YBR_FULL planar0/1·even-width YBR_FULL_422 planar0를 RGBA8로 정규화했다. 기존 공개 선언·revision/Swift/Metal 제품 소스는 보존했고 독립 literal 7종과 예상 거부 19종을 실제 prepare/copy/GPU로 확인했다. 최신 debug/release는 각각 Rust45·PIXEL18·DISPLAY26·COLOR29 pass다. 기존 DISPLAY UI 회귀는 별도 not-run이며 US/Palette/LUT/압축과 전체 P1 합격은 후속이다. [새 결과](results/P1-native-color.json)를 최신 구현의 hash 기준으로 사용한다. DISPLAY/준비 변경과 함께 미커밋이며 push는 없다.

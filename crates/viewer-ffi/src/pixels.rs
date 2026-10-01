@@ -106,12 +106,18 @@ fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
         .unwrap_or_else(|poisoned| poisoned.into_inner())
 }
 
-struct RegisteredFrame {
+pub(crate) struct RegisteredFrame {
     ticket: u64,
-    frame: Arc<FrameData>,
+    pub(crate) frame: Arc<FrameData>,
+    pub(crate) display: Option<Arc<viewer_core::display::DisplayDescriptor>>,
+    pub(crate) source_revision: String,
 }
 impl RegisteredFrame {
-    fn new(frame: Arc<FrameData>) -> Result<Arc<Self>, PixelError> {
+    fn new(
+        frame: Arc<FrameData>,
+        display: Option<Arc<viewer_core::display::DisplayDescriptor>>,
+        source_revision: String,
+    ) -> Result<Arc<Self>, PixelError> {
         let ticket = NEXT_TICKET
             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
                 value.checked_add(1)
@@ -119,7 +125,12 @@ impl RegisteredFrame {
             .map_err(|_| PixelError::ResourceLimit {
                 reason: "Pixel ticket space exhausted".into(),
             })?;
-        let registered = Arc::new(Self { ticket, frame });
+        let registered = Arc::new(Self {
+            ticket,
+            frame,
+            display,
+            source_revision,
+        });
         lock(registry()).insert(ticket, Arc::downgrade(&registered));
         Ok(registered)
     }
@@ -136,7 +147,7 @@ fn copy_source(ticket: u64) -> Option<Arc<RegisteredFrame>> {
 
 #[derive(uniffi::Object)]
 pub struct PixelHandle {
-    registered: Arc<RegisteredFrame>,
+    pub(crate) registered: Arc<RegisteredFrame>,
 }
 #[uniffi::export]
 impl PixelHandle {
@@ -195,8 +206,17 @@ impl PixelSession {
             .map_err(|_| PixelError::Busy)?;
         Ok(Preparation(&self.preparing))
     }
+    #[cfg(test)]
     fn publish(&self, frame: Arc<FrameData>) -> Result<Arc<PixelHandle>, PixelError> {
-        let registered = RegisteredFrame::new(frame)?;
+        self.publish_image(frame, None, String::new())
+    }
+    fn publish_image(
+        &self,
+        frame: Arc<FrameData>,
+        display: Option<Arc<viewer_core::display::DisplayDescriptor>>,
+        source_revision: String,
+    ) -> Result<Arc<PixelHandle>, PixelError> {
+        let registered = RegisteredFrame::new(frame, display, source_revision)?;
         let mut state = lock(&self.state);
         if state.closed {
             return Err(PixelError::SessionClosed);
@@ -225,12 +245,16 @@ impl PixelSession {
         frame_index: u32,
     ) -> Result<Arc<PixelHandle>, PixelError> {
         let _preparation = self.begin()?;
-        let frame = viewer_core::native::prepare_native_frame(
+        let image = viewer_core::native::prepare_native_image(
             Path::new(&path),
             frame_index,
             Arc::clone(&self.budget),
         )?;
-        self.publish(frame)
+        self.publish_image(
+            image.frame,
+            Some(Arc::new(image.display)),
+            image.source_revision,
+        )
     }
     pub fn evict_all(&self) -> u32 {
         let mut state = lock(&self.state);
@@ -321,6 +345,53 @@ pub unsafe extern "C" fn viewer_copy_mask(ticket: u64, destination: *mut u8, len
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn display_reference_survives_close_and_rejects_bad_override() {
+        use crate::{VoiFunction, VoiWindow};
+        let session = PixelSession::new(100, 100).unwrap();
+        let descriptor = viewer_core::display::DisplayDescriptor {
+            windows: vec![],
+            default_window: Some(viewer_core::display::VoiWindow {
+                center: -12.0,
+                width: 1.0,
+                function: viewer_core::display::VoiFunction::LinearExact,
+            }),
+            automatic_window: true,
+            inverted: false,
+            pixel_height_over_width: 1.0,
+            aspect_source: "assumed_square".into(),
+            aspect_estimated: true,
+            unit: "unknown".into(),
+            diagnostics: vec![],
+            can_window: true,
+        };
+        let handle = session
+            .publish_image(gray(&session), Some(Arc::new(descriptor)), "a".repeat(64))
+            .unwrap();
+        session.close();
+        assert_eq!(
+            handle.display_info().unwrap().source_revision,
+            "a".repeat(64)
+        );
+        assert_eq!(
+            handle.reference_rgba(None, false).unwrap(),
+            [128, 128, 128, 255, 0, 0, 0, 255]
+        );
+        assert!(matches!(
+            handle.reference_rgba(
+                Some(VoiWindow {
+                    center: 0.0,
+                    width: 0.0,
+                    function: VoiFunction::Linear,
+                }),
+                false
+            ),
+            Err(PixelError::InvalidArgument { .. })
+        ));
+        assert_eq!(session.memory_snapshot().live_bytes, 10);
+        drop(handle);
+        assert_eq!(session.memory_snapshot().live_bytes, 0);
+    }
     fn gray(session: &PixelSession) -> Arc<FrameData> {
         FrameData::gray_from_fn(2, 1, Arc::clone(&session.budget), true, |i| {
             Ok(if i == 0 { Some(-12.0) } else { None })

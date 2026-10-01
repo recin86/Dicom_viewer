@@ -1,10 +1,13 @@
-//! Small native Part 10 adapter for pixel-contract checks, not general display.
+//! Limited native Part 10 adapter with immutable pixels and display metadata.
 //!
-//! Accepts legacy single-frame gray CT/MR/Secondary Capture and RGB Secondary
-//! Capture, in native LE/BE syntax (8-bit BE OW is explicitly excluded).
+//! Accepts legacy single-frame gray CT/MR/Secondary Capture and unsigned-8
+//! RGB/YBR_FULL/even-width YBR_FULL_422 Secondary Capture, in native LE/BE
+//! syntax (8-bit BE OW is explicitly excluded). Color is normalized once to
+//! row-major RGBA8, with no ICC-based color-match claim.
 //! Gray samples are normalized stored integers, then simple rescale is applied
-//! once in F64 before F32LE output. VOI/polarity, units, source identity, spatial
-//! metadata, and a complete display descriptor remain outside this buffer API.
+//! once in F64 before F32LE output. The image API resolves VOI/polarity/aspect
+//! and hashes the same input snapshot; spatial geometry and F64 measurements
+//! remain outside this API. Pixel-only preparation preserves PIXEL-1 behavior.
 //! Parser allocations are not covered by the payload budget or a hostile-input
 //! memory guarantee. Input is capped on the same opened handle before parsing.
 
@@ -15,8 +18,11 @@ use std::path::Path;
 use std::sync::Arc;
 
 use dicom_object::{DefaultDicomObject, FileMetaTable, OpenFileOptions, Tag, file::ReadPreamble};
+use sha2::{Digest, Sha256};
 
+use crate::display::{DisplayDescriptor, from_native_object};
 use crate::frame::{FrameBudget, FrameData, FrameError};
+use crate::native_color::NativeColorLayout;
 
 const MAX_INPUT_BYTES: u64 = 32 * 1024 * 1024;
 const IMPLICIT_LE: &str = "1.2.840.10008.1.2";
@@ -27,6 +33,15 @@ const MR: &str = "1.2.840.10008.5.1.4.1.1.4";
 const SC: &str = "1.2.840.10008.5.1.4.1.1.7";
 const PIXEL_DATA: Tag = Tag(0x7fe0, 0x0010);
 
+#[derive(Debug)]
+pub struct PreparedImage {
+    pub frame: Arc<FrameData>,
+    pub display: DisplayDescriptor,
+    /// Lowercase SHA-256 hex of the bounded bytes read on the opened handle.
+    /// This identifies the input snapshot, not a promise the file stays fixed.
+    pub source_revision: String,
+}
+
 /// Prepares one immutable pixel buffer from a bounded, opened native file.
 ///
 /// Only frame index zero is accepted. No path or tag value is included in errors.
@@ -35,6 +50,21 @@ pub fn prepare_native_frame(
     frame_index: u32,
     budget: Arc<FrameBudget>,
 ) -> Result<Arc<FrameData>, FrameError> {
+    let bytes = read_native_input(path, frame_index)?;
+    prepare_bytes(&bytes, budget)
+}
+
+/// Prepares native display metadata and the pixels from one opened snapshot.
+pub fn prepare_native_image(
+    path: &Path,
+    frame_index: u32,
+    budget: Arc<FrameBudget>,
+) -> Result<PreparedImage, FrameError> {
+    let bytes = read_native_input(path, frame_index)?;
+    prepare_image_bytes(&bytes, budget)
+}
+
+fn read_native_input(path: &Path, frame_index: u32) -> Result<Vec<u8>, FrameError> {
     if frame_index != 0 {
         return Err(FrameError::InvalidArgument("frame_index"));
     }
@@ -49,8 +79,7 @@ pub fn prepare_native_frame(
     if !metadata.is_file() {
         return Err(FrameError::InvalidArgument("input_not_regular_file"));
     }
-    let bytes = read_bounded(file, metadata.len())?;
-    prepare_bytes(&bytes, budget)
+    read_bounded(file, metadata.len())
 }
 
 fn read_bounded(reader: impl Read, observed_length: u64) -> Result<Vec<u8>, FrameError> {
@@ -79,17 +108,39 @@ fn read_bounded(reader: impl Read, observed_length: u64) -> Result<Vec<u8>, Fram
 }
 
 fn prepare_bytes(bytes: &[u8], budget: Arc<FrameBudget>) -> Result<Arc<FrameData>, FrameError> {
+    let object = parse_object(bytes)?;
+    frame_from_object(&object, budget)
+}
+
+fn prepare_image_bytes(
+    bytes: &[u8],
+    budget: Arc<FrameBudget>,
+) -> Result<PreparedImage, FrameError> {
+    let object = parse_object(bytes)?;
+    let frame = frame_from_object(&object, budget)?;
+    let display = from_native_object(&object, &frame)?;
+    Ok(PreparedImage {
+        frame,
+        display,
+        source_revision: source_revision(bytes),
+    })
+}
+
+fn source_revision(bytes: &[u8]) -> String {
+    format!("{:x}", Sha256::digest(bytes))
+}
+
+fn parse_object(bytes: &[u8]) -> Result<DefaultDicomObject, FrameError> {
     if bytes.len() < 132 || &bytes[128..132] != b"DICM" {
         return Err(FrameError::DecodeFailed("part10_header"));
     }
     // Check syntax before the dataset reader can invoke a deflate/codec path.
     let meta = FileMetaTable::from_reader(Cursor::new(&bytes[128..]))
         .map_err(|_| FrameError::DecodeFailed("file_meta"))?;
-    let big_endian = match meta.transfer_syntax() {
-        IMPLICIT_LE | EXPLICIT_LE => false,
-        EXPLICIT_BE => true,
+    match meta.transfer_syntax() {
+        IMPLICIT_LE | EXPLICIT_LE | EXPLICIT_BE => {}
         _ => return Err(FrameError::Unsupported("transfer_syntax")),
-    };
+    }
     if !matches!(meta.media_storage_sop_class_uid(), CT | MR | SC) {
         return Err(FrameError::Unsupported("sop_class"));
     }
@@ -125,16 +176,25 @@ fn prepare_bytes(bytes: &[u8], budget: Arc<FrameBudget>) -> Result<Arc<FrameData
             return Err(FrameError::Unsupported("pixel_transform_or_dimension"));
         }
     }
-    let height = u32::from(required_u16(&object, Tag(0x0028, 0x0010))?);
-    let width = u32::from(required_u16(&object, Tag(0x0028, 0x0011))?);
+    Ok(object)
+}
+
+fn frame_from_object(
+    object: &DefaultDicomObject,
+    budget: Arc<FrameBudget>,
+) -> Result<Arc<FrameData>, FrameError> {
+    let big_endian = object.meta().transfer_syntax() == EXPLICIT_BE;
+    let sop = text(object, Tag(0x0008, 0x0016))?;
+    let height = u32::from(required_u16(object, Tag(0x0028, 0x0010))?);
+    let width = u32::from(required_u16(object, Tag(0x0028, 0x0011))?);
     if width == 0 || height == 0 {
         return Err(FrameError::DecodeFailed("zero_dimensions"));
     }
-    let samples = required_u16(&object, Tag(0x0028, 0x0002))?;
-    let allocated = required_u16(&object, Tag(0x0028, 0x0100))?;
-    let stored = required_u16(&object, Tag(0x0028, 0x0101))?;
-    let high_bit = required_u16(&object, Tag(0x0028, 0x0102))?;
-    let representation = required_u16(&object, Tag(0x0028, 0x0103))?;
+    let samples = required_u16(object, Tag(0x0028, 0x0002))?;
+    let allocated = required_u16(object, Tag(0x0028, 0x0100))?;
+    let stored = required_u16(object, Tag(0x0028, 0x0101))?;
+    let high_bit = required_u16(object, Tag(0x0028, 0x0102))?;
+    let representation = required_u16(object, Tag(0x0028, 0x0103))?;
     if !matches!(allocated, 8 | 16) {
         return Err(FrameError::Unsupported("bits_allocated"));
     }
@@ -148,15 +208,46 @@ fn prepare_bytes(bytes: &[u8], budget: Arc<FrameBudget>) -> Result<Arc<FrameData
     }
     let count = usize::try_from(u64::from(width) * u64::from(height))
         .map_err(|_| FrameError::ResourceLimit("addressable_size"))?;
-    let expected = count
-        .checked_mul(usize::from(samples))
-        .and_then(|n| n.checked_mul(usize::from(allocated / 8)))
-        .ok_or(FrameError::ResourceLimit("pixel_size_overflow"))?;
-    let source = PixelSource::from_object(&object, allocated, big_endian, expected)?;
-    let photometric = text(&object, Tag(0x0028, 0x0004))?;
+    let photometric = text(object, Tag(0x0028, 0x0004))?;
+    let color_layout =
+        if samples == 3 && matches!(photometric.as_str(), "RGB" | "YBR_FULL" | "YBR_FULL_422") {
+            if sop != SC {
+                return Err(FrameError::Unsupported("rgb_sop_class"));
+            }
+            if allocated != 8 || stored != 8 || high_bit != 7 || representation != 0 {
+                return Err(FrameError::Unsupported("rgb_layout"));
+            }
+            if [
+                Tag(0x0028, 0x1052),
+                Tag(0x0028, 0x1053),
+                Tag(0x0028, 0x0120),
+                Tag(0x0028, 0x0121),
+            ]
+            .iter()
+            .any(|&tag| object.get(tag).is_some())
+            {
+                return Err(FrameError::Unsupported("rgb_transform"));
+            }
+            Some(NativeColorLayout::new(
+                &photometric,
+                required_u16(object, Tag(0x0028, 0x0006))?,
+                width,
+            )?)
+        } else {
+            None
+        };
+    let expected = if let Some(layout) = color_layout {
+        layout.encoded_bytes(count)?
+    } else {
+        count
+            .checked_mul(usize::from(samples))
+            .and_then(|n| n.checked_mul(usize::from(allocated / 8)))
+            .ok_or(FrameError::ResourceLimit("pixel_size_overflow"))?
+    };
+    let source = PixelSource::from_object(object, allocated, big_endian, expected)?;
     if samples == 1 && matches!(photometric.as_str(), "MONOCHROME1" | "MONOCHROME2") {
-        let slope = optional_f64(&object, Tag(0x0028, 0x1053))?;
-        let intercept = optional_f64(&object, Tag(0x0028, 0x1052))?;
+        let slope = optional_f64(object, Tag(0x0028, 0x1053))?;
+        let intercept = optional_f64(object, Tag(0x0028, 0x1052))?;
         let (slope, intercept) = match (slope, intercept) {
             (None, None) => (1.0, 0.0),
             (Some(slope), Some(intercept))
@@ -166,8 +257,8 @@ fn prepare_bytes(bytes: &[u8], budget: Arc<FrameBudget>) -> Result<Arc<FrameData
             }
             _ => return Err(FrameError::Unsupported("rescale_metadata")),
         };
-        let padding = optional_i32(&object, Tag(0x0028, 0x0120))?;
-        let limit = optional_i32(&object, Tag(0x0028, 0x0121))?;
+        let padding = optional_i32(object, Tag(0x0028, 0x0120))?;
+        let limit = optional_i32(object, Tag(0x0028, 0x0121))?;
         let padding = padding_range(padding, limit, stored, representation == 1)?;
         FrameData::gray_from_fn(width, height, budget, padding.is_some(), |i| {
             let value = normalize(source.sample(i), stored, high_bit, representation == 1);
@@ -177,37 +268,8 @@ fn prepare_bytes(bytes: &[u8], budget: Arc<FrameBudget>) -> Result<Arc<FrameData
                 Ok(Some(f64::from(value) * slope + intercept))
             }
         })
-    } else if samples == 3 && photometric == "RGB" {
-        if sop != SC {
-            return Err(FrameError::Unsupported("rgb_sop_class"));
-        }
-        if allocated != 8
-            || stored != 8
-            || high_bit != 7
-            || representation != 0
-            || required_u16(&object, Tag(0x0028, 0x0006))? != 0
-        {
-            return Err(FrameError::Unsupported("rgb_layout"));
-        }
-        if [
-            Tag(0x0028, 0x1052),
-            Tag(0x0028, 0x1053),
-            Tag(0x0028, 0x0120),
-            Tag(0x0028, 0x0121),
-        ]
-        .iter()
-        .any(|&tag| object.get(tag).is_some())
-        {
-            return Err(FrameError::Unsupported("rgb_transform"));
-        }
-        // Unprofiled 8-bit RGB display bytes; no ICC-based color match claim.
-        FrameData::rgba_from_fn(width, height, budget, |i| {
-            Ok([
-                source.sample(i * 3) as u8,
-                source.sample(i * 3 + 1) as u8,
-                source.sample(i * 3 + 2) as u8,
-            ])
-        })
+    } else if let Some(layout) = color_layout {
+        layout.into_frame(width, height, budget, |i| source.sample(i) as u8)
     } else {
         Err(FrameError::Unsupported("photometric_or_samples"))
     }
@@ -607,6 +669,260 @@ mod tests {
     }
 
     #[test]
+    fn sc_native_color_layouts_parse_to_independent_literal_rgba() {
+        let rgb = vec![
+            255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 255, 17, 34, 51,
+        ];
+        let planar = vec![
+            255, 0, 0, 0, 255, 17, 0, 255, 0, 0, 255, 34, 0, 0, 255, 0, 255, 51,
+        ];
+        let rgb_golden = vec![
+            255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 0, 0, 0, 255, 255, 255, 255, 255, 17,
+            34, 51, 255,
+        ];
+        let ybr_golden = vec![
+            254, 0, 0, 255, 0, 255, 1, 255, 0, 0, 254, 255, 0, 0, 0, 255, 255, 255, 255, 255, 128,
+            128, 128, 255,
+        ];
+        for (syntax, photometric, planar_value, width, pixels, golden) in [
+            (EXPLICIT_LE, "RGB", 0, 3, rgb.clone(), rgb_golden.clone()),
+            (EXPLICIT_LE, "RGB", 1, 3, planar.clone(), rgb_golden.clone()),
+            (IMPLICIT_LE, "RGB", 1, 3, planar, rgb_golden.clone()),
+            (EXPLICIT_BE, "RGB", 0, 3, rgb, rgb_golden),
+            (
+                EXPLICIT_LE,
+                "YBR_FULL",
+                0,
+                3,
+                vec![
+                    76, 85, 255, 150, 44, 21, 29, 255, 107, 0, 128, 128, 255, 128, 128, 128, 128,
+                    128,
+                ],
+                ybr_golden.clone(),
+            ),
+            (
+                EXPLICIT_LE,
+                "YBR_FULL",
+                1,
+                3,
+                vec![
+                    76, 150, 29, 0, 255, 128, 85, 44, 255, 128, 128, 128, 255, 21, 107, 128, 128,
+                    128,
+                ],
+                ybr_golden,
+            ),
+            (
+                EXPLICIT_LE,
+                "YBR_FULL_422",
+                0,
+                4,
+                vec![
+                    76, 100, 85, 255, 29, 60, 255, 107, 0, 255, 128, 128, 128, 64, 128, 128,
+                ],
+                vec![
+                    254, 0, 0, 255, 255, 24, 24, 255, 0, 0, 254, 255, 31, 31, 255, 255, 0, 0, 0,
+                    255, 255, 255, 255, 255, 128, 128, 128, 255, 64, 64, 64, 255,
+                ],
+            ),
+        ] {
+            let us = |n: u16| {
+                if syntax == EXPLICIT_BE {
+                    n.to_be_bytes().to_vec()
+                } else {
+                    n.to_le_bytes().to_vec()
+                }
+            };
+            let bytes = part10(
+                syntax,
+                true,
+                &[
+                    (Tag(0x28, 4), b"CS", photometric.as_bytes().to_vec()),
+                    (Tag(0x28, 6), b"US", us(planar_value)),
+                    (Tag(0x28, 0x10), b"US", us(2)),
+                    (Tag(0x28, 0x11), b"US", us(width)),
+                    (PIXEL_DATA, b"OB", pixels),
+                ],
+            );
+            let budget = FrameBudget::new(golden.len() as u64, golden.len() as u64).unwrap();
+            let image = prepare_image_bytes(&bytes, Arc::clone(&budget)).unwrap();
+            assert_eq!(image.frame.pixels(), golden);
+            assert_eq!(image.frame.pixel_format(), crate::frame::PixelFormat::Rgba8);
+            assert_eq!(image.frame.mask(), None);
+            assert_eq!(image.frame.width(), u32::from(width));
+            assert_eq!(image.frame.height(), 2);
+            assert!(!image.display.can_window);
+            assert!(!image.display.inverted);
+            assert!(!image.display.automatic_window);
+            assert!(image.display.windows.is_empty());
+            assert!(image.display.default_window.is_none());
+            assert_eq!(image.display.unit, "unknown");
+            assert_eq!(image.source_revision, source_revision(&bytes));
+            assert_eq!(
+                crate::display::reference_rgba(&image.frame, &image.display, None, true).unwrap(),
+                golden
+            );
+            assert_eq!(budget.snapshot().live_bytes, golden.len() as u64);
+            let owner = Arc::clone(&image.frame);
+            drop(image);
+            assert_eq!(budget.snapshot().live_bytes, golden.len() as u64);
+            assert_eq!(owner.pixels(), golden);
+            drop(owner);
+            assert_eq!(budget.snapshot().live_bytes, 0);
+        }
+    }
+
+    #[test]
+    fn sc_color_layout_transform_and_length_errors_have_safe_categories() {
+        for (extras, expected) in [
+            (
+                vec![(Tag(0x28, 6), b"US", 2_u16.to_le_bytes().to_vec())],
+                FrameError::Unsupported("native_color_layout"),
+            ),
+            (
+                vec![(Tag(0x28, 0x103), b"US", 1_u16.to_le_bytes().to_vec())],
+                FrameError::Unsupported("rgb_layout"),
+            ),
+            (
+                vec![(Tag(0x28, 0x1053), b"DS", b"2".to_vec())],
+                FrameError::Unsupported("rgb_transform"),
+            ),
+            (
+                vec![(Tag(0x28, 0x120), b"US", 0_u16.to_le_bytes().to_vec())],
+                FrameError::Unsupported("rgb_transform"),
+            ),
+            (
+                vec![(Tag(0x28, 0x100), b"US", 16_u16.to_le_bytes().to_vec())],
+                FrameError::Unsupported("rgb_layout"),
+            ),
+            (
+                vec![(PIXEL_DATA, b"OB", vec![0; 4])],
+                FrameError::DecodeFailed("pixel_length"),
+            ),
+            (
+                vec![(PIXEL_DATA, b"OB", vec![0; 8])],
+                FrameError::DecodeFailed("pixel_length"),
+            ),
+            (
+                vec![
+                    (Tag(0x28, 4), b"CS", b"YBR_FULL_422".to_vec()),
+                    (Tag(0x28, 6), b"US", 1_u16.to_le_bytes().to_vec()),
+                ],
+                FrameError::Unsupported("native_color_layout"),
+            ),
+            (
+                vec![
+                    (Tag(0x28, 4), b"CS", b"YBR_FULL_422".to_vec()),
+                    (Tag(0x28, 0x11), b"US", 3_u16.to_le_bytes().to_vec()),
+                ],
+                FrameError::Unsupported("odd_width_ybr422"),
+            ),
+            (
+                vec![
+                    (Tag(0x28, 4), b"CS", b"YBR_FULL_422".to_vec()),
+                    (PIXEL_DATA, b"OB", vec![0; 2]),
+                ],
+                FrameError::DecodeFailed("pixel_length"),
+            ),
+        ] {
+            let budget = budget();
+            let actual =
+                prepare_image_bytes(&part10(EXPLICIT_LE, true, &extras), Arc::clone(&budget))
+                    .err()
+                    .unwrap();
+            assert_eq!(actual, expected);
+            assert_eq!(budget.snapshot().live_bytes, 0);
+            assert_eq!(budget.snapshot().peak_bytes, 0);
+        }
+        let error = prepare_image_bytes(
+            &part10(
+                EXPLICIT_BE,
+                true,
+                &[(PIXEL_DATA, b"OW", vec![255, 0, 0, 17, 34, 51])],
+            ),
+            budget(),
+        )
+        .err()
+        .unwrap();
+        assert_eq!(error, FrameError::Unsupported("big_endian_8bit_ow"));
+    }
+
+    #[test]
+    fn color_image_presentation_rejection_releases_its_reserved_payload() {
+        for (tag, vr, value) in [
+            (Tag(0x28, 0x1050), b"DS", b"0".to_vec()),
+            (Tag(0x28, 0x1051), b"DS", b"1".to_vec()),
+            (Tag(0x28, 0x1056), b"CS", b"LINEAR".to_vec()),
+            (Tag(0x2050, 0x20), b"CS", b"INVERSE".to_vec()),
+        ] {
+            let budget = FrameBudget::new(8, 8).unwrap();
+            let error = prepare_image_bytes(
+                &part10(EXPLICIT_LE, true, &[(tag, vr, value)]),
+                Arc::clone(&budget),
+            )
+            .err()
+            .unwrap();
+            assert_eq!(error, FrameError::Unsupported("rgb_presentation_transform"));
+            assert_eq!(budget.snapshot().peak_bytes, 8);
+            assert_eq!(budget.snapshot().live_bytes, 0);
+        }
+    }
+
+    #[test]
+    fn unsupported_color_sop_palette_profile_and_bit_depth_remain_explicit() {
+        let us = "1.2.840.10008.5.1.4.1.1.6.1";
+        let budget = budget();
+        let error = prepare_image_bytes(
+            &part10_with_sop(EXPLICIT_LE, true, &[], Some(us)),
+            Arc::clone(&budget),
+        )
+        .err()
+        .unwrap();
+        assert_eq!(error, FrameError::Unsupported("sop_class"));
+        for extras in [
+            vec![
+                (Tag(0x28, 4), b"CS", b"PALETTE COLOR".to_vec()),
+                (Tag(0x28, 2), b"US", 1_u16.to_le_bytes().to_vec()),
+                (PIXEL_DATA, b"OB", vec![0, 1]),
+            ],
+            vec![(Tag(0x28, 0x2000), b"OB", vec![0, 0])],
+            vec![(Tag(0x28, 0x2002), b"CS", b"SRGB".to_vec())],
+            vec![(Tag(0x28, 0x101), b"US", 7_u16.to_le_bytes().to_vec())],
+            vec![
+                (Tag(0x28, 0x100), b"US", 16_u16.to_le_bytes().to_vec()),
+                (Tag(0x28, 0x101), b"US", 16_u16.to_le_bytes().to_vec()),
+                (Tag(0x28, 0x102), b"US", 15_u16.to_le_bytes().to_vec()),
+            ],
+        ] {
+            let error =
+                prepare_image_bytes(&part10(EXPLICIT_LE, true, &extras), Arc::clone(&budget))
+                    .err()
+                    .unwrap();
+            assert!(matches!(error, FrameError::Unsupported(_)));
+            assert_eq!(budget.snapshot().live_bytes, 0);
+            assert_eq!(budget.snapshot().peak_bytes, 0);
+        }
+    }
+
+    #[test]
+    fn color_payload_limits_reject_before_allocation_and_allow_recovery() {
+        let budget = FrameBudget::new(8, 8).unwrap();
+        let small =
+            prepare_image_bytes(&part10(EXPLICIT_LE, true, &[]), Arc::clone(&budget)).unwrap();
+        let blocked = prepare_image_bytes(&part10(EXPLICIT_LE, true, &[]), Arc::clone(&budget))
+            .err()
+            .unwrap();
+        assert!(matches!(blocked, FrameError::ResourceLimit(_)));
+        assert_eq!(budget.snapshot().live_bytes, 8);
+        drop(small);
+        assert_eq!(budget.snapshot().live_bytes, 0);
+        let recovered =
+            prepare_image_bytes(&part10(EXPLICIT_LE, true, &[]), Arc::clone(&budget)).unwrap();
+        assert_eq!(recovered.frame.pixels(), [255, 0, 0, 255, 17, 34, 51, 255]);
+        drop(recovered);
+        assert_eq!(budget.snapshot().live_bytes, 0);
+    }
+
+    #[test]
     fn rgb_ct_and_mr_do_not_inherit_secondary_capture_support() {
         for sop in [CT, MR] {
             assert_eq!(
@@ -734,6 +1050,342 @@ mod tests {
             result.expect("FIFO open blocked").unwrap_err(),
             FrameError::InvalidArgument("input_not_regular_file")
         );
+    }
+
+    fn gray_display_bytes(image: &PreparedImage, user_invert: bool) -> Vec<u8> {
+        crate::display::reference_rgba(&image.frame, &image.display, None, user_invert)
+            .unwrap()
+            .as_chunks::<4>()
+            .0
+            .iter()
+            .map(|pixel| pixel[0])
+            .collect()
+    }
+
+    #[test]
+    fn file_voi_is_applied_once_after_signed_bits_and_rescale() {
+        for (function, expected) in [
+            ("LINEAR", [0, 0, 170, 255, 255, 255]),
+            ("LINEAR_EXACT", [0, 0, 128, 255, 255, 255]),
+            ("SIGMOID", [0, 30, 128, 225, 255, 255]),
+        ] {
+            let image = prepare_image_bytes(
+                &part10(
+                    EXPLICIT_LE,
+                    false,
+                    &[
+                        (Tag(0x28, 0x1050), b"DS", b"-10".to_vec()),
+                        (Tag(0x28, 0x1051), b"DS", b"4".to_vec()),
+                        (Tag(0x28, 0x1056), b"CS", function.as_bytes().to_vec()),
+                    ],
+                ),
+                budget(),
+            )
+            .unwrap();
+            assert_eq!(gray_display_bytes(&image, false), expected);
+            assert!(!image.display.automatic_window);
+            assert!(image.display.can_window);
+            assert_eq!(image.display.windows.len(), 1);
+            let modality_values: Vec<f32> = image
+                .frame
+                .pixels()
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .map(|&bytes| f32::from_le_bytes(bytes))
+                .collect();
+            assert_eq!(modality_values, [0.0, -12.0, -10.0, -8.0, 2038.0, 4084.0]);
+        }
+        let image = prepare_image_bytes(
+            &part10(
+                EXPLICIT_LE,
+                false,
+                &[
+                    (Tag(0x28, 0x1050), b"DS", b"-10\\2036".to_vec()),
+                    (Tag(0x28, 0x1051), b"DS", b"4\\4096".to_vec()),
+                ],
+            ),
+            budget(),
+        )
+        .unwrap();
+        assert_eq!(image.display.windows.len(), 2);
+        assert_eq!(image.display.default_window.as_ref().unwrap().center, -10.0);
+        assert_eq!(
+            image.display.default_window.as_ref().unwrap().function,
+            crate::display::VoiFunction::Linear
+        );
+        assert_eq!(image.display.windows[1].center, 2036.0);
+        assert_eq!(image.display.windows[1].width, 4096.0);
+    }
+
+    #[test]
+    fn native_automatic_uniform_all_padding_and_polarity_have_independent_expected_outputs() {
+        let image = prepare_image_bytes(&part10(EXPLICIT_LE, false, &[]), budget()).unwrap();
+        assert!(image.display.automatic_window);
+        assert_eq!(
+            image.display.default_window.as_ref().unwrap().center,
+            2036.0
+        );
+        assert_eq!(image.display.default_window.as_ref().unwrap().width, 4096.0);
+        let uniform = prepare_image_bytes(
+            &part10(EXPLICIT_LE, false, &[(PIXEL_DATA, b"OW", vec![0; 12])]),
+            budget(),
+        )
+        .unwrap();
+        assert_eq!(
+            uniform.display.default_window.as_ref().unwrap().center,
+            -10.0
+        );
+        assert_eq!(uniform.display.default_window.as_ref().unwrap().width, 1.0);
+        assert_eq!(gray_display_bytes(&uniform, false), [128; 6]);
+        let all_padding = prepare_image_bytes(
+            &part10(
+                EXPLICIT_LE,
+                false,
+                &[(PIXEL_DATA, b"OW", [0x00, 0xa8].repeat(6))],
+            ),
+            budget(),
+        )
+        .unwrap();
+        assert!(all_padding.display.default_window.is_none());
+        assert!(!all_padding.display.can_window);
+        assert!(
+            all_padding
+                .display
+                .diagnostics
+                .iter()
+                .any(|d| d == "no_valid_pixels")
+        );
+        assert_eq!(gray_display_bytes(&all_padding, false), [0; 6]);
+        assert_eq!(gray_display_bytes(&all_padding, true), [0; 6]);
+        let m1 = prepare_image_bytes(
+            &part10(
+                EXPLICIT_LE,
+                false,
+                &[
+                    (Tag(0x28, 4), b"CS", b"MONOCHROME1".to_vec()),
+                    (Tag(0x2050, 0x20), b"CS", b"INVERSE".to_vec()),
+                    (Tag(0x28, 0x1050), b"DS", b"-10".to_vec()),
+                    (Tag(0x28, 0x1051), b"DS", b"4".to_vec()),
+                    (Tag(0x28, 0x1056), b"CS", b"LINEAR_EXACT".to_vec()),
+                ],
+            ),
+            budget(),
+        )
+        .unwrap();
+        assert!(m1.display.inverted);
+        assert_eq!(gray_display_bytes(&m1, false), [0, 255, 128, 0, 0, 0]);
+        assert_eq!(gray_display_bytes(&m1, true), [0, 0, 128, 255, 255, 255]);
+    }
+
+    #[test]
+    fn invalid_file_voi_has_no_auto_fallback_and_returns_the_payload_charge() {
+        let cases = [
+            vec![(Tag(0x28, 0x1050), b"DS", b"-10".to_vec())],
+            vec![
+                (Tag(0x28, 0x1050), b"DS", b"-10\\0".to_vec()),
+                (Tag(0x28, 0x1051), b"DS", b"4".to_vec()),
+            ],
+            vec![
+                (Tag(0x28, 0x1050), b"DS", b"-10".to_vec()),
+                (Tag(0x28, 0x1051), b"DS", b"0".to_vec()),
+            ],
+            vec![
+                (Tag(0x28, 0x1050), b"DS", b"NaN".to_vec()),
+                (Tag(0x28, 0x1051), b"DS", b"4".to_vec()),
+            ],
+            vec![(
+                Tag(0x28, 0x1056),
+                b"CS",
+                b"UNSUPPORTED_PRIVATE_FUNCTION".to_vec(),
+            )],
+            vec![(Tag(0x2050, 0x20), b"CS", b"INVERSE".to_vec())],
+        ];
+        for extra in cases {
+            let bytes = part10(EXPLICIT_LE, false, &extra);
+            let budget = budget();
+            let error = prepare_image_bytes(&bytes, Arc::clone(&budget)).unwrap_err();
+            assert!(matches!(error, FrameError::Unsupported(_)));
+            assert!(!error.to_string().contains("PRIVATE_FUNCTION"));
+            assert_eq!(budget.snapshot().live_bytes, 0);
+            // PIXEL-1 remains a pixel-only contract, independent of file VOI.
+            let frame = prepare_bytes(&bytes, Arc::clone(&budget)).unwrap();
+            assert_eq!(frame.accounted_bytes(), 30);
+            drop(frame);
+            assert_eq!(budget.snapshot().live_bytes, 0);
+        }
+    }
+
+    #[test]
+    fn aspect_priority_invalid_fallback_conflicts_and_safe_units_are_preserved() {
+        let image = prepare_image_bytes(
+            &part10(
+                EXPLICIT_LE,
+                false,
+                &[
+                    (Tag(0x28, 0x30), b"DS", b"2\\1".to_vec()),
+                    (Tag(0x18, 0x1164), b"DS", b"1\\1".to_vec()),
+                    (Tag(0x28, 0x1054), b"LO", b"HU".to_vec()),
+                ],
+            ),
+            budget(),
+        )
+        .unwrap();
+        assert_eq!(image.display.pixel_height_over_width, 2.0);
+        assert_eq!(image.display.aspect_source, "pixel_spacing");
+        assert!(!image.display.aspect_estimated);
+        assert_eq!(image.display.unit, "HU");
+        assert!(
+            image
+                .display
+                .diagnostics
+                .iter()
+                .any(|d| d == "display_aspect_conflict")
+        );
+        let fallback = prepare_image_bytes(
+            &part10(
+                EXPLICIT_LE,
+                false,
+                &[
+                    (Tag(0x28, 0x30), b"DS", b"private-invalid-value\\0".to_vec()),
+                    (Tag(0x18, 0x1164), b"DS", b"3\\2".to_vec()),
+                    (Tag(0x28, 0x1054), b"LO", b"private-unit-value".to_vec()),
+                ],
+            ),
+            budget(),
+        )
+        .unwrap();
+        assert_eq!(fallback.display.pixel_height_over_width, 1.5);
+        assert_eq!(fallback.display.aspect_source, "imager_pixel_spacing");
+        assert_eq!(fallback.display.unit, "unknown");
+        assert!(
+            fallback
+                .display
+                .diagnostics
+                .iter()
+                .any(|d| d == "invalid_pixel_spacing")
+        );
+        assert!(!format!("{:?}", fallback.display).contains("private-"));
+        let nominal = prepare_image_bytes(
+            &part10(
+                EXPLICIT_LE,
+                false,
+                &[
+                    (Tag(0x18, 0x1164), b"DS", b"-1\\1".to_vec()),
+                    (Tag(0x18, 0x2010), b"DS", b"0.8\\0.4".to_vec()),
+                    (Tag(0x28, 0x34), b"IS", b"3\\2".to_vec()),
+                ],
+            ),
+            budget(),
+        )
+        .unwrap();
+        assert_eq!(nominal.display.pixel_height_over_width, 2.0);
+        assert_eq!(
+            nominal.display.aspect_source,
+            "nominal_scanned_pixel_spacing"
+        );
+        let aspect_only = prepare_image_bytes(
+            &part10(
+                EXPLICIT_LE,
+                false,
+                &[(Tag(0x28, 0x34), b"IS", b"3\\2".to_vec())],
+            ),
+            budget(),
+        )
+        .unwrap();
+        assert_eq!(aspect_only.display.pixel_height_over_width, 1.5);
+        assert_eq!(aspect_only.display.aspect_source, "pixel_aspect_ratio");
+        assert!(!aspect_only.display.aspect_estimated);
+        let invalid = prepare_image_bytes(
+            &part10(
+                EXPLICIT_LE,
+                false,
+                &[
+                    (Tag(0x28, 0x30), b"DS", b"NaN\\1".to_vec()),
+                    (Tag(0x28, 0x34), b"IS", b"0\\1".to_vec()),
+                ],
+            ),
+            budget(),
+        )
+        .unwrap();
+        assert_eq!(invalid.display.pixel_height_over_width, 1.0);
+        assert_eq!(invalid.display.aspect_source, "assumed_square");
+        assert!(invalid.display.aspect_estimated);
+        let mr = prepare_image_bytes(
+            &part10_with_sop(
+                EXPLICIT_LE,
+                false,
+                &[(Tag(0x28, 0x1054), b"LO", b"HU".to_vec())],
+                Some(MR),
+            ),
+            budget(),
+        )
+        .unwrap();
+        assert_eq!(mr.display.unit, "unknown");
+    }
+
+    #[test]
+    fn unapplied_overlay_and_shutter_are_reported_without_original_text() {
+        let image = prepare_image_bytes(
+            &part10(
+                EXPLICIT_LE,
+                false,
+                &[
+                    (Tag(0x6000, 0x3000), b"OW", vec![0, 0]),
+                    (
+                        Tag(0x6000, 0x22),
+                        b"LO",
+                        b"private-overlay-description".to_vec(),
+                    ),
+                    (Tag(0x18, 0x1600), b"CS", b"RECTANGULAR".to_vec()),
+                ],
+            ),
+            budget(),
+        )
+        .unwrap();
+        assert!(
+            image
+                .display
+                .diagnostics
+                .iter()
+                .any(|d| d == "overlay_not_applied")
+        );
+        assert!(
+            image
+                .display
+                .diagnostics
+                .iter()
+                .any(|d| d == "shutter_not_applied")
+        );
+        assert!(!format!("{:?}", image.display).contains("private-overlay"));
+    }
+
+    #[test]
+    fn source_hash_matches_the_standard_vector_and_the_opened_snapshot() {
+        assert_eq!(
+            source_revision(b"abc"),
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        );
+        let input = TemporaryInput::new();
+        let bytes = part10(EXPLICIT_LE, false, &[]);
+        std::fs::write(&input.path, &bytes).unwrap();
+        let budget = FrameBudget::new(60, 30).unwrap();
+        let first = prepare_native_image(&input.path, 0, Arc::clone(&budget)).unwrap();
+        let expected = source_revision(&bytes);
+        assert_eq!(first.source_revision, expected);
+        assert_eq!(first.source_revision.len(), 64);
+        let mut changed_bytes = bytes.clone();
+        changed_bytes[0] = 1;
+        std::fs::write(&input.path, &changed_bytes).unwrap();
+        let second = prepare_native_image(&input.path, 0, Arc::clone(&budget)).unwrap();
+        assert_ne!(first.source_revision, second.source_revision);
+        assert_eq!(first.source_revision, expected);
+        assert_eq!(first.frame.pixels(), second.frame.pixels());
+        assert_eq!(budget.snapshot().live_bytes, 60);
+        drop(second);
+        assert_eq!(budget.snapshot().live_bytes, 30);
+        drop(first);
+        assert_eq!(budget.snapshot().live_bytes, 0);
     }
 
     #[test]

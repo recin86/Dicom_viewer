@@ -1,0 +1,1472 @@
+{
+  "schema_revision": 1,
+  "task": "P1-DISPLAY-20261001",
+  "date": "2026-10-01",
+  "baseline_commit": "c68c9208be771e366fe0824d0a7a8291eb679597",
+  "branch": "codex/p1-foundation",
+  "snapshot": "uncommitted final source; local foundation/pixel commit completed; no push",
+  "complete": false,
+  "acceptance": {
+    "status": "not-run",
+    "reason": "Final actual NSOpenPanel/Ready/recovery/RGB/diagnostics UI regression requires an unlocked Mac"
+  },
+  "environment": {
+    "hardware": "Apple M5",
+    "memory_gib": 16,
+    "macos": "27.0.1",
+    "macos_build": "26A434",
+    "architecture": "arm64",
+    "minimum_macos": "27.0",
+    "rust": "1.98.1",
+    "swift": "6.4",
+    "uniffi": "0.32.2",
+    "dicom_rs": "0.10.0",
+    "sha2": "0.10.9",
+    "metal_compile": "runtime source; no Xcode required"
+  },
+  "scope": "Native legacy CT/MR/SC grayscale and RGB SC, one frame, file VOI or deterministic F32 display auto range; no measurement capability",
+  "source_hashes": [
+    {
+      "path": "Cargo.lock",
+      "bytes": 37641,
+      "sha256": "cb0db39392948d23b2c9d4c032ee60399623648559ea32793592a2d558fa5958"
+    },
+    {
+      "path": "Cargo.toml",
+      "bytes": 672,
+      "sha256": "4d15d7a742f2bd4329501e0fec746803b0b6f6a4d9d2f1df8e72f0c55f207377"
+    },
+    {
+      "path": "crates/viewer-core/Cargo.toml",
+      "bytes": 298,
+      "sha256": "0bcf0fd8b768122e4132975cc638d582af399f14227c58a5b05189c56b7e7e3f"
+    },
+    {
+      "path": "crates/viewer-core/src/display.rs",
+      "bytes": 22804,
+      "sha256": "4035b8da71e6dfea7cbcb38456812a06d89ecd11bc07e9a62ee24fa1e272e3ca"
+    },
+    {
+      "path": "crates/viewer-core/src/frame.rs",
+      "bytes": 15645,
+      "sha256": "947ace36c558023541599a52a7d6ab9fc9b3ba5e39fad17d3f84d79ffe19b7c3"
+    },
+    {
+      "path": "crates/viewer-core/src/lib.rs",
+      "bytes": 1239,
+      "sha256": "9619bbd9b16b7a1434270de64dc44d017dd4e2b0aa40a0610f29c276011146a1"
+    },
+    {
+      "path": "crates/viewer-core/src/native.rs",
+      "bytes": 43561,
+      "sha256": "2d6399acc4ae28dcb9a08c51db423f2f81fcad57f403d698e583bc9adf54a510"
+    },
+    {
+      "path": "crates/viewer-ffi/Cargo.toml",
+      "bytes": 481,
+      "sha256": "ef057944846a2ecb1164b736c9ac5cfa467125006d823908fdb82cb4c79a3dbe"
+    },
+    {
+      "path": "crates/viewer-ffi/src/bin/viewer-bindgen.rs",
+      "bytes": 49,
+      "sha256": "f7a2dd11fb370e9595bdfa6c32fc41a9b67a60bbab06ec711cb7a03eb873ffa6"
+    },
+    {
+      "path": "crates/viewer-ffi/src/display.rs",
+      "bytes": 3700,
+      "sha256": "ae4bdfcf752802ab6dc919f7c77f3c49fa043e03e98d7de55b6bde4f87b78902"
+    },
+    {
+      "path": "crates/viewer-ffi/src/lib.rs",
+      "bytes": 850,
+      "sha256": "423b87268d5347b6eaf15fb9f1fcc6391fc917e51135a19a28510d5f0eaca4bd"
+    },
+    {
+      "path": "crates/viewer-ffi/src/pixels.rs",
+      "bytes": 19867,
+      "sha256": "74c8449f7326e3b7e85621c1f58548ce19f77d0101caa56e725f3840398c005e"
+    },
+    {
+      "path": "macos/Package.swift",
+      "bytes": 1642,
+      "sha256": "38eddbf733d5a7e4bf51af69050bad25f6ee509344397d53af60c21a9d644ec6"
+    },
+    {
+      "path": "macos/Resources/Info.plist",
+      "bytes": 846,
+      "sha256": "0bc8bf1767fac7c63fea3fa7b3c1e02413e90c91eb90016a103533505c53f465"
+    },
+    {
+      "path": "macos/Sources/ViewerApp/AppDelegate.swift",
+      "bytes": 8105,
+      "sha256": "85092ed984170cf83d080eceb4edd99bc55c6d239cc4ceb4bc9dcb50f40b3b78"
+    },
+    {
+      "path": "macos/Sources/ViewerApp/SmokeReport.swift",
+      "bytes": 4773,
+      "sha256": "873121d561fd199d77eaad5affac4acc20dcaf85f4a9b6b6ecb0d7ed266a06ed"
+    },
+    {
+      "path": "macos/Sources/ViewerApp/ViewerApp.swift",
+      "bytes": 2105,
+      "sha256": "31c4e6ec7f010d2a9edb46b114a431f553ef471b1dc31d31f6377e84632a87ec"
+    },
+    {
+      "path": "macos/Sources/ViewerApp/ViewerWindow.swift",
+      "bytes": 23993,
+      "sha256": "d0b67e9d21dec202dcd065c9f9257241d19ef7386811b5178afb0adbb333c703"
+    },
+    {
+      "path": "macos/Sources/ViewerBridge/DisplayFrames.swift",
+      "bytes": 3351,
+      "sha256": "831f7bda5f661603635da8150f7819a0fed78c3caa3dda1f514c9f1d070d9a74"
+    },
+    {
+      "path": "macos/Sources/ViewerBridge/PixelFrames.swift",
+      "bytes": 14203,
+      "sha256": "e031d426d3ee4922fcc0f07294118ac389f9351c361932920ae6ae20fd82e8fc"
+    },
+    {
+      "path": "macos/Sources/ViewerBridge/ViewerBridge.swift",
+      "bytes": 998,
+      "sha256": "04f611aa22b3ce5e97125fe84cfeede992d832a1901ba7f3d3b28a692ecd1a65"
+    },
+    {
+      "path": "macos/Sources/ViewerContractChecks/ContractChecks.swift",
+      "bytes": 19860,
+      "sha256": "274c3ac730b3cfd4eff3ec3359d2a80d521940dfaa6a4c21d0045880fe90155a"
+    },
+    {
+      "path": "macos/Sources/ViewerDisplayChecks/DisplayChecks.swift",
+      "bytes": 17908,
+      "sha256": "2fe501718655c779a58bd1b9a8ddc94f3efc427c2352022ae17f828fe7446d19"
+    },
+    {
+      "path": "macos/Sources/ViewerPixelCopy/include/module.modulemap",
+      "bytes": 73,
+      "sha256": "478ac46752386c88bfcae544e5ef9ff3d0bd73f05c4c21be52d9d0e29e9264dc"
+    },
+    {
+      "path": "macos/Sources/ViewerPixelCopy/include/viewer_pixel_copy.h",
+      "bytes": 1043,
+      "sha256": "3533dd5792cca4cfe2078577dc2bb6aed46c7b4ee531726bda2cf608098ce9d8"
+    },
+    {
+      "path": "macos/Sources/ViewerPixelCopy/shim.c",
+      "bytes": 114,
+      "sha256": "2dd8fa960ea70adf7357ce614f436eea5f815f4146f2823bbf9dd468c5cbc76d"
+    },
+    {
+      "path": "macos/Sources/ViewerRendering/MetalFrameRenderer.swift",
+      "bytes": 15532,
+      "sha256": "8e7ab7dfe6ca11730eadbaa320dfe94b4c7ec10adf6bb66fce38ca598ed803bb"
+    },
+    {
+      "path": "macos/Sources/ViewerRendering/ViewportTransform.swift",
+      "bytes": 4154,
+      "sha256": "ed51403dc3843cd2c8090daba5db4a6f5ecca29257b4893995c2b953191bd027"
+    },
+    {
+      "path": "macos/Sources/viewer_ffiFFI/shim.c",
+      "bytes": 80,
+      "sha256": "652f71b5d69e7d87880d3e36ebe93a3e5d57d0434d5ad3536af5c359bedda074"
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "bytes": 86,
+      "sha256": "887f9be066a15585a2c583578e84b0fcb541126d81546276bad3d2ff00d61167"
+    },
+    {
+      "path": "scripts/build.sh",
+      "bytes": 2973,
+      "sha256": "fea062e5ea18e7430a9f24bc84f0de5a73f713d8e8b17b3ff825775ac049ceb7"
+    },
+    {
+      "path": "scripts/check.sh",
+      "bytes": 3671,
+      "sha256": "b6ab820939e3de5e1b9a451f5ec1380f8398c107ec15959d6a4f91e9a4322f49"
+    },
+    {
+      "path": "scripts/environment.sh",
+      "bytes": 688,
+      "sha256": "a85f8c75ca3a2f67fe6d2e2193ba8fd603be63cc8ba476a24e8314cc7e579467"
+    },
+    {
+      "path": "scripts/prepare-pixel-fixtures.py",
+      "bytes": 10185,
+      "sha256": "d07cbe8fa74f9a577796538e8eae6ab64b74a6fac683497d6899123e15b639be"
+    },
+    {
+      "path": "scripts/run.sh",
+      "bytes": 334,
+      "sha256": "5f0bb7972b89e759922ea44341b714b68f168b82718cea020334223c253bfe4f"
+    }
+  ],
+  "generated_hashes": [
+    {
+      "path": "macos/Sources/ViewerBindings/viewer_ffi.swift",
+      "bytes": 57302,
+      "sha256": "53492484f43b8e3ef9d95bbe85d443516a9d9c2b4c8401e756d93ab66cbe87c1"
+    },
+    {
+      "path": "macos/Sources/viewer_ffiFFI/include/viewer_ffiFFI.h",
+      "bytes": 26224,
+      "sha256": "c1c3f37c998c881d03b3e7e403f81c06b9f444fdfa144080539762f0241fc198"
+    },
+    {
+      "path": "macos/Sources/viewer_ffiFFI/include/module.modulemap",
+      "bytes": 136,
+      "sha256": "5b711d39492cb5fcbcff902e74e1ace797eff1ce8d86a90f1b18e4719b37e2ef"
+    }
+  ],
+  "fixture_manifest": {
+    "revision": 2,
+    "synthetic_only": true,
+    "source": "generated locally from literal samples; no patient or external source data",
+    "use": "project contract tests; generated binaries are cache-only",
+    "oracle": "independent literal stored samples, slope/intercept arithmetic and RGBA bytes",
+    "writer_sha256": "d07cbe8fa74f9a577796538e8eae6ab64b74a6fac683497d6899123e15b639be",
+    "fixtures": [
+      {
+        "id": "gray-le.dcm",
+        "bytes": 544,
+        "sha256": "cb48e9fd4e3bd075772510a8f3421e5cf4c6d42765f0c1c23c899764fb76edb6",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "gray-be.dcm",
+        "bytes": 544,
+        "sha256": "676d78b35ec2033eb98c38e925fbb11464684b72e9cec0408b98b0ef6d2ba299",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.2",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "gray-implicit.dcm",
+        "bytes": 538,
+        "sha256": "bc137762387e8f46682324b3a4c06d1786854e651bdbe824e6f1bb13e69b7c13",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "rgb.dcm",
+        "bytes": 514,
+        "sha256": "539b0dac2e4b8a7c778ff241f48920f4d1a128fcf094f5832c2c2b2f0f29d6a5",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.7",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 2,
+        "frames": 1,
+        "photometric": "RGB",
+        "bits_allocated": 8,
+        "bits_stored": 8,
+        "high_bit": 7,
+        "signed": false,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "unsupported-multiframe.dcm",
+        "bytes": 556,
+        "sha256": "ffac94a74c25c1a76d1f948ecfa151e5563ded642dfedb49fedd604f528fd785",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 2,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "unsupported",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "unsupported-compressed.dcm",
+        "bytes": 546,
+        "sha256": "728eadc183bac540b1bb93971e33f98cf496c2ae64d7cb295255398f273d3abe",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.4.50",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "unsupported",
+        "note": "deliberately unsupported syntax; native payload"
+      },
+      {
+        "id": "unsupported-enhanced.dcm",
+        "bytes": 548,
+        "sha256": "873c60ee633db028693f60152c6dfa645ae0fe56ee2f787a1257a7dae652fc8e",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2.1",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "unsupported",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "unsupported-overflow.dcm",
+        "bytes": 546,
+        "sha256": "3d7406c0aaa696ba78122fa1ee5b0090234ff95f68f8c9393f0d29316ec614a5",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "unsupported",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "malformed.dcm",
+        "bytes": 17,
+        "sha256": "b2a4dfba7cf22ed9a3b923677d087362f58f140ebf93af6a1bb66944ce169f36",
+        "expected": "decode_failed"
+      },
+      {
+        "id": "display-linear.dcm",
+        "bytes": 580,
+        "sha256": "8b2fcc1b27d89941c234ee2e92d4d91eb6dd037ff22b12e593ef194e2fcca7e1",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "display-exact.dcm",
+        "bytes": 586,
+        "sha256": "0876d06400bcb77004542b0816704ef2d4eceb90673906b7663615cb6f6a4632",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "display-sigmoid.dcm",
+        "bytes": 582,
+        "sha256": "073ce8777c216fc1765beef91b8c0c51ade891539099f56150042b358a37d5dd",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "display-mono1.dcm",
+        "bytes": 602,
+        "sha256": "940626325042b6116b608880b570bcb04e16475e7f2bfebe7cde116f483968d9",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME1",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "display-aspect.dcm",
+        "bytes": 556,
+        "sha256": "7c54a226d31c1887f51e11a67f4386e64c5f619a287e44e7a3d5a45b3820e326",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "display-uniform.dcm",
+        "bytes": 534,
+        "sha256": "171913b11b76c91185e234fb320c038bd637dae975b417429237cb8e961249c7",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "display-padding.dcm",
+        "bytes": 544,
+        "sha256": "7257496ce56b34dbc9608dd3e3057c2b67be0b43d61a710c8076fbe06669b6d8",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "invalid-window.dcm",
+        "bytes": 580,
+        "sha256": "74d5c73e98902c37e0cda1c35485f4b3194b71219345cb3f8c0729aa828e63a3",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "unsupported",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "display-multiwindow.dcm",
+        "bytes": 588,
+        "sha256": "32196f844274f1fefdf58d9b26dbe7b4b6d4bb20f92ac1df47f4e94c270e933d",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "display-large-sigmoid.dcm",
+        "bytes": 572,
+        "sha256": "aead4b9a3c64e1e0773b4e493f064eb46ff8bc9d04a16f40ea796d2e971c0c83",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "display-opposite-sigmoid.dcm",
+        "bytes": 580,
+        "sha256": "1d1c2699d6e09e7a9722d39fced477a83018151e005bef76d9ff837fe2b460aa",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "display-diagnostics.dcm",
+        "bytes": 680,
+        "sha256": "d7d01d0c10b707fd1000c7f4d767b1a60f019c3d806f34a1c16e079883838d52",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "golden_match",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "display-unrenderable-window.dcm",
+        "bytes": 588,
+        "sha256": "041c2ad1d40ee5118a42a71167e8f06f30a1fc420d769f694e2d931b3aa987b0",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 2,
+        "columns": 3,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "rendering_invalid_display",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "oversized-texture.dcm",
+        "bytes": 40522,
+        "sha256": "304cb0c80dd94aeeb8caf83c143d57c3f3cec25a6c282c1e6b61fca0076378d9",
+        "sop_class_uid": "1.2.840.10008.5.1.4.1.1.2",
+        "transfer_syntax_uid": "1.2.840.10008.1.2.1",
+        "rows": 1,
+        "columns": 20000,
+        "frames": 1,
+        "photometric": "MONOCHROME2",
+        "bits_allocated": 16,
+        "bits_stored": 12,
+        "high_bit": 11,
+        "signed": true,
+        "expected": "rendering_invalid_display",
+        "note": "synthetic stored samples"
+      },
+      {
+        "id": "oversized.dcm",
+        "bytes": 33554433,
+        "sha256": "bdf7fbb54387c24608fd757a1b31c32cabcd7b6bee8ff3345c897139fffc072a",
+        "expected": "resource_limit_before_parse"
+      }
+    ],
+    "gray_expected": {
+      "width": 3,
+      "height": 2,
+      "stored": [
+        -2048,
+        -1,
+        0,
+        1,
+        1024,
+        2047
+      ],
+      "slope": 2,
+      "intercept": -10,
+      "f32": [
+        0,
+        -12,
+        -10,
+        -8,
+        2038,
+        4084
+      ],
+      "mask": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "accounted_bytes": 30
+    },
+    "rgba_expected": [
+      255,
+      0,
+      0,
+      255,
+      0,
+      255,
+      0,
+      255,
+      0,
+      0,
+      255,
+      255,
+      17,
+      34,
+      51,
+      255
+    ],
+    "display_expected": {
+      "linear": {
+        "center": -10,
+        "width": 4,
+        "function": "LINEAR",
+        "gray8": [
+          0,
+          0,
+          170,
+          255,
+          255,
+          255
+        ]
+      },
+      "exact": {
+        "center": -10,
+        "width": 4,
+        "function": "LINEAR_EXACT",
+        "gray8": [
+          0,
+          0,
+          128,
+          255,
+          255,
+          255
+        ]
+      },
+      "sigmoid": {
+        "center": -10,
+        "width": 4,
+        "function": "SIGMOID",
+        "gray8": [
+          0,
+          30,
+          128,
+          225,
+          255,
+          255
+        ]
+      },
+      "mono1": {
+        "inverted": true,
+        "gray8": [
+          0,
+          255,
+          128,
+          0,
+          0,
+          0
+        ]
+      },
+      "aspect": {
+        "pixel_height_over_width": 2,
+        "aspect_source": "pixel_spacing"
+      },
+      "uniform": {
+        "center": -10,
+        "width": 1,
+        "function": "LINEAR_EXACT",
+        "gray8": [
+          128,
+          128,
+          128,
+          128,
+          128,
+          128
+        ]
+      },
+      "padding": {
+        "default_window": null,
+        "can_window": false,
+        "gray8": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "multiwindow": {
+        "centers": [
+          -10,
+          2036
+        ],
+        "widths": [
+          4,
+          4096
+        ]
+      },
+      "large_sigmoid": {
+        "center": 0,
+        "width": 3e+38,
+        "function": "SIGMOID",
+        "gray8": [
+          250,
+          250,
+          250,
+          250,
+          250,
+          250
+        ]
+      },
+      "opposite_sigmoid": {
+        "center": -2.5e+38,
+        "width": 3.4e+38,
+        "function": "SIGMOID",
+        "gray8": [
+          251,
+          251,
+          251,
+          251,
+          251,
+          251
+        ]
+      },
+      "diagnostics": [
+        "overlay_not_applied",
+        "shutter_not_applied"
+      ]
+    }
+  },
+  "fixture_manifest_evidence": {
+    "path": "$P1_CACHE/pixel-fixtures/manifest.json",
+    "bytes": 14654,
+    "sha256": "d60f84f9bc181641bfe992f11706a23121d09e3a334196b3bfa4bdaa7d9b5487"
+  },
+  "profiles": {
+    "debug": {
+      "automated_status": "pass",
+      "command": "bash scripts/check.sh",
+      "rust_core_passed": 28,
+      "rust_ffi_passed": 7,
+      "reports": {
+        "pixel-contract": {
+          "evidence": {
+            "path": "$P1_CACHE/pixel-contract-debug.json",
+            "bytes": 2568,
+            "sha256": "77f45356ac4a1ee339b3959537b2b072da8ba25994469ee4b0a8851a58c9d71d"
+          },
+          "result": {
+            "apiRevision": 1,
+            "architecture": "arm64",
+            "checks": [
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "main_actor_background_boundary",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "golden_gray-le.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "golden_gray-be.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "golden_gray-implicit.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "golden_rgb.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "rust_handle_and_swift_copy_survive_close",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "swift_budget_alias_and_readmission",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "rust_live_budget_includes_evicted_handles",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "rust_per_frame_limit_before_payload",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "concurrent_separate_immutable_copies",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "invalid_frame_index",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_unsupported-multiframe.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_unsupported-compressed.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_unsupported-enhanced.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_unsupported-overflow.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_malformed.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_missing.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_oversized.dcm",
+                "status": "pass"
+              }
+            ],
+            "coreVersion": "0.1.0",
+            "dicomRSVersion": "0.10.0",
+            "failedCount": 0,
+            "mainActorCallerOnMainThread": true,
+            "notRun": [
+              "Metal presentation and GPU lifetime",
+              "Full DICOM codec support",
+              "Request generation and cancellation"
+            ],
+            "osVersion": "Version 27.0.1 (Build 26A434)",
+            "passed": true,
+            "passedCount": 18,
+            "schemaRevision": 1,
+            "status": "pass",
+            "suite": "P1-PIXEL-SWIFT"
+          }
+        },
+        "native-display": {
+          "evidence": {
+            "path": "$P1_CACHE/native-display-debug.json",
+            "bytes": 3408,
+            "sha256": "4a9fc45698b9fee1ebdc4f8a91d56909209769c2552dff615117e4bfa2ad8156"
+          },
+          "result": {
+            "checks": [
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "main_actor_and_runtime_metal_compilation",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_gray-le.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_gray-be.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_gray-implicit.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-linear.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-exact.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-sigmoid.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-mono1.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-aspect.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-uniform.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-padding.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-large-sigmoid.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-opposite-sigmoid.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "rgb_identity_and_disabled_gray_capabilities",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "multiple_file_windows_and_changed_voi",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "linear_width_one_and_near_one",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "mask_nearest_and_weighted_linear_neighbors",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "aspect_fit_pan_zoom_and_retina_roundtrip",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "reject_invalid_file_voi",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "reject_invalid_override_window",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "shared_generation_rule_rejects_late_completion",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "shared_full_state_restore_and_stale_failure",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "safe_display_limit_diagnostics",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "finite_but_unrepresentable_metal_window_rejected",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "native_frame_larger_than_metal_texture_limit_rejected",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "gpu_uploaded_owner_survives_copy_release",
+                "passed": true
+              }
+            ],
+            "failedCount": 0,
+            "notRun": [
+              "Physical monitor calibration",
+              "Compressed and Enhanced DICOM",
+              "Rotation and annotation transforms"
+            ],
+            "passed": true,
+            "passedCount": 26,
+            "suite": "P1-DISPLAY-APP"
+          }
+        },
+        "bootstrap": {
+          "evidence": {
+            "path": "$P1_CACHE/bootstrap-debug.json",
+            "bytes": 103,
+            "sha256": "42ae81196af40318ce4ac54166ea1cb4f82967b9976bb302ae335c179955d656"
+          },
+          "result": {
+            "api_revision": 1,
+            "core_version": "0.1.0",
+            "dicom_rs_version": "0.10.0",
+            "frame_decode_implemented": false
+          }
+        }
+      },
+      "raw_log": {
+        "path": "$P1_CACHE/display-check-debug.log",
+        "bytes": 12287,
+        "sha256": "32ecf89f7e9bd4e4742f5c59d3121959b181b10e6fed019be71f7f82f20d820f"
+      },
+      "binaries": [
+        {
+          "path": "$P1_CACHE/app-debug/DICOM Viewer.app/Contents/MacOS/ViewerApp",
+          "bytes": 17026416,
+          "sha256": "fc25d9ef96675b5d5ee0343f5442a16e254eeb1c592f643f0b78e0c4f6065594"
+        },
+        {
+          "path": "$P1_CACHE/swift-debug/out/Products/Debug/ViewerContractChecks",
+          "bytes": 16662976,
+          "sha256": "6d76de036f1aa3a26596c168d0b778cb8c7376c67a18d0c2fb4147d01f972c8a"
+        },
+        {
+          "path": "$P1_CACHE/swift-debug/out/Products/Debug/ViewerDisplayChecks",
+          "bytes": 16858704,
+          "sha256": "ff96ba7f933c68b793f86ebb90a884f8143a6e217455ecffad9af1284277e472"
+        }
+      ],
+      "mach_o": {
+        "architecture": "arm64",
+        "minos": "27.0",
+        "external_rust_dylib": false,
+        "adhoc_strict_signature_status": "pass"
+      },
+      "latest_required_ui": {
+        "status": "not-run",
+        "reason": "Mac locked after final re-presentation correction; manual unlock requested"
+      }
+    },
+    "release": {
+      "automated_status": "pass",
+      "command": "bash scripts/check.sh --release",
+      "rust_core_passed": 28,
+      "rust_ffi_passed": 7,
+      "reports": {
+        "pixel-contract": {
+          "evidence": {
+            "path": "$P1_CACHE/pixel-contract-release.json",
+            "bytes": 2568,
+            "sha256": "77f45356ac4a1ee339b3959537b2b072da8ba25994469ee4b0a8851a58c9d71d"
+          },
+          "result": {
+            "apiRevision": 1,
+            "architecture": "arm64",
+            "checks": [
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "main_actor_background_boundary",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "golden_gray-le.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "golden_gray-be.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "golden_gray-implicit.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "golden_rgb.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "rust_handle_and_swift_copy_survive_close",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "swift_budget_alias_and_readmission",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "rust_live_budget_includes_evicted_handles",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "rust_per_frame_limit_before_payload",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "concurrent_separate_immutable_copies",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "invalid_frame_index",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_unsupported-multiframe.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_unsupported-compressed.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_unsupported-enhanced.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_unsupported-overflow.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_malformed.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_missing.dcm",
+                "status": "pass"
+              },
+              {
+                "detail": "expected values and lifetime/budget conditions matched",
+                "id": "reject_oversized.dcm",
+                "status": "pass"
+              }
+            ],
+            "coreVersion": "0.1.0",
+            "dicomRSVersion": "0.10.0",
+            "failedCount": 0,
+            "mainActorCallerOnMainThread": true,
+            "notRun": [
+              "Metal presentation and GPU lifetime",
+              "Full DICOM codec support",
+              "Request generation and cancellation"
+            ],
+            "osVersion": "Version 27.0.1 (Build 26A434)",
+            "passed": true,
+            "passedCount": 18,
+            "schemaRevision": 1,
+            "status": "pass",
+            "suite": "P1-PIXEL-SWIFT"
+          }
+        },
+        "native-display": {
+          "evidence": {
+            "path": "$P1_CACHE/native-display-release.json",
+            "bytes": 3408,
+            "sha256": "4a9fc45698b9fee1ebdc4f8a91d56909209769c2552dff615117e4bfa2ad8156"
+          },
+          "result": {
+            "checks": [
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "main_actor_and_runtime_metal_compilation",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_gray-le.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_gray-be.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_gray-implicit.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-linear.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-exact.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-sigmoid.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-mono1.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-aspect.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-uniform.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-padding.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-large-sigmoid.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "cpu_and_gpu_literal_display-opposite-sigmoid.dcm",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "rgb_identity_and_disabled_gray_capabilities",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "multiple_file_windows_and_changed_voi",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "linear_width_one_and_near_one",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "mask_nearest_and_weighted_linear_neighbors",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "aspect_fit_pan_zoom_and_retina_roundtrip",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "reject_invalid_file_voi",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "reject_invalid_override_window",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "shared_generation_rule_rejects_late_completion",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "shared_full_state_restore_and_stale_failure",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "safe_display_limit_diagnostics",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "finite_but_unrepresentable_metal_window_rejected",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "native_frame_larger_than_metal_texture_limit_rejected",
+                "passed": true
+              },
+              {
+                "detail": "expected descriptor, pixels, or ownership matched",
+                "id": "gpu_uploaded_owner_survives_copy_release",
+                "passed": true
+              }
+            ],
+            "failedCount": 0,
+            "notRun": [
+              "Physical monitor calibration",
+              "Compressed and Enhanced DICOM",
+              "Rotation and annotation transforms"
+            ],
+            "passed": true,
+            "passedCount": 26,
+            "suite": "P1-DISPLAY-APP"
+          }
+        },
+        "bootstrap": {
+          "evidence": {
+            "path": "$P1_CACHE/bootstrap-release.json",
+            "bytes": 103,
+            "sha256": "42ae81196af40318ce4ac54166ea1cb4f82967b9976bb302ae335c179955d656"
+          },
+          "result": {
+            "api_revision": 1,
+            "core_version": "0.1.0",
+            "dicom_rs_version": "0.10.0",
+            "frame_decode_implemented": false
+          }
+        }
+      },
+      "raw_log": {
+        "path": "$P1_CACHE/display-check-release.log",
+        "bytes": 12971,
+        "sha256": "3d6cfe8c425483c135a3d37f6ae8c2390f38264c0460ef7b661fa3f244ad48b5"
+      },
+      "binaries": [
+        {
+          "path": "$P1_CACHE/app-release/DICOM Viewer.app/Contents/MacOS/ViewerApp",
+          "bytes": 3498160,
+          "sha256": "4e5587fe568ccb7a76f165bb902cb2510899a8988946185746c0ec216b65b1ee"
+        },
+        {
+          "path": "$P1_CACHE/swift-release/out/Products/Release/ViewerContractChecks",
+          "bytes": 3379400,
+          "sha256": "7dad62ca3866c7f583875e7eff368c722a9c165cbd60d52be734018f509d9615"
+        },
+        {
+          "path": "$P1_CACHE/swift-release/out/Products/Release/ViewerDisplayChecks",
+          "bytes": 3513424,
+          "sha256": "640fcaff9d9acf2a3c0561fd03674e5ea41857a1f09b3b229f346b639b0faf09"
+        }
+      ],
+      "mach_o": {
+        "architecture": "arm64",
+        "minos": "27.0",
+        "external_rust_dylib": false,
+        "adhoc_strict_signature_status": "pass"
+      },
+      "latest_required_ui": {
+        "status": "not-run",
+        "reason": "Mac locked after final re-presentation correction; manual unlock requested"
+      }
+    }
+  },
+  "historical_ui_note": "Earlier startup native drawable smoke passed debug/release before final one-shot re-presentation correction. Manual NSOpenPanel opening then exposed endless Loading. Final correction is source-reviewed and automatically built/tested but its actual UI regression is not-run due to Mac lock. Earlier UI JSONs must not be treated as current-source UI results.",
+  "review": {
+    "state": "conditional_source_and_automated_evidence_reviewed_final_ui_pending",
+    "open_source_findings": 0,
+    "final_ui_acceptance": "not-run",
+    "fixes": [
+      "LINEAR near-width-one precision",
+      "SIGMOID intermediate multiplication and delta overflow",
+      "full previous state restoration and stale error rejection",
+      "safe diagnostic visibility and popup selection consistency",
+      "maximum texture dimension rejection",
+      "actual presentation retries after sheet/resize skipped drawables"
+    ],
+    "independent_source_hashes_verified": 35,
+    "independent_generated_hashes_verified": 3,
+    "independent_fixture_hashes_verified": 24,
+    "independent_binary_hashes_verified": 6,
+    "independent_raw_log_hashes_verified": 2,
+    "independent_report_hashes_verified": 6,
+    "independent_pydicom_fixtures_parsed": 13,
+    "reviewer_rebuilt_or_launched_app": false,
+    "conclusion": "No open mandatory source finding; DISPLAY-1 remains incomplete until the final actual native UI regression is run."
+  },
+  "remaining_not_run": [
+    "Current actual NSOpenPanel opening reaches Ready",
+    "Current actual failed candidate preserves prior user VOI/invert/zoom/pan and allows retry",
+    "Current actual diagnostic/RGB controls and resize observation",
+    "Compressed/Enhanced/multiframe/LUT support",
+    "Rotation/annotation/PNG transforms",
+    "Physical monitor calibration/color profiles",
+    "Full parser/engine/GPU/RSS and performance limits",
+    "P5 distribution installation/notarization"
+  ],
+  "pixel_suite_note": "The PIXEL report notRun fields are scoped to that suite; DISPLAY tests independently exercise GPU/generation policies.",
+  "p0_preservation": "No experiments/P0 tracked changes; source DICOM hashes unchanged"
+}

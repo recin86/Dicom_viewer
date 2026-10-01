@@ -121,7 +121,7 @@ public final class ViewerPixelSession: @unchecked Sendable {
             try requireBackgroundThread()
             do {
                 let handle = try raw.prepareNativeFrame(path: path, frameIndex: frameIndex)
-                let frame = PreparedPixelFrame(raw: handle)
+                let frame = try PreparedPixelFrame(raw: handle)
                 _ = try frame.info.validatedSizes()
                 return frame
             } catch {
@@ -155,11 +155,24 @@ public final class ViewerPixelSession: @unchecked Sendable {
 /// An immutable Rust payload owner. Its ticket and generated handle stay private.
 public final class PreparedPixelFrame: @unchecked Sendable {
     public let info: PixelFrameMetadata
+    public let display: FrameDisplayInfo
     private let raw: PixelHandle
 
-    fileprivate init(raw: PixelHandle) {
+    fileprivate init(raw: PixelHandle) throws {
         self.raw = raw
         info = PixelFrameMetadata(raw: raw.info())
+        display = FrameDisplayInfo(try raw.displayInfo())
+        try display.validate(format: info.pixelFormat)
+    }
+
+    /// Bounded CPU oracle for small display checks, never the app's display path.
+    public func referenceRGBA(window: VoiWindow? = nil, userInvert: Bool = false) async throws -> [UInt8] {
+        let raw = raw
+        return try await Task.detached {
+            try requireBackgroundThread()
+            do { return Array(try raw.referenceRgba(window: window?.raw, userInvert: userInvert)) }
+            catch { throw translatedPixelError(error) }
+        }.value
     }
 
     /// Make one separately charged, immutable Swift copy. No caller-owned writable
@@ -167,6 +180,7 @@ public final class PreparedPixelFrame: @unchecked Sendable {
     public func copy(using budget: PixelCopyBudget) async throws -> OwnedPixelFrame {
         let raw = raw
         let info = info
+        let display = display
         return try await Task.detached {
             try requireBackgroundThread()
             let sizes = try info.validatedSizes()
@@ -202,7 +216,7 @@ public final class PreparedPixelFrame: @unchecked Sendable {
                 }
             }
             let result = OwnedPixelFrame(
-                info: info, pixels: pixels, mask: mask,
+                info: info, display: display, pixels: pixels, mask: mask,
                 pixelBytes: sizes.pixels, maskBytes: sizes.mask, lease: lease
             )
             transferred = true
@@ -215,6 +229,7 @@ public final class PreparedPixelFrame: @unchecked Sendable {
 /// Storage is inaccessible except through synchronous read-only borrowed closures.
 public final class OwnedPixelFrame: @unchecked Sendable {
     public let info: PixelFrameMetadata
+    public let display: FrameDisplayInfo
     private let pixels: UnsafeMutableRawPointer
     private let mask: UnsafeMutableRawPointer?
     private let pixelBytes: Int
@@ -222,11 +237,12 @@ public final class OwnedPixelFrame: @unchecked Sendable {
     private let lease: PixelCopyLease
 
     fileprivate init(
-        info: PixelFrameMetadata, pixels: UnsafeMutableRawPointer,
+        info: PixelFrameMetadata, display: FrameDisplayInfo, pixels: UnsafeMutableRawPointer,
         mask: UnsafeMutableRawPointer?, pixelBytes: Int, maskBytes: Int,
         lease: PixelCopyLease
     ) {
         self.info = info
+        self.display = display
         self.pixels = pixels
         self.mask = mask
         self.pixelBytes = pixelBytes

@@ -144,6 +144,10 @@ P0 종료(2026-09-30)에서 고정한 값: Rust 1.98.1(aarch64-apple-darwin), Un
 
 P1 PIXEL-1(2026-10-01): `bash scripts/check.sh`와 `--release`는 fmt/clippy, Rust core 16+FFI 6, 실제 native 합성 DICOM→Swift 계약 18, bootstrap과 원본 hash 보존을 검증한다. 별도 debug/release 앱 UI smoke도 실행했다. [결과](implementation/results/P1-pixel-contract.json)는 소스·바이너리·fixture hash와 macOS 27.0.1 환경을 기록한다. T-03~05의 좁은 native 변환, T-11의 payload 수명과 T-13의 payload 예산 일부에 해당한다. 요청 generation·GPU 완료·전체 parser/codec/engine 한도·RSS와 정식 설치는 미검증으로 유지한다.
 
+후속 DISPLAY-1의 최신 명령은 debug/release 각각 Rust core28+FFI7, PIXEL18, Metal26을 실행한다. 동일 F32 입력의 작은 CPU reference 및 독립 literal과 GPU를 전 픽셀 비교하며 T-04/T-11/T-12/T-21 일부(VOI·mask·수명·generation/state 정책·비율/Retina)를 확인했다. fixture24개, 코드/생성물/binary/log hash는 [표시 결과](implementation/results/P1-native-display.json)에 둔다. 마지막 사용자 파일 선택 창의 Loading 문제를 보완한 뒤 `--ui`·실제 설정 복구 관찰은 Mac 잠금 때문에 **not-run**이다. 따라서 DISPLAY-1 완료와 전체 P1 합격은 보류한다. 잠금 해제 후 [재개 절차](implementation/P1-native-display.md)를 따르며 물리 모니터 보정·회전/PNG·전체 codec·전체 자원/성능·P5는 별도다.
+
+COLOR-1은 사용자 지시에 따라 해당 UI 회귀 대기와 독립적으로 진행했다. 최신 `check.sh`·`--release` 각각 fmt/clippy·Rust core38+FFI7·PIXEL18·DISPLAY26·COLOR29 pass다. T-05의 SC unsigned8 planar RGB/YBR_FULL·even-width YBR_FULL_422를 literal과 전 픽셀 비교하고, T-11/T-13의 확장 RGBA 예산·close 후 copy/GPU 마지막 owner를 확인했다. 새로운 [컬러 결과](implementation/results/P1-native-color.json)가 source39/generated3/fixture50/binary8/log2/report8의 최신 근거다. 이전 DISPLAY 결과는 당시의 snapshot으로 보존한다. 실제 사용자 UI·full IOD/모니터색/US·Palette·압축 지원은 별도 미검증이며 전체 P1 판정을 올리지 않는다.
+
 개인용 설치는 일반 `.app` 패키지를 목표로 한다. Apple Silicon/Intel 모두 지원할 경우 각 아키텍처 라이브러리와 모든 codec 의존성을 검사하고 적절한 범용 패키징을 수행한다. Intel 지원을 실제 Intel에서 검증했는지 Rosetta에서만 검증했는지 구분한다.
 
 서명, Sandbox, notarization과 배포 채널은 OQ-05에서 정한다. 개발 중 로컬 실행과 다른 Mac으로 배포하는 경우를 구분하고, 배포 방식을 확정할 때 Apple의 최신 지침을 다시 확인한다. 인증서나 개발자 계정이 이미 준비됐다고 가정하지 않는다. [Apple macOS 배포 공증 안내](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution)

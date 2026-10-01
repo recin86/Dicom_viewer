@@ -2,13 +2,15 @@
 
 상태: 제안. 날짜: 2026-09-30. 결정 시점: P0/P1. 관련 문서: [DICOM 지원 명세](../03-dicom-support.md), [시스템 아키텍처](../02-system-architecture.md), [화면과 조작](../05-ui-and-interaction.md).
 
+2026-10-01 구현 근거: [DISPLAY-1](../implementation/P1-native-display.md)에서 AppKit/MTKView·GrayF32LE/r32Float·RGBA8·mask와 runtime Metal 표시를 연결했다. debug/release의 실제 GPU 기준 시험26개가 통과했으며 단일 파일 source/generation·소유 수명을 검증했다. 최종 파일 선택 창 사용자 경로의 회귀가 Mac 잠금으로 남아 있어 채택/단계 완료 판정은 보류한다. 전체 Series/display set/FrameRef와 SwiftUI 일반 화면은 아직 제안이다.
+
 ## 배경
 
 CT/MR 스택, X-ray 정지 영상과 US cine는 서로 다른 탐색 방식이 필요하지만 영상 표시와 확대·이동은 공유할 수 있다. window/level을 조작할 때마다 CPU에서 전체 이미지를 다시 만드는 경로는 피하고, 표시와 수치 계산의 의미를 분리할 필요가 있다.
 
 ## 선택 제안
 
-SwiftUI로 일반 화면을 만들고 AppKit 기반 viewport와 MTKView를 연결한다. Rust가 프레임의 의미와 표시 설명을 제공하고 Metal은 텍스처에 VOI와 화면 변환을 적용한다.
+초기 제품은 AppKit 화면과 MTKView를 연결했고 SwiftUI 일반 화면은 후속 선택안이다. Rust가 프레임의 의미와 표시 설명을 제공하고 Metal은 텍스처에 VOI와 화면 변환을 적용한다.
 
 도메인 모델은 Series 아래에 display set과 frame reference를 둔다. 탐색은 정지 영상, 공간 스택, 시간 시퀀스와 순서 목록으로 구분한다. 하나의 DICOM 파일을 하나의 이미지 또는 모든 시리즈를 3D 볼륨으로 고정하지 않는다.
 

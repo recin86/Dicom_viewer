@@ -2,6 +2,43 @@
 
 이 문서는 작업별 변경과 검증·인수인계의 이력을 보존한다. 현재 상태는 [PROGRESS.md](../../PROGRESS.md), 작성 규칙은 [진행 기록 안내](README.md)를 따른다. 오래된 기록은 당시 관찰이며 현재 상태를 자동 보장하지 않는다.
 
+## 2026-10-01 · P1-COMMIT-20261001 · 사용자 요청으로 현재 작업 로컬 커밋
+
+- 사용자 지시: "일단 여기까지 커밋". Codex/root가 `codex/p1-foundation`/기준 `c68c9208` 이후 native 표시·컬러 경계 준비·SC 컬러와 중앙 문서/검증 기록을 한 후속 커밋에 포함했다. 현재 실행 중인 소스 작성자 없음, core/app 작성권 반환 및 독립 reviewer 최종 결과 회수 확인. 커밋 식별자는 `git log -1`로 확인한다.
+- 검토된 source39/generated3 hash와 현재 구현의 일치를 재확인, `git diff --check` pass, P0 diff 없음. 기존 debug/release 각각 Rust45·PIXEL18·DISPLAY26·COLOR29 pass 및 필수 리뷰 결함0을 보존했다. 이번에는 인수인계의 커밋 상태만 추가 갱신했고 제품 코드는 바꾸지 않았다.
+- 실제 UI/전체 지원 not-run을 커밋 메시지와 인수 기록에 유지한다. raw 로그·생성 binding·binary·DICOM은 Git 제외, 원격 push 없음. 후속은 최신 실제 UI 회귀와 독립적인 Palette16 LUT 과업이다. 결과 JSON의 baseline/uncommitted는 시험 당시 상태를 나타내며 과거 snapshot은 재작성하지 않는다.
+
+## 2026-10-01 · P1-COLOR-20261001 · native SC 컬러 자동 검증 완료
+
+- 사용자 지시: "일단 다음단계진행". UI를 기다리지 않고 독립적인 SC컬러 producer/자동소비자 시험을 진행한다. DISPLAY 실제NSOpenPanel/presentation 회귀는 private컬러 수치계약의 의존성이 아니므로 분리하고 UI/전체지원 완료판정은 보류한다. 기준 c68c9208+이전DISPLAY/준비 미커밋변경 보존.
+- [새 컬러 과업](P1-native-color.md)에 작성권/기존revision/독립literal/시험을 등록했다. core는 native/privatecolor/lib와Rust시험, app은새ViewerColorChecks만, main은Package/check/FFI필요변경/문서/fixture/결과를 맡는다. 최종reviewer는읽기전용. source작성범위를겹치지않고 기존App/Rendering/Bridge를보존한다.
+- 구현: core `native.rs`·신규 `native_color.rs`·`lib.rs`, 신규 Swift ViewerColorChecks, Package/check 연결. RGB planar0/1·YBR_FULL planar0/1·even-width422 planar0를 RGBA8로 한 번 정규화. 기존 API/revision/generated3·App/Bridge/Rendering·fixture generator2/manifest와 P0는 보존.
+- 실제 최종 자동 실행: `bash scripts/check.sh`·`--release` 각각exit0, fmt/clippy·Rust38+FFI7·PIXEL18·DISPLAY26·COLOR29 pass. 정상7종·오류19종과 source/원본hash·선형보간·W/L/invert무변화·확장payload budget·close/copy/GPUlastowner 확인. source39/gen3/fixture50/binary8/log2/report8은 [컬러JSON](results/P1-native-color.json). 양쪽 bundle strict/deep ad-hoc 서명·8실행파일arm64/minos27/staticRust 확인.
+- core/app 작성권 반환·소스 동결. 독립 reviewer 최종 저장 근거 크기/hash·embedded JSON과 서명/링크 대조 pass, 필수 결함0. YBR 전체8-bit 조합 독자수치비교 최대차1로 허용범위 충족. 좁은 COLOR-1 자동 범위 완료, 실제 사용자 UI 회귀와 전체 지원은 별도not-run. 기존 DISPLAY/준비JSON은 당시snapshot으로 보존하며 현재 캐시binary로 역사적hash를 재해석하지 않는다. 변경은 앞선 작업과 함께 미커밋·push 없음.
+
+## 2026-10-01 · P1-ADAPTER-PREP-20261001 · 다음 묶음 독립 준비 착수
+
+- 사용자 요청: 다음 단계 진행. 실제 `codex/p1-foundation`/HEAD `c68c9208`와 이전 DISPLAY 미커밋 변경·반환 작성권을 대조했다. 현재 DISPLAY 최종 UI는 다시 확인해도 Mac 잠금으로 `not-run`이며 잠금 해제를 비동기 요청했다.
+- [컬러·코덱 경계 준비](P1-color-boundary.md)에 별도 task와 작성권을 등록했다. core는 P0 실패와 다음 최소 adapter 범위 읽기 전용 조사, root는 독립 literal fixture writer/별도 cache/manifest, reviewer는 준비 결과 읽기 전용 검토를 맡는다. 현재 제품 소스/FFI/DISPLAY fixture·결과/P0 변경 없음.
+- 의존 제품 구현은 DISPLAY 실제 회귀 뒤 진행한다. 조사·fixture 준비는 독립적으로 진행하며 준비 완료를 제품 색/codec 지원으로 판정하지 않는다. source와 UI 작업의 작성권은 main, 중앙 문서 작성권은 root다. 새 준비 변경은 미커밋이며 push 없음.
+- 준비 실행: 별도cache에서 writer2회·pydicom3.0.2/numpy2.5.3/Python3.12.13 readback으로26개 preparation pass/0fail, 정상후보11/raw전용3 stored/RGB/RGBA literal 정확일치·negative15 metadata 경계·반복26byte일치. oracle오염/filebyte변경 두 주입은 각각 rgb_literal/file_hash와exit1을 검출. 초기USplanar/Paletteindex규칙과implicitVR검증 오판을 수정했고, reviewer가 C.8.5.6.1.2의 USnative Photometric 제약을 추가지적해 USYBR3개를 unsupported/rawreadback전용으로 분리했다(manifestrev2/v2cache, 이전오판이력보존). PythonAST/diff검사, 기존DISPLAY35/gen3/fixture24보존과P0동결 확인. [준비JSON](results/P1-color-preparation.json)에source2/fixture형식/hash/실제readback·controls를 기록했다. 독립 reviewer 최종hash 읽기전용검토 중.
+- 최종 반환: reviewer는 source2·manifest2·fixture26/repeat26·readback/controls와실패주입report 크기/hash/내용을 대조했고, 독자 pydicom/BT.601/palette계산으로 raw14와negative15를 확인했다. 열린 필수결함0·준비완료. 검증CLI/fixture생성/빌드/앱기동/파일수정은 수행하지 않았다. 마지막 main CUA재시도까지3회 Mac잠금 유지. 독립준비만완료, COLOR제품/adapter거부 및 DISPLAY최종UI는not-run·완료보류. 실행 중인 소스 작성 없음·작성권 반환, 새로운4파일/중앙문서와기존DISPLAY는미커밋·push없음. 다음은 잠금해제→DISPLAY실제회귀/review/commit→컬러첫substep구현.
+
+## 2026-10-01 · P1-DISPLAY-20261001 · 구현·자동 검증, 최종 UI 대기
+
+- 완료한 선행 골격/PIXEL-1은 `c68c9208be771e366fe0824d0a7a8291eb679597`으로 커밋했고 직후 clean 확인, push 없음. 이후 묶음3 변경은 미커밋이며 기존 P0는 동결 유지.
+- 구현: core DISPLAY-1 VOI·auto range·극성·padding·aspect·안전단위/diagnostics·동일입력SHA256·≤64KiB CPU reference, FFI/Swift immutable display bridge, AppKit native 파일 열기/상태복구·generation·Metal/shader/fit·확대/이동·CLI, sha2 lock·Package·fixture24·check 및 중앙 문서.
+- 최종 자동 실행: macOS27.0.1/M5/16GiB에서 `bash scripts/check.sh`, `bash scripts/check.sh --release` 각각 fmt/clippy·locked Rust core28+FFI7·PIXEL18·Metal26·bootstrap·원본 hash 보존 pass. source35/generated3/fixture24/debug-release binary6/log2 해시 및 결과는 [P1-native-display.json](results/P1-native-display.json). 두 local ad-hoc bundle strict/deep signature·arm64/minos27/static Rust 직접 확인.
+- 독립 reviewer 조건부 최종 반환: 근접 폭1 LINEAR·큰 SIGMOID 수치 overflow, 이전 전체 표시 상태 복구·stale failure, 제한 설명·window popup·texture bound·실제 presentation 재표시 수정 확인. 열린 필수 소스 결함0. source35/generated3/fixture24/binary6/log2/report6 크기·해시·실제 JSON 일치, pydicom13종 read-only 별도 파싱·서명/링크 직접 확인. reviewer는 재빌드·앱 실행·fixture 생성하지 않았고 실제 UI 미실행으로 완료 보류.
+- 실제 UI: 마지막 재표시 수정 전 startup native drawable smoke는 두 profile pass. CUA 수동 NSOpenPanel 선택에서는 첫 frame이 보이나 Loading/disabled가 남는 문제를 발견. 후보의 실제 presentedTime>0 승인까지 연속 draw, Ready/Fail/새load/close 때 on-demand 복귀로 보완. 이후 자동26개는 pass지만 실제 panel/사용자설정복구·진단/RGB·최신 startup UI는 **not-run (Mac 잠금, 비동기 잠금 해제 요청)**. 완료 판정 보류.
+- 인수: core/app 소스 작성 종료·main에 반환. 새 작성 없음. 잠금 해제 후 기존 앱 종료·최신 debug/release `--ui`, 실제 파일 선택 창→Ready, 사용자 대비/반전/확대/이동 뒤 encode실패→복구/재시도, 제한/RGB controls를 AX·screenshot/선택적safe trace로 확인하고 reviewer/해시를 갱신한다. 전체codec/LUT/Enhanced·회전/측정/PNG·성능/전체RSS·P5는 후속. 상세 재개 절차는 [표시 기록](P1-native-display.md).
+
+## 2026-10-01 · P1-DISPLAY-20261001 · 커밋과 표시 착수
+
+- 사용자 요청: 커밋하고 다음 단계 진행. reviewed 골격·PIXEL-1 변경 42파일을 `c68c920`으로 커밋, 이후 working tree clean 확인. push 없음. 이전 JSON은 검증 당시 상태로 보존한다.
+- [표시 계획](P1-native-display.md)에 DISPLAY-1·작성권·native 단일 파일→표시 목표·T-04/T-11/T-12/T-16/T-21 부분 검증을 등록. core 표시 설명·CPU 기준, 앱 Metal/열기와 main FFI/bridge/공통 빌드를 분리 배정하며 최종 독립 리뷰 수행.
+- 상태 running, 검증 not-run. 압축/Enhanced/다중frame·폴더/시리즈·측정은 후속.
+
 ## 2026-10-01 · P1-PIXEL-CONTRACT-20260930 · Codex 완료
 
 - 사용자 요청의 다음 단계(P1 묶음 2) 완료. `codex/p1-foundation`/`ca9e8b8`와 골격 미커밋 변경을 보존. commit/push 없음, 모든 core/app/main/reviewer 배정 종료·작성권 반환.

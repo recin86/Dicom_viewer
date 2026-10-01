@@ -6,6 +6,9 @@ import ViewerBridge
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let readiness: ViewerReadiness
     private let uiSmoke: Bool
+    private let initialPath: String?
+    private let displaySmoke: Bool
+    private var pendingDisplayReport: DisplaySmokeReport?
     private var viewerWindow: ViewerWindow?
     private var openMenuItem: NSMenuItem?
     private var quitMenuItem: NSMenuItem?
@@ -15,9 +18,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var launchDate: Date?
     private(set) var didEmitUISmokeReport = false
 
-    init(readiness: ViewerReadiness, uiSmoke: Bool) {
+    init(readiness: ViewerReadiness, uiSmoke: Bool, initialPath: String? = nil, displaySmoke: Bool = false) {
         self.readiness = readiness
         self.uiSmoke = uiSmoke
+        self.initialPath = initialPath
+        self.displaySmoke = displaySmoke
         super.init()
     }
 
@@ -29,6 +34,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         viewerWindow.window.center()
         viewerWindow.window.makeKeyAndOrderFront(nil)
         NSApplication.shared.activate()
+
+        if displaySmoke {
+            viewerWindow.presentationObserver = { [weak self] success, generation, info in
+                guard let self, pendingDisplayReport == nil else { return }
+                pendingDisplayReport = DisplaySmokeReport(passed: success, generation: generation,
+                                                          presentation: success, width: info?.width, height: info?.height)
+                requestedSmokeClose = true
+                viewerWindow.window.performClose(nil)
+            }
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(20))
+                guard let self, !didEmitUISmokeReport else { return }
+                SmokeOutput.write(LaunchFailure(reason: "presentation_timeout")); exit(1)
+            }
+        }
+        if let initialPath { viewerWindow.load(path: initialPath) }
 
         if uiSmoke {
             Task { @MainActor [weak self] in
@@ -44,6 +65,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        if displaySmoke {
+            guard var report = pendingDisplayReport else {
+                SmokeOutput.write(LaunchFailure(reason: "display_terminated_before_observation")); exit(1)
+            }
+            report.lastWindowCloseTriggeredTermination = requestedSmokeClose && lastWindowPolicyConsulted
+            report.passed = report.passed && report.lastWindowCloseTriggeredTermination
+            didEmitUISmokeReport = true
+            SmokeOutput.write(report)
+            if !report.passed { exit(1) }
+            return
+        }
         guard uiSmoke else { return }
         guard var report = pendingUISmokeReport else {
             didEmitUISmokeReport = true
@@ -76,10 +108,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let fileMenu = NSMenu(title: "파일")
         fileMenu.autoenablesItems = false
-        let open = fileMenu.addItem(withTitle: "열기…", action: nil, keyEquivalent: "o")
+        let open = fileMenu.addItem(withTitle: "열기…", action: #selector(ViewerWindow.openFile(_:)), keyEquivalent: "o")
+        open.target = viewerWindow
         open.keyEquivalentModifierMask = [.command]
-        open.isEnabled = readiness.canOpenDicom
-        open.toolTip = "영상 열기 기능을 준비하고 있습니다."
+        open.isEnabled = ViewerBridge.nativeDisplayAvailable()
+        open.toolTip = "단일 영상 파일 열기"
         openMenuItem = open
         fileMenu.addItem(.separator())
         let close = fileMenu.addItem(withTitle: "창 닫기", action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w")

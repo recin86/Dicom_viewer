@@ -10,3 +10,4 @@ dicom-object.workspace = true
 dicom-pixeldata.workspace = true
 dicom-transfer-syntax-registry.workspace = true
 libc.workspace = true
+sha2.workspace = true

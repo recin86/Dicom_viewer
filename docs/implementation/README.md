@@ -10,7 +10,7 @@
 | [work-log.md](work-log.md) | 날짜·task ID별 변경, 판단 근거, 실행 결과와 인수인계 이력 | 조정 담당 AI; 기존 기록은 보존 |
 | `<단계>-<주제>.md` | 해당 단계의 작업 배정, 파일 작성권, 계약 revision, 시험 증거와 종료 판정 | 해당 단계의 조정 담당 AI |
 
-단계 계획은 실제 착수할 때 [계획 양식](../../.agents/skills/dicom-orchestrate/assets/stage-plan.md)을 구체화한다. P0~P5의 비어 있는 완료 보고서를 미리 만들지 않는다. 현재 제품 단계 계획은 [P1 한 프레임 표시](P1-single-frame.md)이며, 묶음 2는 [P1 제품 픽셀 계약](P1-pixel-contract.md)에 기록한다. 기술 검증 이력은 [P0 계획](P0-tech-data.md)과 [P0 종료 기록](P0-closeout.md)에 있다.
+단계 계획은 실제 착수할 때 [계획 양식](../../.agents/skills/dicom-orchestrate/assets/stage-plan.md)을 구체화한다. P0~P5의 비어 있는 완료 보고서를 미리 만들지 않는다. 현재 제품 단계 계획은 [P1 한 프레임 표시](P1-single-frame.md), 묶음 2는 [픽셀 계약](P1-pixel-contract.md), 묶음 3은 [native 표시](P1-native-display.md)에 기록한다. 묶음 4의 독립 조사·fixture 준비는 [컬러 경계 준비](P1-color-boundary.md), 첫 SC 제품 변환은 [native 컬러](P1-native-color.md)에 둔다. 기술 검증 이력은 [P0 계획](P0-tech-data.md)과 [P0 종료 기록](P0-closeout.md)에 있다.
 
 ## 모든 AI의 작업 시작 절차
 

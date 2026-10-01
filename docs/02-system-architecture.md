@@ -2,7 +2,7 @@
 
 이 문서는 Rust 영상 코어와 Swift macOS 앱의 책임 및 실행 흐름을 정의한다. 목표는 DICOM의 의미와 수치 처리를 화면에서 독립적으로 검증하고, macOS의 입력과 GPU 표시 기능을 직접 활용하는 구조다.
 
-문서 버전 0.2 · 작성·검토일 2026-09-30 · 상태 검토·보완한 설계 초안. Rust/dicom-rs와 Swift의 사용은 확정 사항이다. UniFFI 연결과 픽셀 전달 방식은 P0 종료에서 채택했다(ADR 0002). SwiftUI/AppKit/Metal, SQLite와 아래 모듈 분할은 설계 제안이다.
+문서 버전 0.2 · 작성·검토일 2026-09-30 · 상태 검토·보완한 설계 초안. Rust/dicom-rs와 Swift의 사용은 확정 사항이다. UniFFI 연결과 픽셀 전달 방식은 P0 종료에서 채택했다(ADR 0002). AppKit/Metal의 좁은 native 표시 경로는 P1에서 구현·검증 중이며 SwiftUI 일반 화면, SQLite와 전체 모듈 분할은 후속 제안이다.
 
 ## 구성과 책임
 
@@ -42,7 +42,7 @@ SwiftUI에 AppKit 뷰를 넣는 경계에는 NSViewRepresentable을 사용하고
 
 초기에는 Rust 모듈로 책임을 나누고, 실제 재사용이나 빌드 시간의 이점이 있을 때 crate를 분리한다. 범용성을 이유로 첫 단계부터 과도한 인터페이스 계층이나 플러그인 시스템을 만들지 않는다.
 
-P1 골격에서 `viewer-core`, `viewer-ffi`, `macos`, `scripts`를 생성했다. 후속 PIXEL-1은 코어의 불변 frame/budget·좁은 native adapter, FFI session/handle·C copy, Swift 소유 버퍼를 연결한다([픽셀 계약](implementation/P1-pixel-contract.md)). 앱은 아직 AppKit 기본 창만 제공한다. 아래 domain/engine/persistence 등의 전체 모듈은 후속 계획이다.
+P1 골격에서 `viewer-core`, `viewer-ffi`, `macos`, `scripts`를 생성했다. PIXEL-1은 코어의 불변 frame/budget·좁은 native adapter, FFI session/handle·C copy, Swift 소유 버퍼를 연결한다([픽셀 계약](implementation/P1-pixel-contract.md)). DISPLAY-1은 Rust의 표시 설명·동일 입력 hash, Swift의 파일별 session/generation, AppKit/MTKView·Metal과 작은 CPU 기준 비교를 연결한다([표시 기록](implementation/P1-native-display.md)). 아래 domain/engine/persistence 등의 전체 모듈은 후속 계획이다.
 
 ```text
 crates/viewer-core/    domain, dicom, engine, measurement, persistence
